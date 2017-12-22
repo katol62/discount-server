@@ -1,0 +1,26 @@
+div.navbar.navbar-default.navbar-fixed-top(role='navigation')
+    div.container
+        div.navbar-header
+            button.navbar-toggle(type='button', data-toggle='collapse', data-target='.navbar-collapse')
+                span.icon-bar
+                span.icon-bar
+                span.icon-bar
+            a.navbar-brand(href="/")
+                | Система скидок
+        div.collapse.navbar-collapse
+            if !account
+                ul.nav.navbar-nav
+                    +headLi('home', 'Главная', '')
+                ul.nav.navbar-nav.navbar-right
+                    +headLi('signin', 'Войти', 'signin', 'glyphicon glyphicon-log-in')
+            else
+                ul.nav.navbar-nav
+                    +headLi('home', 'Главная', '')
+                    +headLi('companies', 'Компании', 'companies')
+                    if account.role == 'super'
+                        +headLi('admins', 'Администраторы', 'admins')
+                ul.nav.navbar-nav.navbar-right
+                    li.bold-type
+                        span.navbar-text.bold-type
+                            a(href="/profile") #{account.name+' '+account.last} (#{account.role})
+                    +headLi('signout', 'Выйти', 'signout', 'glyphicon glyphicon-log-out')

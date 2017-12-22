@@ -1,0 +1,61 @@
+extends ../layout
+
+block content
+
+    div.container
+        div.row
+            div.col-lg-4.col-lg-offset-4.col-md-6.col-md-offset-3.col-sm-12
+                h2= dict.titles.companies
+            div.col-lg-12.margin-top
+                a(class=('btn btn-primary') href="/companies/create")
+                    span(class='glyphicon glyphicon-plus-sign')
+                    | &nbsp;
+                    = dict.titles.create_company
+            if items && items.length>0
+                div.col-lg-12.margin-top
+
+                    div.table-responsive
+
+                        table.table.table-bordered
+                            thead
+                                tr(class='th-users'): th= dict.labels.label_name
+                                    th= dict.labels.label_actions
+                            tbody
+                                each item, i in items
+                                    tr(class='tr-top')
+                                        td #{item.name}
+                                        td(class="col-md-4")
+                                            +link('', '/companies/' + item.id + '/edit', 'glyphicon glyphicon-edit', '', dict.labels.label_update)
+                                            | &nbsp;&nbsp;
+                                            +link('', '', 'glyphicon glyphicon-trash text-danger', '', dict.labels.label_delete, 'confirmDeleteCompany(' + item.id + ', "' + item.name + '"); return false;')
+                                            | &nbsp;&nbsp;
+                                            +link('btn btn-primary', '/companies/'+item.id+'/terminals/create', 'glyphicon glyphicon-plus-sign', dict.titles.terminal, dict.labels.label_add_terminal)
+                                            | &nbsp;&nbsp;
+                                            +link('btn btn-primary', '/companies/'+item.id+'/users', 'glyphicon glyphicon-user', dict.titles.users, dict.titles.users)
+
+                                    if item.terminals && item.terminals.length
+                                        each subitem, i in item.terminals
+                                            tr(class='tr-second')
+                                                td(class='offset') #{subitem.name}
+                                                td(class="col-md-4")
+                                                    +link('', '/companies/' + item.id + '/terminals/' + subitem.id+'/edit', 'glyphicon glyphicon-edit', '', dict.labels.label_update)
+                                                    | &nbsp;&nbsp;
+                                                    +link('', '', 'glyphicon glyphicon-trash text-danger', '', dict.labels.label_delete, 'confirmDeleteTerminal(' + item.id + ', '+subitem.id+' ,"' + subitem.name + '"); return false;')
+                                                    | &nbsp;&nbsp;
+                                                    +link('btn btn-primary', '/companies/' + item.id + '/terminals/' + subitem.id+'/tariffs', 'glyphicon glyphicon-ruble', dict.titles.tariffs, dict.titles.tariffs)
+                                                    | &nbsp;&nbsp;
+
+
+            if message
+                div.col-lg-4.col-lg-offset-4.col-md-6.col-md-offset-3.col-sm-12.margin-top
+                    span.mess.success #{message}
+
+            if error
+                div.col-lg-4.col-lg-offset-4.col-md-6.col-md-offset-3.col-sm-12.margin-top
+                    span.mess.error #{error}
+
+            if errors
+                div.col-lg-4.col-lg-offset-4.col-md-6.col-md-offset-3.col-sm-12.margin-top
+                    ul.error
+                        for error in errors
+                            li.mess.error!= error.msg

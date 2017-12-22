@@ -1,0 +1,43 @@
+include misc/mixins
+
+doctype html
+html
+    head
+        block title
+            title Система скидок
+        block meta
+            meta(name='description', content='')
+            meta(name='keywords', content='')
+
+        link(rel='stylesheet', href='/bootstrap/css/bootstrap.min.css')
+        link(rel='stylesheet', href='/bootstrap/css/bootstrap-theme.min.css')
+
+        link(rel='stylesheet', href='/bootstrap-datepicker/css/bootstrap-datepicker.min.css')
+        link(rel='stylesheet', href='/bootstrap-select/css/bootstrap-select.min.css')
+        | <style>
+        | body { padding-top: 60px; }
+        | </style>
+        link(rel='stylesheet', href='/stylesheets/style.css')
+        script(src='/jquery/jquery.min.js')
+        script(src='/bootstrap/js/bootstrap.min.js')
+
+        script(src='/bootbox/bootbox.min.js')
+        script(src='/bootstrap-datepicker/js/bootstrap-datepicker.min.js')
+        script(src='/bootstrap-select/js/bootstrap-select.min.js')
+
+        script(src='/javascripts/functions.js')
+
+    body
+        include misc/header
+
+        block content
+
+        include misc/footer
+
+script(type='text/javascript').
+    $(document).ready(function () {
+        $('#datepicker').datepicker({
+            format: 'yyyy-mm-dd',
+            language: 'ru'
+        });
+    })

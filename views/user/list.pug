@@ -1,0 +1,54 @@
+extends ../layout
+
+block content
+
+    div.container
+        div.row
+            div.col-lg-4.col-lg-offset-4.col-md-6.col-md-offset-3.col-sm-12
+                h2= dict.titles.users
+                p(style='font-weight:bold')= company.name
+                p= company.countryname + ', ' + company.focname + ', ' + company.regionname
+
+            div.col-lg-12.margin-top
+                +link('btn btn-primary', '/companies/'+company.id+'/users/create', 'glyphicon glyphicon-plus-sign', dict.titles.create_users, dict.titles.create_users)
+            if items && items.length
+                div.col-lg-12.margin-top
+
+                    div.table-responsive
+
+                        table.table.table-bordered
+                            thead
+                                tr(class='th-users')
+                                    th #{dict.titles.terminal}
+                                    th #{dict.labels.label_first_name}
+                                    th #{dict.labels.label_email}
+                                    th #{dict.labels.label_role}
+                                    th #{dict.labels.label_actions}
+                            tbody
+                                each item, i in items
+                                    tr(class=item.role === 'admin' ? 'tr-top' : 'tr-second')
+                                        td #{item.terminal ? item.terminal.name : 'Все'}
+                                        td #{item.name+' '+item.last}
+                                        td #{item.email}
+                                        td #{item.role == 'admin' ? 'Администратор' : 'Кассир'}
+                                        td
+                                            if item.id!==account.id
+                                                +link('', '/companies/' + company.id + '/users/'+item.id+'/edit', 'glyphicon glyphicon-edit', '', dict.labels.label_update, '')
+                                                | &nbsp;&nbsp;
+                                            if item.parent === account.id || account.role === 'super'
+                                                +link('', '', 'glyphicon glyphicon-trash text-danger', '', dict.labels.label_delete, 'confirmDeleteUser(' + item.id + ', "' + item.name + '"); return false;')
+                                                | &nbsp;&nbsp;
+
+            if message
+                div.col-lg-4.col-lg-offset-4.col-md-6.col-md-offset-3.col-sm-12.margin-top
+                    span.mess.success #{message}
+
+            if error
+                div.col-lg-4.col-lg-offset-4.col-md-6.col-md-offset-3.col-sm-12.margin-top
+                    span.mess.error #{error}
+
+            if errors
+                div.col-lg-4.col-lg-offset-4.col-md-6.col-md-offset-3.col-sm-12.margin-top
+                    ul.error
+                        for error in errors
+                            li.mess.error!= error.msg

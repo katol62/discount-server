@@ -1,0 +1,44 @@
+extends ../layout
+
+block content
+
+    div.container
+
+        div.row
+            div.col-lg-4.col-lg-offset-4.col-md-6.col-md-offset-3.col-sm-12.login-form-pre
+                h2= dict.titles.create_admin
+            div.col-lg-4.col-lg-offset-4.col-md-6.col-md-offset-3.col-sm-12
+                form(method='post' action='/admins/create')
+
+                    input#role(type='hidden', name='role', value='admin')
+                    input(type='hidden', name='parent', value=account.id)
+
+                    +formTextInput('name', 'text', dict.labels.label_first_name, dict.labels.label_first_name, '')
+                    +formTextInput('last', 'text', dict.labels.label_last_name, dict.labels.label_last_name, '')
+                    +formTextInput('phone', 'number', dict.labels.label_phone, dict.labels.label_phone, '')
+                    +formTextInput('email', 'email', dict.labels.label_email, dict.labels.label_email, '')
+                    +formTextInput('password', 'password', dict.labels.password, dict.labels.password, '')
+                    +formTextInput('confirmPassword', 'password', dict.labels.label_confirm_pwd, dict.labels.label_confirm_pwd, '')
+
+                    .form-group#publish
+                        .form-check.form-check-inline
+                            label.form-check-label
+                                input#publisher.form-check-input(type='checkbox', name='publisher' )
+                                |  #{dict.labels.label_can_publish}
+
+
+                    button.btn.btn-primary(type='submit') #{dict.labels.label_create}
+
+            if message
+                div.col-lg-4.col-lg-offset-4.col-md-6.col-md-offset-3.col-sm-12.margin-top
+                    span.mess.success #{message}
+
+            if error
+                div.col-lg-4.col-lg-offset-4.col-md-6.col-md-offset-3.col-sm-12.margin-top
+                    span.mess.error #{error}
+
+            if errors
+                div.col-lg-4.col-lg-offset-4.col-md-6.col-md-offset-3.col-sm-12.margin-top
+                    ul.error
+                        for error in errors
+                            li.mess.error!= error.msg

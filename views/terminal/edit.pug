@@ -1,0 +1,32 @@
+extends ../layout
+
+block content
+
+    div.container
+
+        div.row
+            div.col-lg-4.col-lg-offset-4.col-md-6.col-md-offset-3.col-sm-12.login-form-pre
+                h2= dict.titles.update_terminal
+                p(style='font-weight:bold')= company.name
+                p= company.countryname+', '+company.focname+', '+company.regionname
+            div.col-lg-4.col-lg-offset-4.col-md-6.col-md-offset-3.col-sm-12
+                form(method='post' action='/companies/'+company.id+'/terminals/'+terminal.id+'/edit')
+                    input#_method(type='hidden', name='_method', value='PUT')
+                    input#cid(type='hidden', name='cid', value=company.id)
+                    input#tid(type='hidden', name='tid', value=terminal.id)
+
+                    +formTextInput('name', 'text', dict.labels.label_name, dict.labels.label_name, terminal.name)
+                    +formSelect('type', dict.labels.label_discount_type, discounts, terminal.type)
+                    +formTextInput('place', 'text', dict.labels.label_city, dict.labels.label_city, terminal.place)
+
+                    button.btn.btn-default(type='submit') #{dict.labels.label_update}
+
+            div.col-lg-4.col-lg-offset-4.col-md-6.col-md-offset-3.col-sm-12.login-form-pre
+                if errors
+                    ul.error
+                        for error in errors
+                            li!= error.msg
+                if error
+                    p.mess.error #{error}
+                if success
+                    p #{success.msg}

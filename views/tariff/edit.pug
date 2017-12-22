@@ -1,0 +1,56 @@
+extends ../layout
+
+block content
+
+    div.container
+
+        div.row
+            div.col-lg-4.col-lg-offset-4.col-md-6.col-md-offset-3.col-sm-12.login-form-pre
+                h2= dict.titles.create_tariff
+                p(style='font-weight:bold') Компания: #{company.name}
+                p= company.countryname + ', ' + company.focname + ', ' + company.regionname
+                p(style='font-weight:bold') Терминал: #{terminal.name}
+            div.col-lg-4.col-lg-offset-4.col-md-6.col-md-offset-3.col-sm-12
+                form(method='post' action='/companies/'+company.id+'/terminals/'+terminal.id+'/tariffs/'+tariff.id+'/edit')
+                    input#_method(type='hidden', name='_method', value='PUT')
+                    input#owner(type='hidden', name='owner', value=account.id)
+                    input#id(type='hidden', name='id', value=tariff.id)
+                    input#tid(type='hidden', name='tid', value=terminal.id)
+
+                    +formTextInput('name', 'text', dict.labels.label_name, dict.labels.label_name, tariff.name)
+                    .form-group
+                        label(for='datepicker')= dict.labels.label_period
+                        #datepicker.input-group.input-daterange
+                            input.form-control(type='text', name='start' value=moment(tariff.start).format("YYYY-MM-DD") placeholder=dict.labels.label_start_date)
+                            .input-group-addon #{dict.labels.label_to}
+                            input.form-control(type='text', name='end' value=moment(tariff.end).format("YYYY-MM-DD") placeholder=dict.labels.label_end_date)
+                    +formSelect('type', dict.labels.label_tariff_type, types, tariff.type)
+                    +formTextInput('discount', 'number', dict.labels.label_discount, dict.labels.label_discount, tariff.discount)
+
+                    .form-group
+                        .form-check.form-check-inline
+                            label.form-check-label
+                                input#guest.form-check-input(type='checkbox', name='guest' checked=tariff.guest==='1')
+                                |  #{dict.labels.label_guest}
+
+                    .form-group#passContainer(style=tariff.guest==='0'?'display:none':'display:block')
+                        label(for='pass')
+                        select.form-control.selectpicker(id='pass' name='pass' type="select")
+                            each pass in passes
+                                option(value=pass.id data-tokens=pass.id selected=pass.id===tariff.pass) #{pass.name}
+
+                    button.btn.btn-primary(type='submit') #{dict.labels.label_update}
+
+            if message
+                div.col-lg-4.col-lg-offset-4.col-md-6.col-md-offset-3.col-sm-12.margin-top
+                    span.mess.success #{message}
+
+            if error
+                div.col-lg-4.col-lg-offset-4.col-md-6.col-md-offset-3.col-sm-12.margin-top
+                    span.mess.error #{error}
+
+            if errors
+                div.col-lg-4.col-lg-offset-4.col-md-6.col-md-offset-3.col-sm-12.margin-top
+                    ul.error
+                        for error in errors
+                            li.mess.error!= error.msg

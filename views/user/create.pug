@@ -1,0 +1,42 @@
+extends ../layout
+
+block content
+
+    div.container
+
+        div.row
+            div.col-lg-4.col-lg-offset-4.col-md-6.col-md-offset-3.col-sm-12.login-form-pre
+                h2= dict.labels.label_create_user
+                p(style='font-weight:bold')= company.name
+                p= company.countryname + ', ' + company.focname + ', ' + company.regionname
+
+            div.col-lg-4.col-lg-offset-4.col-md-6.col-md-offset-3.col-sm-12
+                form(method='post' action='/companies/'+company.id+'/users/create')
+
+                    input#role(type='hidden', name='role', value='cashier')
+                    input(type='hidden', name='parent', value=account.id)
+                    input(type='hidden', name='cid', value=company.id)
+
+                    +formTextInput('name', 'text', dict.labels.label_first_name, dict.labels.label_first_name, '')
+                    +formTextInput('last', 'text', dict.labels.label_last_name, dict.labels.label_last_name, '')
+                    +formTextInput('phone', 'number', dict.labels.label_phone, dict.labels.label_phone, '')
+                    +formTextInput('email', 'email', dict.labels.label_email, dict.labels.label_email, '')
+                    +formSelect('tid', dict.titles.terminal, terminals)
+                    +formTextInput('password', 'password', dict.labels.password, dict.labels.password, '')
+                    +formTextInput('confirmPassword', 'password', dict.labels.label_confirm_pwd, dict.labels.label_confirm_pwd, '')
+
+                    button.btn.btn-primary(type='submit') #{dict.labels.label_create}
+
+            if message
+                div.col-lg-4.col-lg-offset-4.col-md-6.col-md-offset-3.col-sm-12.margin-top
+                    span.mess.success #{message}
+
+            if error
+                div.col-lg-4.col-lg-offset-4.col-md-6.col-md-offset-3.col-sm-12.margin-top
+                    span.mess.error #{error}
+
+            if errors
+                div.col-lg-4.col-lg-offset-4.col-md-6.col-md-offset-3.col-sm-12.margin-top
+                    ul.error
+                        for error in errors
+                            li.mess.error!= error.msg

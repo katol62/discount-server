@@ -1,0 +1,55 @@
+mixin modal(id, title, footer)
+    .modal.fade(id= id): .modal-dialog: .modal-content
+        .modal-header
+            button.close(
+            type="button"
+            data-dismiss="modal"
+            aria-hidden="true"
+            ) &times;
+            h4.modal-title= title
+        .modal-body
+            if block
+                block
+        if footer
+            .modal-footer
+                button.btn.btn-default(
+                type="button"
+                data-dismiss="modal"
+                ) Отмена
+                button.btn.btn-primary(type="button") ОК
+
+mixin headLi(type, label, link, icon)
+    li(class=(pageType === type ? 'active' : ''))
+        if icon
+            a(href="/"+link)
+                i(class=icon)
+                | &nbsp;
+                = label
+        else
+            a(href="/" + link) #{label}
+
+mixin formTextInput(id, type, label, placeholder, value, disabled)
+    .form-group
+        label(for=id) #{label}
+        input.form-control(id= id type= type, name= id, placeholder= placeholder value= value disabled=disabled)
+
+mixin formSelect(id, label, items, value, disabled, parentId, hideBlank)
+    .form-group(id=parentId)
+        label(for=id) #{label}
+        select.form-control.selectpicker(id= id name=id type="select" disabled=disabled)
+            if hideBlank !== 'hide'
+                option(value='' title='--Выбрать--')
+            each item in items
+                if item.last
+                    option(value=item.id data-tokens=item.id selected=item.id===value) #{item.name + ' ' + item.last}
+                else
+                    option(value=item.id data-tokens=item.id selected = item.id === value) #{item.name}
+
+mixin link(aclass, href, icon, label, title, onclick)
+    a(class=(aclass? aclass : '') href=href title=title onclick=onclick)
+        if icon
+            i(class=icon)
+            | &nbsp;
+        = label
+
+

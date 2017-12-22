@@ -1,0 +1,35 @@
+extends ../layout
+
+block content
+
+    div.container
+
+        div.row
+            div.col-lg-4.col-lg-offset-4.col-md-6.col-md-offset-3.col-sm-12.login-form-pre
+                h2= dict.titles.create_company
+            div.col-lg-4.col-lg-offset-4.col-md-6.col-md-offset-3.col-sm-12
+                form(method='post' action='/companies/create')
+
+                    if account.role === 'super'
+                        +formSelect('owner', dict.labels.label_admin, adminlist)
+                    else
+                        input#owner(type='hidden', name='owner', value=account.id)
+
+                    +formTextInput('name', 'text', dict.labels.label_company_name, dict.labels.label_company_name, '')
+
+                    +formSelect('country', dict.labels.label_country, countries)
+                    +formSelect('foc', dict.labels.label_fed_okrug, fos)
+                    +formSelect('region', dict.labels.label_region, regions)
+
+                    button.btn.btn-primary(type='submit') #{dict.labels.label_create}
+
+            div.col-lg-4.col-lg-offset-4.col-md-6.col-md-offset-3.col-sm-12.login-form-pre
+                if errors
+                    ul.error
+                        for error in errors
+                            li!= error.msg
+                if error
+                    div.col-lg-4.col-lg-offset-4.col-md-6.col-md-offset-3.col-sm-12.margin-top
+                        span.mess.error #{error}
+                if success
+                    p #{success.msg}
