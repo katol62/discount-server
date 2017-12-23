@@ -4,13 +4,13 @@ var Card = {
 
     getAll: (limit, offset, done)=>{
         var query = 'SELECT * from cards LIMIT ? OFFSET ?';
+        console.log(query);
+        console.log(limit+" "+offset);
         db.query(query, [limit, offset], (err, rows)=>{
             if (err) {
-                if (err) {
-                    return done(err)
-                }
-                done(null, rows)
+                return done(err)
             }
+            done(null, rows)
         })
     },
 

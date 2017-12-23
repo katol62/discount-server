@@ -41,9 +41,14 @@ router.get('/', (req, res, next)=>{
     var limit = 10;
 
     Card.getAll(limit, offset, (err, rows)=>{
+        console.log(err)
         if (err) {
             req.session.error = dict.messages.db_error+":"+err.message;
             return res.redirect('/cards');
+        }
+        console.log(rows);
+        if (rows.length === 0) {
+            rows = [];
         }
 
         return res.render('card/list', {

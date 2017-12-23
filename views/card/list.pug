@@ -10,8 +10,13 @@ block content
                 a(class=('btn btn-primary') href="/cards/create")
                     span(class='glyphicon glyphicon-plus-sign')
                     | &nbsp;
-                    = dict.titles.create_company
-            if items && items.length>0
+                    = dict.titles.create_cards
+                | &nbsp;
+                a(class=('btn btn-primary') href="/cards/generate")
+                    span(class='glyphicon glyphicon-plus-sign')
+                    | &nbsp;
+                    = dict.titles.generate_cards
+            if items && items.length
                 div.col-lg-12.margin-top
 
                     div.table-responsive
@@ -39,7 +44,7 @@ block content
                                             td #{item.m_code}
                                             td #{item.card_nb}
                                             td #{item.type}
-                                            td #{item.statusName}
+                                            td #{item.status}
                                             td #{item.lifetime}
                                             td #{item.servicetime}
                                             td #{item.test == 1 ? 'YES' : 'NO'}

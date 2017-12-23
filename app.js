@@ -19,6 +19,7 @@ var profiles = require('./routes/profiles');
 var companies = require('./routes/companies');
 var terminals = require('./routes/terminals');
 var locations = require('./routes/locations');
+var cards = require('./routes/cards');
 
 var app = express();
 
@@ -65,6 +66,7 @@ app.use('/profile', profiles);
 app.use('/companies', companies);
 app.use('/terminals', terminals);
 app.use('/location', locations);
+app.use('/cards', cards);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
