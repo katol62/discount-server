@@ -22,6 +22,9 @@ module.exports = {
             "update_terminal":"Изменить терминал",
             "create_tariff": "Создать тариф",
             "update_tariff": "Изменить тариф",
+            "cards": "Карты",
+            "create_cards": "Создать карту",
+            "generate_cards": "Генерировать транш",
         },
         "labels": {
             "email_address": "Емейл",

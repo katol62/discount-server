@@ -21,17 +21,15 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `cards` (
-  `cid` int(11) NOT NULL,
-  `qr_code` varchar(128) COLLATE utf8_bin DEFAULT NULL,
-  `nfs_code` varchar(64) COLLATE utf8_bin NOT NULL DEFAULT '',
-  `m_code` varchar(128) COLLATE utf8_bin NOT NULL DEFAULT '',
-  `card_nb` varchar(128) COLLATE utf8_bin DEFAULT NULL,
+  `id` int(11) NOT NULL,
+  `qr_code` varchar(128) COLLATE utf8_bin NOT NULL,
+  `nfs_code` varchar(128) COLLATE utf8_bin NOT NULL,
+  `m_code` varchar(128) COLLATE utf8_bin NOT NULL,
+  `card_nb` varchar(128) COLLATE utf8_bin NOT NULL,
   `type` enum('adult','child','other') COLLATE utf8_bin NOT NULL DEFAULT 'adult',
-  `discount` int(11) NOT NULL DEFAULT '0',
-  `pass` enum('0','1','3','6') COLLATE utf8_bin NOT NULL DEFAULT '0',
   `status` enum('published','sold','activated','overdue','blocked') COLLATE utf8_bin NOT NULL DEFAULT 'published',
-  `lifetime` int(11) DEFAULT NULL,
-  `servicetime` int(11) DEFAULT NULL,
+  `lifetime` int(11) NOT NULL,
+  `servicetime` int(11) NOT NULL,
   `test` enum('0','1') COLLATE utf8_bin NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
@@ -177,6 +175,17 @@ CREATE TABLE `users` (
 INSERT INTO `users` (`id`, `name`, `last`, `phone`, `email`, `password`, `role`, `parent`, `publisher`) VALUES
 (1, 'Супер', 'Супер', NULL, 'super@s.com', '$2a$05$63vJAM8ql9LYfVvwom/iMeLLbNErXfcsg67qBL5QEHZ82EkgS3W8u', 'super', 0, '1');
 
+-- --------------------------------------------------------
+--
+-- Table structure for table `transh`
+--
+
+CREATE TABLE `transh` (
+  `id` int(11) NOT NULL,
+  `start` int(11) NOT NULL,
+  `count` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
 --
 -- Indexes for dumped tables
 --
@@ -185,7 +194,7 @@ INSERT INTO `users` (`id`, `name`, `last`, `phone`, `email`, `password`, `role`,
 -- Indexes for table `cards`
 --
 ALTER TABLE `cards`
-  ADD PRIMARY KEY (`cid`),
+  ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `qr_code` (`qr_code`);
 
 --
@@ -237,6 +246,12 @@ ALTER TABLE `users`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `transh`
+--
+ALTER TABLE `transh`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- AUTO_INCREMENT for dumped tables
 --
 
@@ -244,7 +259,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `cards`
 --
 ALTER TABLE `cards`
-  MODIFY `cid` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 --
 -- AUTO_INCREMENT for table `company`
 --
@@ -280,3 +295,8 @@ ALTER TABLE `tariff`
 --
 ALTER TABLE `users`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=2;
+--
+-- AUTO_INCREMENT for table `transh`
+--
+ALTER TABLE `transh`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;

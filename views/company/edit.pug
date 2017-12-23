@@ -16,7 +16,7 @@ block content
                     input#region(type='hidden', name='region', value=company.region)
 
                     if account.role === 'super'
-                        +formSelect('owner', dict.labels.label_admin, adminlist)
+                        +formSelect('owner', dict.labels.label_admin, adminlist, company.owner)
                     else
                         input#owner(type='hidden', name='owner', value=company.owner)
 
