@@ -9,6 +9,9 @@ var Tariff = {
             if (err) {
                 return done(err)
             }
+            console.log('======');
+            console.log(rows);
+            console.log('======');
             done(null, rows)
         })
 
@@ -21,6 +24,7 @@ var Tariff = {
             if (err) {
                 return done(err)
             }
+            console.log(rows);
             done(null, rows)
         })
 
@@ -28,14 +32,21 @@ var Tariff = {
 
     create: (body, done)=> {
 
+        console.log(body);
+
         var name = body.name;
-        var start = (body.start ? body.start : '0000-00-00');
-        var end = (body.end ? body.end : '0000-00-00');
+        var start = (body.start && body.start!=='' ? body.start : '0000-00-00');
+        var end = (body.end && body.end!==''? body.end : '0000-00-00');
         var type = body.type;
         var discount = body.discount;
         var terminal = body.tid;
         var guest = body.guest === 'on' ? '1' : '0';
         var pass = guest=='1' ? body.pass : '0';
+
+        console.log('=======')
+        console.log(start)
+        console.log(end)
+        console.log('=======')
 
         var query = 'INSERT INTO tariff (name, start, end, type, discount, terminal, guest, pass) SELECT ?, ?, ?, ?, ?, ?, ?, ? FROM DUAL WHERE NOT EXISTS (SELECT * FROM tariff WHERE name = ? AND type = ? AND terminal = ?) LIMIT 1';
         var params = [name, start, end, type, discount, terminal, guest, pass, name, type, terminal];
@@ -60,16 +71,22 @@ var Tariff = {
     },
     update: (body, done)=> {
 
+        console.log(body);
+
         var id = body.id;
         var name = body.name;
-        var start = (body.start ? body.start : '0000-00-00');
-        var end = (body.end ? body.end : '0000-00-00');
+        var start = (body.start && body.start!=='' ? body.start : '0000-00-00');
+        var end = (body.end && body.end!==''? body.end : '0000-00-00');
         var type = body.type;
         var discount = body.discount;
         var terminal = body.tid;
         var guest = body.guest === 'on' ? '1' : '0';
         var pass = guest=='1' ? body.pass : '0';
 
+        console.log('=======')
+        console.log(start)
+        console.log(end)
+        console.log('=======')
         var query = 'UPDATE tariff SET name=?, start=?, end=?, type=?, discount=?, terminal=?, guest=?, pass=? WHERE id=?';
         var params = [name, start, end, type, discount, terminal, guest, pass, id];
 

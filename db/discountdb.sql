@@ -14,6 +14,11 @@ SET time_zone = "+00:00";
 -- Database: `discountdb`
 --
 
+
+CREATE DATABASE `discountdb` CHARACTER SET utf8 COLLATE utf8_general_ci;
+
+USE `discountdb`;
+
 -- --------------------------------------------------------
 
 --

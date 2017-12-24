@@ -175,20 +175,18 @@ router.get('/:id/edit', function(req, res, next) {
         } else {
             if (rows.length == 0) {
                 req.session.error = dict.messages.user_not_found;
-                res.redirect('/admins');
-            } else {
-                return res.render('admin/edit', {
-                    pageType: 'admins',
-                    dict: dict,
-                    account: req.session.user,
-                    subtitle: rows[0].name+' '+rows[0].last,
-                    user: rows[0],
-                    message: session_message,
-                    error: session_error,
-                    errors: session_validate_error,
-                });
+                return res.redirect('/admins');
             }
-
+            return res.render('admin/edit', {
+                pageType: 'admins',
+                dict: dict,
+                account: req.session.user,
+                subtitle: rows[0].name+' '+rows[0].last,
+                user: rows[0],
+                message: session_message,
+                error: session_error,
+                errors: session_validate_error,
+            });
         }
     });
 });

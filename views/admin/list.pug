@@ -30,7 +30,7 @@ block content
                                         td #{item.email}
                                         td #{item.role}
                                         td
-                                            a(class='glyphicon glyphicon-edit' href='/admins/edit/' + item.id)
+                                            a(class='glyphicon glyphicon-edit' href='/admins/' + item.id + '/edit')
                                             |&nbsp;
                                             a(class='glyphicon glyphicon-trash text-danger' onclick='confirmDeleteAdmin('+ item.id+', "'+item.name+' '+item.last+'"); return false;' style='cursor:pointer')
 

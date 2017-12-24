@@ -452,6 +452,7 @@ router.post('/:cid/terminals/create', (req, res, next)=> {
             return res.redirect('/companies/'+cid+'/terminals/create');
         }
 
+        console.log(rows);
         if (rows.affectedRows == 0) {
             req.session.error = dict.messages.terminal_create_error;
         } else {
@@ -701,24 +702,23 @@ router.post('/:cid/users/create', (req, res, next)=> {
                 req.session.error = err;
                 res.redirect('/companies/'+req.params.cid+'/users/create');
                 return;
-            } else {
-                if (row.affectedRows == 0) {
-                    req.session.error = dict.messages.db_error;
-                    res.redirect('/companies/'+req.params.cid+'/users/create');
-                    return;
-                } else {
-
-                    User.updateReference(row.insertId, req.body.cid, req.body.tid, (err, rows)=>{
-                        if (err) {
-                            req.session.error = dict.messages.db_error+": "+err.message;
-                            return res.redirect('/companies/'+req.params.cid+'/users');
-                        }
-                        req.session.message = dict.messages.user_created;
-                        return res.redirect('/companies/'+req.params.cid+'/users');
-                    })
-
-                }
             }
+            if (row.affectedRows == 0) {
+                req.session.error = dict.messages.db_error;
+                res.redirect('/companies/'+req.params.cid+'/users/create');
+                return;
+            }
+
+            var tid = req.body.tid ? req.body.tid : '0';
+            User.updateReference(row.insertId, req.body.cid, tid, (err, rows)=>{
+                if (err) {
+                    req.session.error = dict.messages.db_error+": "+err.message;
+                    return res.redirect('/companies/'+req.params.cid+'/users');
+                }
+                req.session.message = dict.messages.user_created;
+                return res.redirect('/companies/'+req.params.cid+'/users');
+            })
+
         })
 
     });
@@ -821,7 +821,8 @@ router.put('/:cid/users/:uid/edit', (req, res, next)=> {
                     return res.redirect('/companies/'+req.params.cid+'/users');
                 }
 
-                User.updateReference(req.body.id, req.body.cid, req.body.tid, (err, rows)=>{
+                var tid = req.body.tid ? req.body.tid : '0';
+                User.updateReference(req.body.id, req.body.cid, tid, (err, rows)=>{
                     if (err) {
                         req.session.error = dict.messages.db_error+": "+err.message;
                         return res.redirect('/companies/'+req.params.cid+'/users');

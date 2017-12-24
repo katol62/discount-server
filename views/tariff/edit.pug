@@ -21,9 +21,9 @@ block content
                     .form-group
                         label(for='datepicker')= dict.labels.label_period
                         #datepicker.input-group.input-daterange
-                            input.form-control(type='text', name='start' value=moment(tariff.start).format("YYYY-MM-DD") placeholder=dict.labels.label_start_date)
+                            input.form-control(type='text', name='start' value=tariff.start==='0000-00-00'?'':moment(tariff.start).format("YYYY-MM-DD") placeholder=dict.labels.label_start_date)
                             .input-group-addon #{dict.labels.label_to}
-                            input.form-control(type='text', name='end' value=moment(tariff.end).format("YYYY-MM-DD") placeholder=dict.labels.label_end_date)
+                            input.form-control(type='text', name='end' value=tariff.end==='0000-00-00'?'':moment(tariff.end).format("YYYY-MM-DD") placeholder=dict.labels.label_end_date)
                     +formSelect('type', dict.labels.label_tariff_type, types, tariff.type)
                     +formTextInput('discount', 'number', dict.labels.label_discount, dict.labels.label_discount, tariff.discount)
 
