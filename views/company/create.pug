@@ -16,6 +16,15 @@ block content
                         input#owner(type='hidden', name='owner', value=account.id)
 
                     +formTextInput('name', 'text', dict.labels.label_company_name, dict.labels.label_company_name, '')
+                    +formTextInput('fullname', 'text', dict.labels.label_company_full_name, dict.labels.label_company_full_name, '')
+                    +formTextInput('inn', 'text', dict.labels.label_company_inn, dict.labels.label_company_inn, '')
+                    +formTextInput('kpp', 'text', dict.labels.label_company_kpp, dict.labels.label_company_kpp, '')
+                    +formTextInput('ogrn', 'text', dict.labels.label_company_ogrn, dict.labels.label_company_ogrn, '')
+                    +formTextInput('juradress', 'text', dict.labels.label_company_juradress, dict.labels.label_company_juradress, '')
+                    +formTextInput('adress', 'text', dict.labels.label_company_adress, dict.labels.label_company_adress, '')
+                    +formTextInput('nds', 'text', dict.labels.label_company_nds, dict.labels.label_company_nds, '')
+                    +formTextInput('dogovor', 'text', dict.labels.label_company_dogovor, dict.labels.label_company_dogovor, '')
+                    +formTextInput('dogovordate', 'date', dict.labels.label_company_dogovor_date, dict.labels.label_company_dogovor_date, '')
 
                     +formSelect('country', dict.labels.label_country, countries)
                     +formSelect('foc', dict.labels.label_fed_okrug, fos)

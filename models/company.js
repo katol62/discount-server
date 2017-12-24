@@ -20,9 +20,10 @@ var Company = {
 
     create: (body, done)=> {
 
-        var params = [body.name, body.owner, body.country, body.foc, body.region, body.name, body.region];
+        console.log('nds='+body.nds);
+        var params = [body.name, body.fullname, body.inn, body.kpp, body.ogrn, body.juradress, body.adress, body.nds, body.dogovor, body.dogovordate, body.owner, body.country, body.foc, body.region, body.name, body.region];
 
-        db.query('INSERT INTO company (name, owner, country, foc, region) SELECT ?, ?, ?, ?, ? FROM DUAL WHERE NOT EXISTS (SELECT * FROM company WHERE name=? AND region = ?) LIMIT 1', params, (err, rows)=> {
+        db.query('INSERT INTO company (name, fullname, inn, kpp, ogrn, juradress, adress, nds, dogovor, dogovordate, owner, country, foc, region) SELECT ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? FROM DUAL WHERE NOT EXISTS (SELECT * FROM company WHERE name=? AND region = ?) LIMIT 1', params, (err, rows)=> {
             if (err) {
                 return done(err)
             }
@@ -147,8 +148,8 @@ var Company = {
     update: (body, done)=> {
 
         console.log(body);
-        var query = 'UPDATE company SET name = ?, country = ?, foc = ?, region = ?, owner = ? WHERE id = ?';
-        var params = [body.name, body.country, body.foc, body.region, body.owner, body.id];
+        var query = 'UPDATE company SET name=?, fullname=?, inn=?, kpp=?, ogrn=?, juradress=?, adress=?, nds=?, dogovor=?, dogovordate=?, country = ?, foc = ?, region = ?, owner = ? WHERE id = ?';
+        var params = [body.name, body.fullname, body.inn, body.kpp, body.ogrn, body.juradress, body.adress, body.nds, body.dogovor, body.dogovordate, body.country, body.foc, body.region, body.owner, body.id];
         db.query(query, params, (err, rows)=>{
             if (err) {
                 return done(err)

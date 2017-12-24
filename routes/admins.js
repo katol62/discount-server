@@ -193,13 +193,6 @@ router.get('/:id/edit', function(req, res, next) {
 
 router.put('/:id/edit', function(req, res, next) {
 
-    var session_message = req.session.message ? req.session.message : null;
-    req.session.message = null;
-    var session_error = req.session.error ? req.session.error : null;
-    req.session.error = null;
-    var session_validate_error = req.session.validate_error ? req.session.validate_error : null;
-    req.session.validate_error = null;
-
     req.checkBody('name', dict.messages.name_required).notEmpty();
     req.checkBody('last', dict.messages.last_required).notEmpty();
     req.checkBody('email', dict.messages.email_required).notEmpty();

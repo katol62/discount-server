@@ -33,7 +33,7 @@ block content
 
                     .form-group#passContainer(style='display:none')
                         label(for='pass')
-                        select.form-control.selectpicker(id='pass' name='pass' type="select")
+                        select.form-control.selectpicker(id='pass' name='pass' type="select" disabled)
                             each pass in passes
                                 option(value=pass.id data-tokens=pass.id) #{pass.name}
 

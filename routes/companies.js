@@ -214,7 +214,6 @@ router.post('/create', function(req, res, next) {
         res.redirect('/companies/create');
         return;
     }
-    console.log(req.body);
 
     Company.create(req.body, function(err, row){
         if (err) {
@@ -227,17 +226,16 @@ router.post('/create', function(req, res, next) {
             if (row.affectedRows == 0) {
                 req.session.error = dict.messages.company_exists;
                 return res.redirect('/companies/create');
-            } else {
-                User.updateReference(req.body.owner, row.insertId, 0, (err, rows)=>{
-                    if (err) {
-                        req.session.error = dict.messages.db_error+": "+err.message;
-                        return res.redirect('/companies/create');
-                    }
-                    req.session.message = dict.messages.company_created;
-                    return res.redirect('/companies');
-                })
-
             }
+            User.updateReference(req.body.owner, row.insertId, 0, (err, rows)=>{
+                if (err) {
+                    req.session.error = dict.messages.db_error+": "+err.message;
+                    return res.redirect('/companies/create');
+                }
+                req.session.message = dict.messages.company_created;
+                return res.redirect('/companies');
+            })
+
         }
     })
 });

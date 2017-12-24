@@ -14,7 +14,7 @@ block content
                 form(method='post' action='/companies/'+company.id+'/users/create')
 
                     input#role(type='hidden', name='role', value='cashier')
-                    input(type='hidden', name='parent', value=account.id)
+                    input(type='hidden', name='parent', value=company.owner)
                     input(type='hidden', name='cid', value=company.id)
 
                     +formTextInput('name', 'text', dict.labels.label_first_name, dict.labels.label_first_name, '')

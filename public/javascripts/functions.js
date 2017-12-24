@@ -251,3 +251,38 @@ var confirmDeleteTariff = (cid, tid, tariff, name)=> {
     });
 };
 
+var confirmDeleteCard = (id, number)=>{
+    bootbox.confirm({
+        message: "Удалить карту "+number+"?",
+        buttons: {
+            confirm: {
+                label: 'Да',
+                className: 'btn-success'
+            },
+            cancel: {
+                label: 'Нет',
+                className: 'btn-danger'
+            }
+        },
+        callback: function (result) {
+            if (result) {
+
+                var url = '/cards/'+id+'/delete';
+                $.ajax({
+                    url: url,
+                    type: 'DELETE',
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader('X-HTTP-Method-Override', 'DELETE');
+                    },
+                    data: {},
+                    success:  () => {
+                        location.reload();
+                    },
+                    error: (data)=> {
+                        console.log(data);
+                    },
+                });
+            }
+        }
+    });
+};

@@ -23,36 +23,33 @@ block content
                         div.table-responsive
                             table.table.table-bordered
                                 thead
-                                    tr: th Id
-                                        th QR Code
-                                        th NFS Code
-                                        th M Code
-                                        th Card Number
-                                        th Card Type
-                                        th Card status
-                                        th Life time
-                                        th Service time
-                                        th Test Mark
-                                        th Actions
+                                    tr: th QR
+                                        th NFS
+                                        th M-Code
+                                        th= dict.labels.label_card_number
+                                        th= dict.labels.label_card_type
+                                        th= dict.labels.label_card_status
+                                        th= dict.labels.label_card_lifetime
+                                        th= dict.labels.label_card_servicetime
+                                        th= dict.labels.label_card_test
+                                        th= dict.labels.label_actions
 
                                 tbody
                                     each item, i in items
                                         tr
-                                            td #{item.cid}
                                             td #{item.qr_code}
                                             td #{item.nfs_code}
                                             td #{item.m_code}
                                             td #{item.card_nb}
-                                            td #{item.type}
-                                            td #{item.status}
+                                            td #{item.typeName}
+                                            td #{item.statusName}
                                             td #{item.lifetime}
                                             td #{item.servicetime}
-                                            td #{item.test == 1 ? 'YES' : 'NO'}
-                                                | &nbsp;
-                                                a(onclick='doToggle(' + oid + ',' + tariff.id + ',' + item.cid + '); return false;' style='cursor:pointer') Toggle
+                                            td #{item.test == 1 ? dict.labels.label_yes : dict.labels.label_no}
                                             td
-                                                a(href='/organizations/' + oid + '/tariffs/' + tariff.id + '/cards/' + item.cid) Change
-
+                                                a(class='glyphicon glyphicon-edit' href='/cards/' + item.id + '/edit')
+                                                | &nbsp;
+                                                a(class='glyphicon glyphicon-trash text-danger' onclick='confirmDeleteCard(' + item.id + ', "' + item.card_nb + '"); return false;' style='cursor:pointer')
 
             if message
                 div.col-lg-4.col-lg-offset-4.col-md-6.col-md-offset-3.col-sm-12.margin-top

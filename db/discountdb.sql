@@ -15,9 +15,9 @@ SET time_zone = "+00:00";
 --
 
 
-CREATE DATABASE `discountdb` CHARACTER SET utf8 COLLATE utf8_general_ci;
+#CREATE DATABASE `discountdb` CHARACTER SET utf8 COLLATE utf8_general_ci;
 
-USE `discountdb`;
+#USE `discountdb`;
 
 -- --------------------------------------------------------
 
@@ -47,6 +47,15 @@ CREATE TABLE `cards` (
 CREATE TABLE `company` (
   `id` int(11) NOT NULL,
   `name` varchar(128) COLLATE utf8_bin NOT NULL,
+  `fullname` varchar(128) COLLATE utf8_bin NOT NULL,
+  `inn` varchar(128) COLLATE utf8_bin NOT NULL,
+  `kpp` varchar(32) COLLATE utf8_bin NOT NULL,
+  `ogrn` varchar(32) COLLATE utf8_bin NOT NULL,
+  `juradress` varchar(128) COLLATE utf8_bin NOT NULL,
+  `adress` varchar(128) COLLATE utf8_bin NOT NULL,
+  `nds` varchar(32) COLLATE utf8_bin NOT NULL,
+  `dogovor` varchar(32) COLLATE utf8_bin NOT NULL,
+  `dogovordate` date NOT NULL,
   `country` int(11) NOT NULL,
   `foc` int(11) NOT NULL,
   `region` int(11) NOT NULL,

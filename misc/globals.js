@@ -2,29 +2,28 @@ var locale = require('./../misc/locale');
 var config = require('./../misc/config');
 var dict = locale[config.locale];
 
-exports = {
+var globals = {
 
     methods: {
-        nameById: function(id, arr) {
+        nameById: (id, arr)=> {
             var ar = Array(arr);
             var name = '';
             arr.forEach( function (item) {
-                if (item.code == id) {
+                if (item.id == id) {
                     name = item.name;
                 }
             });
             return name;
+        },
+        getCodeType: (cardNumber)=> {
+            var codeString = cardNumber.substr(6, 4);
+            console.log(codeString);
+            var code = Number(codeString);
+            return code;
         }
-    },
-    vars: {
-        discountTypes: ()=> {
-            return [
-                {code: 'pass', name: dict.labels.label_pass},
-                {code: 'discount', name: dict.labels.label_discount},
-            ];
-        }
-    }
 
+    },
 };
 
+module.exports = globals;
 

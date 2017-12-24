@@ -35,7 +35,7 @@ block content
 
                     .form-group#passContainer(style=tariff.guest==='0'?'display:none':'display:block')
                         label(for='pass')
-                        select.form-control.selectpicker(id='pass' name='pass' type="select")
+                        select.form-control.selectpicker(id='pass' name='pass' type="select" disabled)
                             each pass in passes
                                 option(value=pass.id data-tokens=pass.id selected=pass.id===tariff.pass) #{pass.name}
 

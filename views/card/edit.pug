@@ -1,0 +1,41 @@
+extends ../layout
+
+block content
+
+    div.container
+
+        div.row
+            div.col-lg-4.col-lg-offset-4.col-md-6.col-md-offset-3.col-sm-12.login-form-pre
+                h2= dict.titles.update_cards
+                p= card.card_nb
+            div.col-lg-4.col-lg-offset-4.col-md-6.col-md-offset-3.col-sm-12
+                form(method='post' action='/cards/'+card.id+'/edit')
+                    input#_method(type='hidden', name='_method', value='PUT')
+                    input(type='hidden', name='id', value=card.id)
+                    input(type='hidden', name='codetype', value=card.codetype)
+
+                    +formTextInput('lifetime', 'number', dict.labels.label_card_lifetime, dict.labels.label_card_lifetime, card.lifetime)
+                    +formTextInput('servicetime', 'number', dict.labels.label_card_servicetime, dict.labels.label_card_servicetime, card.servicetime)
+
+                    +formSelect('type', dict.labels.label_card_type, types, card.type)
+                    +formSelect('status', dict.labels.label_card_status, statuses, card.status)
+
+                    .form-group
+                        .form-check.form-check-inline
+                            label.form-check-label
+                                input#guest.form-check-input(type='checkbox', name='test' checked=card.test=='1' )
+                                |  #{dict.labels.label_card_test}
+
+
+                    button.btn.btn-primary(type='submit') #{dict.labels.label_update}
+
+            div.col-lg-4.col-lg-offset-4.col-md-6.col-md-offset-3.col-sm-12.login-form-pre
+                if errors
+                    ul.error
+                        for error in errors
+                            li!= error.msg
+                if error
+                    div.col-lg-4.col-lg-offset-4.col-md-6.col-md-offset-3.col-sm-12.margin-top
+                        span.mess.error #{error}
+                if success
+                    p #{success.msg}

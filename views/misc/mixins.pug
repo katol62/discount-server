@@ -37,13 +37,14 @@ mixin formSelect(id, label, items, value, disabled, parentId, hideBlank)
     .form-group(id=parentId)
         label(for=id) #{label}
         select.form-control.selectpicker(id= id name=id type="select" disabled=disabled)
-            if hideBlank !== 'hide'
-                option(value='' title='--Выбрать--')
-            each item in items
-                if item.last
-                    option(value=item.id data-tokens=item.id selected=item.id===value) #{item.name + ' ' + item.last}
-                else
-                    option(value=item.id data-tokens=item.id selected = item.id === value) #{item.name}
+            if items && items.length
+                if hideBlank !== 'hide'
+                    option(value='' title='--Выбрать--')
+                each item in items
+                    if item.last
+                        option(value=item.id data-tokens=item.id selected=item.id===value) #{item.name + ' ' + item.last}
+                    else
+                        option(value=item.id data-tokens=item.id selected = item.id === value) #{item.name}
 
 mixin link(aclass, href, icon, label, title, onclick)
     a(class=(aclass? aclass : '') href=href title=title onclick=onclick)
