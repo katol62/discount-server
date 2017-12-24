@@ -182,7 +182,9 @@ var User = {
         console.log(query);
         console.log(uid+" "+cid+" "+tid);
 
-        db.query(query, [uid, cid, tid, tid], function(err, rows) {
+        var tidval = tid ? tid : NULL;
+
+        db.query(query, [uid, cid, tidval, tidval], function(err, rows) {
             if (err) {
                 return done(err);
             }
