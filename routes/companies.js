@@ -1162,5 +1162,31 @@ router.put('/:cid/terminals/:tid/tariffs/:trid/edit', (req, res, next)=>{
 
 });
 
+/*
+ *
+ */
+
+router.get('/admins/:id/companies', function (req, res, next) {
+
+    Company.getCompaniesForOwner(req.params.id, (err, rows)=>{
+        if (err) {
+            return res.status(500).send(err);
+        }
+        return res.status(200).send(rows);
+    });
+
+});
+
+router.get('/super/:id/companies', function (req, res, next) {
+
+    Company.getCompaniesForParent(req.params.id, (err, rows)=>{
+        if (err) {
+            return res.status(500).send(err);
+        }
+        return res.status(200).send(rows);
+    });
+
+});
+
 
 module.exports = router;

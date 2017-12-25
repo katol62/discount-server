@@ -211,6 +211,18 @@ var User = {
         })
     },
 
+    getUserByCompanyId: (id, done)=>{
+
+        var query = 'SELECT * from users WHERE id = (SELECT owner FROM company WHERE id = ?)';
+        db.query(query, [id], (err, rows)=>{
+            if (err) {
+                return done(err);
+            }
+            done(null, rows)
+        })
+
+    },
+
 };
 
 module.exports = User;

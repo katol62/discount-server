@@ -64,7 +64,7 @@ app.use('/admins', admins);
 //app.use('/users', users);
 app.use('/profile', profiles);
 app.use('/companies', companies);
-app.use('/terminals', terminals);
+//app.use('/terminals', terminals);
 app.use('/location', locations);
 app.use('/cards', cards);
 

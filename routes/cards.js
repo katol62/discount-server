@@ -1,6 +1,7 @@
 var express = require('express');
 var User = require('./../models/user');
 var Card = require('./../models/card');
+var Company = require('./../models/company');
 var bcrypt = require('bcrypt');
 var locale = require('./../misc/locale');
 var config = require('./../misc/config');
@@ -59,7 +60,7 @@ router.get('/', (req, res, next)=>{
     var offset = req.params.start ? req.params.start : 0;
     var limit = 10;
 
-    Card.getAll(limit, offset, (err, rows)=>{
+    Card.getAllForUser(req.session.user, limit, offset, (err, rows)=>{
         if (err) {
             req.session.error = dict.messages.db_error+":"+err.message;
             return res.redirect('/cards');
@@ -105,15 +106,6 @@ router.get('/', (req, res, next)=>{
 });
 
 /*
- * Get auto increment
- */
-
-router.post('/ai', (req, res, next)=>{
-
-});
-
-
-/*
  * Create card
  */
 
@@ -128,16 +120,59 @@ router.get('/create', (req, res, next)=> {
     var statuses = config.cardStatus;
     var types = config.tariffTypes;
 
-    return res.render('card/create', {
-        pageType: 'cards',
-        dict: dict,
-        account: req.session.user,
-        types: types,
-        statuses: statuses,
-        message: session_message,
-        error: session_error,
-        errors: session_validate_error
-    });
+    if (req.session.user.role === 'super') {
+        User.getForParentRole(req.session.user.id, 'admin', (err, rows)=>{
+            if (err) {
+                req.session.error = dict.messages.db_error+":"+err.message;
+                return res.redirect('/cards');
+            }
+            var admins = rows;
+            var companies = [];
+
+            Company.getCompaniesForParent(req.session.user.id, (err, rows)=>{
+                if (err) {
+                    req.session.error = dict.messages.db_error+":"+err.message;
+                    return res.redirect('/cards');
+                }
+
+                companies = rows;
+
+                return res.render('card/create', {
+                    pageType: 'cards',
+                    dict: dict,
+                    account: req.session.user,
+                    types: types,
+                    admins: admins,
+                    companies: companies,
+                    statuses: statuses,
+                    message: session_message,
+                    error: session_error,
+                    errors: session_validate_error
+                });
+            });
+
+        });
+    } else {
+        Company.getCompaniesForOwner(req.session.user.id, (err, rows)=>{
+            if (err) {
+                req.session.error = dict.messages.db_error+":"+err.message;
+                return res.redirect('/cards');
+            }
+            var companies = rows;
+            return res.render('card/create', {
+                pageType: 'cards',
+                dict: dict,
+                account: req.session.user,
+                types: types,
+                companies: companies,
+                statuses: statuses,
+                message: session_message,
+                error: session_error,
+                errors: session_validate_error
+            });
+        })
+    }
+
 });
 
 router.post('/create', (req, res, next)=> {
@@ -164,7 +199,20 @@ router.post('/create', (req, res, next)=> {
         var qr_code = md5(card_number);
 
         console.log(card_number+" "+qr_code);
-        var body = {card_nb: card_number, qr_code: qr_code, type: req.body.type, status: 'published', lifetime: req.body.lifetime, servicetime: req.body.servicetime, test: req.body.test};
+        console.log(req.body);
+        var body = {};
+        body.card_nb = card_number;
+        body.qr_code = qr_code;
+        body.type = req.body.type;
+        body.status = 'published';
+        body.lifetime = req.body.lifetime;
+        body.servicetime = req.body.servicetime;
+        body.company = req.body.company !='' ? req.body.company : null;
+        body.transh = '0';
+        body.test = req.body.test;
+        body.owner = req.body.admin != '' ? req.body.admin : req.body.owner;
+        //var body = {card_nb: card_number, qr_code: qr_code, type: req.body.type, status: 'published', lifetime: req.body.lifetime, servicetime: req.body.servicetime, company:req.body.company!=''?req.body.company:null, transh:'0', test: req.body.test};
+        console.log(body);
         Card.createCard(body, (err, rows)=>{
             if (err) {
                 req.session.error = dict.messages.db_error+": "+err.message;
@@ -198,7 +246,7 @@ router.get('/:id/edit', (req, res, next)=>{
 
     Card.getById(req.params.id, (err, rows)=>{
         if (err) {
-            req.session.error = dict.messages.db_error+": "+err.message;
+            req.session.error = dict.messages.db_error+": +++"+err.message;
             res.redirect('/cards/'+req.params.id+'/edit');
             return;
         }
@@ -214,17 +262,99 @@ router.get('/:id/edit', (req, res, next)=>{
         var statuses = config.cardStatus;
         var types = config.tariffTypes;
 
-        return res.render('card/edit', {
-            pageType: 'cards',
-            dict: dict,
-            account: req.session.user,
-            types: types,
-            card: card,
-            statuses: statuses,
-            message: session_message,
-            error: session_error,
-            errors: session_validate_error
-        });
+        if (req.session.user.role === 'super') {
+            if (card.owner == 0) {
+                User.getForParentRole(req.session.user.id, 'admin', (err, rows)=>{
+                    if (err) {
+                        req.session.error = dict.messages.db_error+": !!!"+err.message;
+                        return res.redirect('/cards');
+                    }
+                    var admins = rows;
+                    var companies = [];
+
+                    Company.getCompaniesForParent(req.session.user.id, (err, rows)=>{
+                        if (err) {
+                            req.session.error = dict.messages.db_error+": ???"+err.message;
+                            return res.redirect('/cards');
+                        }
+
+                        companies = rows;
+
+                        return res.render('card/edit', {
+                            pageType: 'cards',
+                            dict: dict,
+                            account: req.session.user,
+                            types: types,
+                            admins: admins,
+                            card: card,
+                            companies: companies,
+                            statuses: statuses,
+                            message: session_message,
+                            error: session_error,
+                            errors: session_validate_error
+                        });
+                    });
+
+                });
+            } else {
+
+                User.getForParentRole(req.session.user.id, 'admin', (err, rows)=>{
+                    if (err) {
+                        req.session.error = dict.messages.db_error+": !!!"+err.message;
+                        return res.redirect('/cards');
+                    }
+                    var admins = rows;
+
+                    Company.getCompaniesForOwner(card.owner, (err, rows)=>{
+                        if (err) {
+                            req.session.error = dict.messages.db_error+":"+err.message;
+                            return res.redirect('/cards');
+                        }
+                        var companies = rows;
+
+                        return res.render('card/edit', {
+                            pageType: 'cards',
+                            dict: dict,
+                            account: req.session.user,
+                            types: types,
+                            card: card,
+                            admins: admins,
+                            companies: companies,
+                            statuses: statuses,
+                            message: session_message,
+                            error: session_error,
+                            errors: session_validate_error
+                        });
+                    })
+
+                });
+            }
+
+
+        } else {
+
+            Company.getCompaniesForOwner(req.session.user.id, (err, rows)=>{
+                if (err) {
+                    req.session.error = dict.messages.db_error+":"+err.message;
+                    return res.redirect('/cards');
+                }
+                var companies = rows;
+                return res.render('card/edit', {
+                    pageType: 'cards',
+                    dict: dict,
+                    account: req.session.user,
+                    types: types,
+                    card: card,
+                    companies: companies,
+                    statuses: statuses,
+                    message: session_message,
+                    error: session_error,
+                    errors: session_validate_error
+                });
+            })
+
+        }
+
     })
 });
 
@@ -242,6 +372,8 @@ router.put('/:id/edit', (req, res, next)=> {
         res.redirect('/cards/'+req.body.id+'/edit');
         return;
     }
+
+    console.log(req.body);
 
     Card.updateCard(req.body, (err, rows)=>{
         if (err) {
@@ -279,6 +411,22 @@ router.delete('/:id/delete', function(req, res, next) {
         }
         return res.status(200).send('ok');
     });
+
+});
+
+/*
+ * Transhes
+ */
+
+router.get('/transhes', (req, res, next)=>{
+    var session_message = req.session.message ? req.session.message : null;
+    req.session.message = null;
+    var session_error = req.session.error ? req.session.error : null;
+    req.session.error = null;
+    var session_validate_error = req.session.validate_error ? req.session.validate_error : null;
+    req.session.validate_error = null;
+
+
 
 });
 

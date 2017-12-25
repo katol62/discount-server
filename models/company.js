@@ -100,6 +100,36 @@ var Company = {
         })
     },
 
+    getCompaniesForOwner: (owner, done)=>{
+        var query = 'SELECT * from company WHERE owner = ?';
+        db.query(query, [owner], (err, rows)=> {
+            if (err) {
+                return done(err)
+            }
+            done(null, rows)
+        })
+    },
+
+    getCompaniesForId: (id, done)=>{
+        var query = 'SELECT * from company WHERE owner = (SELECT owner from company WHERE id = ?)';
+        db.query(query, [id], (err, rows)=> {
+            if (err) {
+                return done(err)
+            }
+            done(null, rows)
+        })
+    },
+
+    getCompaniesForParent: (id, done)=>{
+        var query = 'SELECT * from company WHERE owner IN ((SELECT id from users WHERE parent = ?))';
+        db.query(query, [id], (err, rows)=> {
+            if (err) {
+                return done(err)
+            }
+            done(null, rows)
+        })
+    },
+
     getTerminals: (owner, cid, done)=>{
         var query = 'SELECT * from company WHERE owner = ? AND id = ?';
         db.query(query, [owner], (err, rows)=> {

@@ -17,42 +17,55 @@ $(document).ready(()=>{
     //create company
     $('#country').on('change', function () {
         var selected = $(this).find("option:selected").val();
-        $.ajax({
-            type: "GET",
-            url: '/location/countries/'+selected+'/fos',
-            //data: dataString,
-            success: function (result) {
-                console.log(result)
-                $("#foc").html('');
-                $("#foc").append('<option value="">--Select--</option>')
-                $.each(result, function () {
-                    $("#foc").append('<option value="' + this.id + '">' + this.name + '</option>')
-                })
-                $("#foc").selectpicker('refresh');
-            }
-
-        });
+        if (selected == '') {
+            $("#foc").html('');
+            $("#foc").append('<option value="">--Выбрать--</option>')
+            $("#foc").selectpicker('refresh');
+            $("#region").html('');
+            $("#region").append('<option value="">--Выбрать--</option>')
+            $("#region").selectpicker('refresh');
+        } else {
+            $.ajax({
+                type: "GET",
+                url: '/location/countries/'+selected+'/fos',
+                //data: dataString,
+                success: function (result) {
+                    console.log(result)
+                    $("#foc").html('');
+                    $("#foc").append('<option value="">--Выбрать--</option>')
+                    $.each(result, function () {
+                        $("#foc").append('<option value="' + this.id + '">' + this.name + '</option>')
+                    })
+                    $("#foc").selectpicker('refresh');
+                }
+            });
+        }
 
     });
 
     $('#foc').on('change', function () {
         var selected = $(this).find("option:selected").val();
-        var selected = $(this).find("option:selected").val();
-        $.ajax({
-            type: "GET",
-            url: '/location/fos/' + selected + '/regions',
-            //data: dataString,
-            success: function (result) {
-                console.log(result)
-                $("#region").html('');
-                $("#region").append('<option value="">--Select--</option>')
-                $.each(result, function () {
-                    $("#region").append('<option value="' + this.id + '">' + this.name + '</option>')
-                })
-                $("#region").selectpicker('refresh');
-            }
+        if (selected == '') {
+            $("#region").html('');
+            $("#region").append('<option value="">--Выбрать--</option>')
+            $("#region").selectpicker('refresh');
+        } else {
+            $.ajax({
+                type: "GET",
+                url: '/location/fos/' + selected + '/regions',
+                //data: dataString,
+                success: function (result) {
+                    console.log(result)
+                    $("#region").html('');
+                    $("#region").append('<option value="">--Выбрать--</option>')
+                    $.each(result, function () {
+                        $("#region").append('<option value="' + this.id + '">' + this.name + '</option>')
+                    })
+                    $("#region").selectpicker('refresh');
+                }
 
-        });
+            });
+        }
     });
 
     $('#guest').change( ()=>{
@@ -61,7 +74,45 @@ $(document).ready(()=>{
         } else {
             $('#passContainer').css('display', 'none')
         }
-    })
+    });
+
+    $('#admin').on('change', function () {
+        var selected = $(this).find("option:selected").val();
+        if (selected == '') {
+            $.ajax({
+                type: "GET",
+                url: '/companies/super/1/companies',
+                //data: dataString,
+                success: function (result) {
+                    $("#company").html('');
+                    $("#company").append('<option value="">--Выбрать--</option>')
+                    $.each(result, (index, item)=> {
+                        console.log(this);
+                        $("#company").append('<option value="' + item.id + '">' + item.name + '</option>')
+                    })
+                    $("#company").selectpicker('refresh');
+                }
+
+            });
+        } else {
+            $.ajax({
+                type: "GET",
+                url: '/companies/admins/' + selected + '/companies',
+                //data: dataString,
+                success: function (result) {
+                    $("#company").html('');
+                    $("#company").append('<option value="">--Выбрать--</option>')
+                    $.each(result, (index, item)=> {
+                        console.log(this);
+                        $("#company").append('<option value="' + item.id + '">' + item.name + '</option>')
+                    })
+                    $("#company").selectpicker('refresh');
+                }
+
+            });
+        }
+    });
+
 
 });
 
