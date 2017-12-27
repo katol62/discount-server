@@ -2,6 +2,7 @@ var express = require('express');
 var User = require('./../models/user');
 var Card = require('./../models/card');
 var Company = require('./../models/company');
+var Transh = require('./../models/transh');
 var bcrypt = require('bcrypt');
 var locale = require('./../misc/locale');
 var config = require('./../misc/config');
@@ -57,52 +58,75 @@ router.get('/', (req, res, next)=>{
     var session_validate_error = req.session.validate_error ? req.session.validate_error : null;
     req.session.validate_error = null;
 
-    var offset = req.params.start ? req.params.start : 0;
-    var limit = 10;
-
-    Card.getAllForUser(req.session.user, limit, offset, (err, rows)=>{
+    Card.getTotalForOwner(req.session.user, (err, rows)=>{
         if (err) {
             req.session.error = dict.messages.db_error+":"+err.message;
             return res.redirect('/cards');
         }
-        console.log(rows);
-        if (rows.length === 0) {
-            rows = [];
-            return res.render('card/list', {
-                pageType: 'cards',
-                dict: dict,
-                account: req.session.user,
-                message: session_message,
-                error: session_error,
-                items: rows
-            });
-        }
-        var finalRows = [];
-        var count = 0;
-        var length = rows.length;
 
-        rows.forEach((row, index)=>{
-            count++
-            var finalRow = row;
-            console.log(row.type);
-            console.log(row.status);
-            finalRow.typeName = globals.methods.nameById(row.type, config.tariffTypes);
-            finalRow.statusName = globals.methods.nameById(row.status, config.cardStatus);
-            finalRows.push(finalRow);
-            if (count >= rows.length) {
+        if (rows.length === 0) {
+            req.session.error = dict.messages.db_error;
+            return res.redirect('/cards');
+        }
+        var total = rows[0].count;
+
+        var limit = config.paginationLimit;
+        var page = req.query.page ? Number(req.query.page) : 1;
+        var offset = (page-1)*limit;
+        var page = {offset: offset, limit: limit, page: page, total: total};
+
+        Card.getAllForUser(req.session.user, limit, offset, (err, rows)=>{
+            if (err) {
+                req.session.error = dict.messages.db_error+":"+err.message;
+                return res.redirect('/cards');
+            }
+            if (rows.length === 0) {
+                rows = [];
+                page.pages = [];
                 return res.render('card/list', {
                     pageType: 'cards',
                     dict: dict,
+                    page: page,
                     account: req.session.user,
                     message: session_message,
                     error: session_error,
-                    items: finalRows
+                    items: rows
                 });
-
             }
+            var finalRows = [];
+            var count = 0;
+            var pCount = Math.ceil(total/limit);
+            console.log(pCount+' '+total+' '+(total/limit));
+            page.pages = [];
+            for (var i=1; i<=pCount; i++) {
+                page.pages.push(i);
+            }
+            rows.forEach((row, index)=>{
+                count++;
+                var finalRow = row;
+                finalRow.typeName = globals.methods.nameById(row.type, config.tariffTypes);
+                finalRow.statusName = globals.methods.nameById(row.status, config.cardStatus);
+                finalRows.push(finalRow);
+                if (count >= rows.length) {
+                    return res.render('card/list', {
+                        pageType: 'cards',
+                        dict: dict,
+                        page: page,
+                        account: req.session.user,
+                        message: session_message,
+                        error: session_error,
+                        items: finalRows
+                    });
+
+                }
+            });
+
         });
 
+
     });
+
+
 });
 
 /*
@@ -198,8 +222,6 @@ router.post('/create', (req, res, next)=> {
         var card_number = generateCardNumber(req.session.user.id, Number(req.body.codetype), ai);
         var qr_code = md5(card_number);
 
-        console.log(card_number+" "+qr_code);
-        console.log(req.body);
         var body = {};
         body.card_nb = card_number;
         body.qr_code = qr_code;
@@ -211,8 +233,6 @@ router.post('/create', (req, res, next)=> {
         body.transh = '0';
         body.test = req.body.test;
         body.owner = req.body.admin != '' ? req.body.admin : req.body.owner;
-        //var body = {card_nb: card_number, qr_code: qr_code, type: req.body.type, status: 'published', lifetime: req.body.lifetime, servicetime: req.body.servicetime, company:req.body.company!=''?req.body.company:null, transh:'0', test: req.body.test};
-        console.log(body);
         Card.createCard(body, (err, rows)=>{
             if (err) {
                 req.session.error = dict.messages.db_error+": "+err.message;
@@ -373,8 +393,6 @@ router.put('/:id/edit', (req, res, next)=> {
         return;
     }
 
-    console.log(req.body);
-
     Card.updateCard(req.body, (err, rows)=>{
         if (err) {
             req.session.error = dict.messages.db_error+": "+err.message;
@@ -426,9 +444,327 @@ router.get('/transhes', (req, res, next)=>{
     var session_validate_error = req.session.validate_error ? req.session.validate_error : null;
     req.session.validate_error = null;
 
+    Transh.getAllByOwner(req.session.user, (err, rows)=>{
+        if (err) {
+            req.session.error = dict.messages.db_error+": "+err.message;
+            res.redirect('/cards');
+            return;
+        }
 
+        return res.render('transh/list', {
+            pageType: 'cards',
+            dict: dict,
+            account: req.session.user,
+            items: rows,
+            message: session_message,
+            error: session_error,
+            errors: session_validate_error
+        });
+
+    })
 
 });
+
+/*
+ * Create transh
+ */
+
+router.get('/transhes/create', (req, res, next)=> {
+
+    var session_message = req.session.message ? req.session.message : null;
+    req.session.message = null;
+    var session_error = req.session.error ? req.session.error : null;
+    req.session.error = null;
+    var session_validate_error = req.session.validate_error ? req.session.validate_error : null;
+    req.session.validate_error = null;
+
+    var statuses = config.cardStatus;
+    var types = config.tariffTypes;
+
+    if (req.session.user.role === 'super') {
+        User.getForParentRole(req.session.user.id, 'admin', (err, rows)=>{
+            if (err) {
+                req.session.error = dict.messages.db_error+":"+err.message;
+                return res.redirect('/cards');
+            }
+            var admins = rows;
+            var companies = [];
+
+            Company.getCompaniesForParent(req.session.user.id, (err, rows)=>{
+                if (err) {
+                    req.session.error = dict.messages.db_error+":"+err.message;
+                    return res.redirect('/cards');
+                }
+
+                companies = rows;
+
+                return res.render('transh/create', {
+                    pageType: 'cards',
+                    dict: dict,
+                    account: req.session.user,
+                    types: types,
+                    admins: admins,
+                    companies: companies,
+                    statuses: statuses,
+                    message: session_message,
+                    error: session_error,
+                    errors: session_validate_error
+                });
+            });
+
+        });
+    } else {
+        Company.getCompaniesForOwner(req.session.user.id, (err, rows)=>{
+            if (err) {
+                req.session.error = dict.messages.db_error+":"+err.message;
+                return res.redirect('/cards');
+            }
+            var companies = rows;
+            return res.render('transh/create', {
+                pageType: 'cards',
+                dict: dict,
+                account: req.session.user,
+                types: types,
+                companies: companies,
+                statuses: statuses,
+                message: session_message,
+                error: session_error,
+                errors: session_validate_error
+            });
+        })
+    }
+
+});
+
+router.post('/transhes/create', (req, res, next)=> {
+    req.checkBody('count', dict.messages.transh_count_required).notEmpty();
+    req.checkBody('lifetime', dict.messages.card_lifetime_required).notEmpty();
+    req.checkBody('servicetime', dict.messages.card_servicetime_required).notEmpty();
+    req.checkBody('type', dict.messages.card_type_required).notEmpty();
+
+    var errors = req.validationErrors();
+
+    if (errors) {
+        req.session.validate_error = errors;
+        res.redirect('/cards/transhes/create');
+        return;
+    }
+
+    Card.getAutoIncrement((err, rows)=>{
+        if (err) {
+            req.session.error = dict.messages.db_error+": "+err.message;
+            res.redirect('/cards/transhes');
+            return;
+        }
+        var start = rows[0].ai;
+        var count = req.body.count;
+        var owner = req.body.admin != '' ? req.body.admin : req.body.owner;
+
+        var body = {start: start, count: count, owner: owner};
+
+        Transh.createTransh(body, (err, rows)=>{
+            if (err) {
+                req.session.error = dict.messages.db_error+": "+err.message;
+                return res.redirect('/cards/transhes');
+            }
+            if (!rows.insertId) {
+                req.session.error = dict.messages.transh_create_error;
+                return res.redirect('/cards/transhes');
+            }
+            var transh = rows.insertId;
+
+            var finalArray = [];
+
+            console.log(Number(start));
+            console.log(Number(count));
+            console.log(Number(start)+Number(count));
+
+            for (var i=Number(start); i<Number(start)+Number(count); i++) {
+                var card_number = generateCardNumber(req.session.user.id, Number(req.body.codetype), i);
+                var qr_code = md5(card_number);
+                var card = [];
+                card.push(qr_code);
+                card.push(card_number);
+                card.push(req.body.type);
+                card.push('published');
+                card.push(req.body.lifetime);
+                card.push(req.body.servicetime);
+                card.push(req.body.company !='' ? req.body.company : null);
+                card.push(transh);
+                card.push('0');
+                card.push(owner);
+
+                finalArray.push(card);
+            }
+
+            console.log(finalArray);
+
+            Card.createCardTransh(finalArray, (err, rows)=>{
+                if (err) {
+                    req.session.error = dict.messages.db_error+": !!!"+err.message;
+                    res.redirect('/cards/transhes/create');
+                    return;
+                }
+                if (rows.affectedRows===0) {
+                    req.session.error = dict.messages.transh_create_error;
+                    res.redirect('/cards/transhes');
+                    return;
+                }
+                req.session.message = dict.messages.transh_created;
+                res.redirect('/cards');
+            })
+
+        });
+
+    })
+
+});
+
+/*
+ * Edit transh
+ */
+
+router.get('/transhes/:id/edit', (req, res, next)=>{
+
+    var session_message = req.session.message ? req.session.message : null;
+    req.session.message = null;
+    var session_error = req.session.error ? req.session.error : null;
+    req.session.error = null;
+    var session_validate_error = req.session.validate_error ? req.session.validate_error : null;
+    req.session.validate_error = null;
+
+    var statuses = config.cardStatus;
+    var types = config.tariffTypes;
+
+    Transh.getTransh(req.params.id, (err, rows)=>{
+        if (err) {
+            req.session.error = dict.messages.db_error+":"+err.message;
+            return res.redirect('/cards/transhes');
+        }
+        if (rows.length === 0) {
+            req.session.error = dict.messages.transh_not_found;
+            return res.redirect('/cards/transhes');
+        }
+        var transh = rows[0];
+
+        if (req.session.user.role === 'super') {
+            User.getForParentRole(req.session.user.id, 'admin', (err, rows)=>{
+                if (err) {
+                    req.session.error = dict.messages.db_error+":"+err.message;
+                    return res.redirect('/cards/transhes');
+                }
+                var admins = rows;
+                var companies = [];
+
+                Company.getCompaniesForParent(req.session.user.id, (err, rows)=>{
+                    if (err) {
+                        req.session.error = dict.messages.db_error+":"+err.message;
+                        return res.redirect('/cards/transhes');
+                    }
+
+                    companies = rows;
+
+                    return res.render('transh/edit', {
+                        pageType: 'cards',
+                        dict: dict,
+                        account: req.session.user,
+                        types: types,
+                        admins: admins,
+                        transh: transh,
+                        companies: companies,
+                        statuses: statuses,
+                        message: session_message,
+                        error: session_error,
+                        errors: session_validate_error
+                    });
+                });
+
+            });
+        } else {
+            Company.getCompaniesForOwner(req.session.user.id, (err, rows)=>{
+                if (err) {
+                    req.session.error = dict.messages.db_error+":"+err.message;
+                    return res.redirect('/cards/transhes');
+                }
+                var companies = rows;
+                return res.render('transh/edit', {
+                    pageType: 'cards',
+                    dict: dict,
+                    account: req.session.user,
+                    types: types,
+                    transh: transh,
+                    companies: companies,
+                    statuses: statuses,
+                    message: session_message,
+                    error: session_error,
+                    errors: session_validate_error
+                });
+            })
+        }
+
+    });
+
+});
+
+router.put('/transhes/:id/edit', (req, res, next)=> {
+
+    req.checkBody('lifetime', dict.messages.card_lifetime_required).notEmpty();
+    req.checkBody('servicetime', dict.messages.card_servicetime_required).notEmpty();
+    req.checkBody('type', dict.messages.card_type_required).notEmpty();
+
+    var errors = req.validationErrors();
+
+    if (errors) {
+        req.session.validate_error = errors;
+        res.redirect('/cards/transhes/'+req.params.id+'/edit');
+        return;
+    }
+
+    Transh.updateTransh(req.body, (err, rows)=>{
+        if (err) {
+            req.session.error = dict.messages.db_error+": "+err.message;
+            res.redirect('/cards/transhes/'+req.params.id+'/edit');
+            return;
+        }
+        Card.updateCardsForTransh(req.body, (err, rows)=>{
+            if (err) {
+                req.session.error = dict.messages.db_error+": "+err.message;
+                res.redirect('/cards/transhes/'+req.params.id+'/edit');
+                return;
+            }
+            if (rows.affectedRows === 0) {
+                req.session.error = dict.messages.transh_update_error;
+                res.redirect('/cards/transhes/'+req.params.id+'/edit');
+                return;
+            }
+            req.session.message = dict.messages.transh_updated;
+            res.redirect('/cards/transhes');
+
+        })
+    });
+});
+
+/*
+ * Delete card
+ */
+
+router.delete('/transhes/:id/delete', function(req, res, next) {
+
+    Card.deleteCardsForTransh(req.params.id, (err, rows)=> {
+        if (err) {
+            req.session.error = dict.messages.db_error+": "+err.message;
+        } else {
+            if (rows.affectedRows) {
+                req.session.message = dict.messages.transh_deleted;
+            } else {
+                req.session.error = dict.messages.transh_delete_error;
+            }
+        }
+        return res.status(200).send('ok');
+    });
+
+});
+
 
 
 module.exports = router;

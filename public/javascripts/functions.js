@@ -337,3 +337,40 @@ var confirmDeleteCard = (id, number)=>{
         }
     });
 };
+
+var confirmDeleteTransh = (id)=>{
+    bootbox.confirm({
+        message: "Удалить карты транша "+id+"?",
+        buttons: {
+            confirm: {
+                label: 'Да',
+                className: 'btn-success'
+            },
+            cancel: {
+                label: 'Нет',
+                className: 'btn-danger'
+            }
+        },
+        callback: function (result) {
+            if (result) {
+
+                var url = '/cards/transhes/'+id+'/delete';
+                $.ajax({
+                    url: url,
+                    type: 'DELETE',
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader('X-HTTP-Method-Override', 'DELETE');
+                    },
+                    data: {},
+                    success:  () => {
+                        location.reload();
+                    },
+                    error: (data)=> {
+                        console.log(data);
+                    },
+                });
+            }
+        }
+    });
+};
+

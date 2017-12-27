@@ -11,6 +11,7 @@ module.exports = {
     'secret': 'Mxmbawlx50XOpKkUMcY2wNjoRmU06g3ComNXJfxfnyt9ESuAKSQxe8FXG',
     'sessionSecret': '2dgiEtWdUxbqK9hZ9sWZ4KdGwI5pRmQo0xivuMlh5G2f0ZBco2eDPEZ269Mg',
     'roles': ['super', 'admin', 'cashier'],
+    'paginationLimit': 10,
     'tariffTypes': [
         {id:'adult', name:dict.labels.label_tariff_adult},
         {id:'child', name:dict.labels.label_tariff_child},

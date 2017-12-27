@@ -1,0 +1,40 @@
+extends ../layout
+
+block content
+
+    div.container
+
+        div.row
+            div.col-lg-4.col-lg-offset-4.col-md-6.col-md-offset-3.col-sm-12.login-form-pre
+                h2= dict.titles.edit_transh
+                p= dict.labels.label_transh_start+": "+transh.card_nb
+                p= dict.labels.label_transh_count + ": " + transh.count
+            div.col-lg-4.col-lg-offset-4.col-md-6.col-md-offset-3.col-sm-12
+                form(method='post' action='/cards/transhes/'+transh.id+'/edit')
+                    input#_method(type='hidden', name='_method', value='PUT')
+                    input#id(type='hidden', name='id', value=transh.id)
+
+                    if account.role === 'super'
+                        +formSelect('admin', dict.labels.label_admin, admins, transh.owner)
+
+                    input(type='hidden', name='owner', value=account.id)
+
+                    +formSelect('company', dict.labels.label_company, companies, transh.company_id)
+
+                    +formTextInput('lifetime', 'number', dict.labels.label_card_lifetime, dict.labels.label_card_lifetime, transh.lifetime)
+                    +formTextInput('servicetime', 'number', dict.labels.label_card_servicetime, dict.labels.label_card_servicetime, transh.servicetime)
+
+                    +formSelect('type', dict.labels.label_card_type, types, transh.type, false, '', 'hide')
+                    +formSelect('status', dict.labels.label_card_status, statuses, transh.status, false, '', 'hide')
+
+                    button.btn.btn-primary(type='submit') #{dict.labels.label_update}
+
+            div.col-lg-4.col-lg-offset-4.col-md-6.col-md-offset-3.col-sm-12.login-form-pre
+                if errors
+                    ul.error
+                        for error in errors
+                            li.mess.error!= error.msg
+                if error
+                    p.mess.error #{error}
+                if success
+                    p #{success.msg}

@@ -12,10 +12,10 @@ block content
                     | &nbsp;
                     = dict.titles.create_cards
                 | &nbsp;
-                a(class=('btn btn-primary') href="#")
+                a(class=('btn btn-primary') href="/cards/transhes")
                     span(class='glyphicon glyphicon-plus-sign')
                     | &nbsp;
-                    = dict.titles.generate_cards
+                    = dict.titles.transhes
             if items && items.length
                 div.col-lg-12.margin-top
 
@@ -23,7 +23,7 @@ block content
                         div.table-responsive
                             table.table.table-bordered
                                 thead
-                                    tr: th QR
+                                    tr(class='th-users'): th QR
                                         th NFS
                                         th M-Code
                                         th= dict.labels.label_card_number
@@ -50,6 +50,17 @@ block content
                                                 a(class='glyphicon glyphicon-edit' href='/cards/' + item.id + '/edit')
                                                 | &nbsp;
                                                 a(class='glyphicon glyphicon-trash text-danger' onclick='confirmDeleteCard(' + item.id + ', "' + item.card_nb + '"); return false;' style='cursor:pointer')
+                if page.pages.length
+                    div.col-lg-12
+                        ul(class='pagination')
+                            each p in page.pages
+                                if page.page == p
+                                    li(class='active')
+                                        a= p
+                                else
+                                    li
+                                        a(href='/cards?page='+p)= p
+
 
             if message
                 div.col-lg-4.col-lg-offset-4.col-md-6.col-md-offset-3.col-sm-12.margin-top

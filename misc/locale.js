@@ -25,6 +25,9 @@ module.exports = {
             "create_cards": "Добавить карту",
             "generate_cards": "Генерировать транш",
             "update_cards": "Изменить карту",
+            "transhes": "Транши",
+            "transh": "Транш",
+            "edit_transh": "Редактировать карты транша",
         },
         "labels": {
             "email_address": "Емейл",
@@ -98,6 +101,8 @@ module.exports = {
             "label_card_test":"Тестовая карта",
             "label_card_number":"Номер карты",
             "label_company":"Компания",
+            "label_transh_start":"Начальный номер",
+            "label_transh_count":"Количество карт в транше",
         },
         "messages": {
             "user_not_found": "Пользователь не найден",
@@ -157,6 +162,14 @@ module.exports = {
             "card_updated":"Карта изменена",
             "card_deleted": "Карта удалена",
             "card_not_deleted": "Ошибка удаления карты",
+            "transh_count_required":"Определите количество карт в транше",
+            "transh_create_error":"Ошибка генерации транша",
+            "transh_created":"Транш сформирован",
+            "transh_not_found":"Транш не найден",
+            "transh_update_error":"Ошибка изменения транша",
+            "transh_updated":"Карты для транша изменены",
+            "transh_delete_error":"Ошибка удаления карт транша",
+            "transh_deleted":"Карты транша удалены",
         }
     }
 };
