@@ -50,7 +50,7 @@ block content
                                                 a(class='glyphicon glyphicon-edit' href='/cards/' + item.id + '/edit')
                                                 | &nbsp;
                                                 a(class='glyphicon glyphicon-trash text-danger' onclick='confirmDeleteCard(' + item.id + ', "' + item.card_nb + '"); return false;' style='cursor:pointer')
-                if page.pages.length>page.limit
+                if page.total>page.limit
                     div.col-lg-12
                         ul(class='pagination')
                             each p in page.pages

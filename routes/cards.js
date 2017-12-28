@@ -558,7 +558,7 @@ router.post('/transhes/create', (req, res, next)=> {
         }
         var start = rows[0].ai;
         var count = req.body.count;
-        var owner = req.body.admin != '' ? req.body.admin : req.body.owner;
+        var owner = (req.body.admin && req.body.admin != '') ? req.body.admin : req.body.owner;
 
         var body = {start: start, count: count, owner: owner};
 
