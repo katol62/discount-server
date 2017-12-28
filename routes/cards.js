@@ -232,7 +232,10 @@ router.post('/create', (req, res, next)=> {
         body.company = req.body.company !='' ? req.body.company : null;
         body.transh = '0';
         body.test = req.body.test;
-        body.owner = req.body.admin != '' ? req.body.admin : req.body.owner;
+        body.owner = (req.body.admin && req.body.admin != '') ? req.body.admin : req.body.owner;
+
+        console.log(body);
+
         Card.createCard(body, (err, rows)=>{
             if (err) {
                 req.session.error = dict.messages.db_error+": "+err.message;
