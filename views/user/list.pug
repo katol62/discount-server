@@ -30,7 +30,7 @@ block content
                                         td #{item.terminal ? item.terminal.name : 'Все'}
                                         td #{item.name+' '+item.last}
                                         td #{item.email}
-                                        td #{item.role == 'admin' ? 'Администратор' : 'Кассир'}
+                                        td #{item.role == 'admin' || !item.terminal ? 'Администратор' : 'Кассир'}
                                         td
                                             if item.id!==account.id
                                                 +link('', '/companies/' + company.id + '/users/'+item.id+'/edit', 'glyphicon glyphicon-edit', '', dict.labels.label_update, '')

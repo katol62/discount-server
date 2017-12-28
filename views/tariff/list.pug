@@ -32,7 +32,7 @@ block content
                                     tr
                                         td #{item.name}
                                         if item.start && item.start != '0000-00-00'
-                                            td #{moment(item.start).format("YYYY/MM/DD") + ' - '+moment(item.end).format("YYYY/MM/DD")}
+                                            td #{moment(item.start).format("DD/MM/YYYY") + ' - '+moment(item.end).format("DD/MM/YYYY")}
                                         else
                                             td= dict.labels.label_unlimited
                                         td #{item.discount}

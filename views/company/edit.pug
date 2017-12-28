@@ -25,11 +25,11 @@ block content
                     +formTextInput('inn', 'text', dict.labels.label_company_inn, dict.labels.label_company_inn, company.inn)
                     +formTextInput('kpp', 'text', dict.labels.label_company_kpp, dict.labels.label_company_kpp, company.kpp)
                     +formTextInput('ogrn', 'text', dict.labels.label_company_ogrn, dict.labels.label_company_ogrn, company.ogrn)
-                    +formTextInput('nds', 'text', dict.labels.label_company_nds, dict.labels.label_company_nds, company.nds)
+                    +formTextInput('nds', 'number', dict.labels.label_company_nds, dict.labels.label_company_nds, company.nds)
                     +formTextInput('juradress', 'text', dict.labels.label_company_juradress, dict.labels.label_company_juradress, company.juradress)
                     +formTextInput('adress', 'text', dict.labels.label_company_adress, dict.labels.label_company_adress, company.adress)
                     +formTextInput('dogovor', 'text', dict.labels.label_company_dogovor, dict.labels.label_company_dogovor, company.dogovor)
-                    +formTextInput('dogovordate', 'date', dict.labels.label_company_dogovor_date, dict.labels.label_company_dogovor_date, company.dogovordate)
+                    +formTextInput('dogovordate', 'date', dict.labels.label_company_dogovor_date, dict.labels.label_company_dogovor_date, moment(company.dogovordate).format("YYYY-MM-DD"))
 
                     +formSelect('country', dict.labels.label_country, countries, company.country, true)
                     +formSelect('foc', dict.labels.label_fed_okrug, fos, company.foc, true)
