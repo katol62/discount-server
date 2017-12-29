@@ -87,6 +87,15 @@ var Card = {
         })
     },
 
+    getByIdOrNumber: (id, done)=>{
+        db.query('SELECT * FROM cards WHERE id = ? OR card_nb = ?', [id, id], (err, rows)=>{
+            if (err) {
+                return done(err)
+            }
+            done(null, rows)
+        })
+    },
+
     delete: (id, done)=>{
         db.query('DELETE FROM cards WHERE id = ?', [id], (err, rows)=>{
             if (err) {
@@ -124,6 +133,34 @@ var Card = {
     deleteCardsForTransh: (id, done)=>{
         var query = 'DELETE t, c FROM transh t JOIN cards c ON c.transh = t.id WHERE t.id = ?';
         var params = [id];
+        db.query(query, params, (err, rows)=>{
+            if (err) {
+                return done(err)
+            }
+            done(null, rows)
+        })
+    },
+
+    setSold: (id, pass, done)=>{
+        var query = 'UPDATE cards SET status=\'sold\', pass = ? WHERE id = ?';
+        var params = [pass, id];
+        db.query(query, params, (err, rows)=>{
+            if (err) {
+                return done(err)
+            }
+            done(null, rows)
+        })
+    },
+
+    updateStatus: (body, done)=>{
+        var query = 'UPDATE cards SET status=? WHERE id = ?';
+        var params = [body.status, body.id];
+
+        if (body.pass) {
+            query = 'UPDATE cards SET status=? AND pass=? WHERE id = ?';
+            params = [body.status, body.pass, body.id];
+        }
+
         db.query(query, params, (err, rows)=>{
             if (err) {
                 return done(err)

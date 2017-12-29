@@ -1,0 +1,48 @@
+extends ../layout
+
+block content
+
+    div.container
+
+        div.row
+            div.col-lg-4.col-lg-offset-4.col-md-6.col-md-offset-3.col-sm-12.login-form-pre
+                h2= dict.titles.create_visit
+                p(style='font-weight:bold') Компания: #{company.name}
+                p= company.countryname + ', ' + company.focname + ', ' + company.regionname
+                p(style='font-weight:bold') Терминал: #{terminal.name}
+            div.col-lg-4.col-lg-offset-4.col-md-6.col-md-offset-3.col-sm-12
+                form(method='post' action='/companies/'+company.id+'/terminals/'+terminal.id+'/visits/add')
+                    input#owner(type='hidden', name='owner', value=account.id)
+                    input#tid(type='hidden', name='tid', value=terminal.id)
+                    input#guest(type='hidden', name='guest', value='0')
+
+                    +formTextInput('card', 'number', dict.labels.label_card_number, dict.labels.label_card_number, '')
+                    .form-group
+                        label(for='tariff')= dict.titles.tariff
+                        select.form-control.selectpicker(id='tariff' name='tariff' type="select")
+                            option(value='' title='--Выбрать--')
+                            each tariff in tariffs
+                                option(value=tariff.id data-card=tariff.guest) #{tariff.name}
+                    +formSelect('type', dict.labels.label_visit_type, types, terminal.type, false, '', 'hide')
+                    +formTextInput('price', 'number', dict.labels.label_visit_price, dict.labels.label_visit_price, '0')
+                    .form-group#passContainer(style='display:none')
+                        label(for='pass')= dict.labels.label_visit_pass
+                        select.form-control.selectpicker(id='pass' name='pass' type="select" disabled)
+                            each pass in passes
+                                option(value=pass.id data-tokens=pass.id) #{pass.name}
+
+                    button.btn.btn-primary(type='submit') #{dict.labels.label_add}
+
+            if message
+                div.col-lg-4.col-lg-offset-4.col-md-6.col-md-offset-3.col-sm-12.margin-top
+                    span.mess.success #{message}
+
+            if error
+                div.col-lg-4.col-lg-offset-4.col-md-6.col-md-offset-3.col-sm-12.margin-top
+                    span.mess.error #{error}
+
+            if errors
+                div.col-lg-4.col-lg-offset-4.col-md-6.col-md-offset-3.col-sm-12.margin-top
+                    ul.error
+                        for error in errors
+                            li.mess.error!= error.msg

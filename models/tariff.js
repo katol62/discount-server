@@ -27,12 +27,9 @@ var Tariff = {
             console.log(rows);
             done(null, rows)
         })
-
     },
 
     create: (body, done)=> {
-
-        console.log(body);
 
         var name = body.name;
         var start = (body.start && body.start!=='' ? body.start : '0000-00-00');
@@ -44,8 +41,7 @@ var Tariff = {
         var pass = guest=='1' ? body.pass : '0';
 
         console.log('=======')
-        console.log(start)
-        console.log(end)
+        console.log(guest)
         console.log('=======')
 
         var query = 'INSERT INTO tariff (name, start, end, type, discount, terminal, guest, pass) SELECT ?, ?, ?, ?, ?, ?, ?, ? FROM DUAL WHERE NOT EXISTS (SELECT * FROM tariff WHERE name = ? AND type = ? AND terminal = ?) LIMIT 1';
@@ -83,14 +79,22 @@ var Tariff = {
         var guest = body.guest === 'on' ? '1' : '0';
         var pass = guest=='1' ? body.pass : '0';
 
-        console.log('=======')
-        console.log(start)
-        console.log(end)
-        console.log('=======')
+        console.log(guest);
+
         var query = 'UPDATE tariff SET name=?, start=?, end=?, type=?, discount=?, terminal=?, guest=?, pass=? WHERE id=?';
         var params = [name, start, end, type, discount, terminal, guest, pass, id];
 
         db.query(query, params, function(err, rows) {
+            if (err) {
+                return done(err)
+            }
+            done(null, rows)
+        })
+    },
+
+    getForTerminal: (id, done)=>{
+        var query = 'SELECT * FROM tariff WHERE terminal = ?';
+        db.query(query, [id], (err, rows)=>{
             if (err) {
                 return done(err)
             }

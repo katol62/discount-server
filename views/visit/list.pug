@@ -1,0 +1,51 @@
+extends ../layout
+
+block content
+
+    div.container
+        div.row
+            div.col-lg-4.col-lg-offset-4.col-md-6.col-md-offset-3.col-sm-12
+                h2= dict.titles.visits
+                p(style='font-weight:bold') Компания: #{company.name}
+                p= company.countryname + ', ' + company.focname + ', ' + company.regionname
+                p(style='font-weight:bold') Терминал: #{terminal.name}
+            div.col-lg-12.margin-top
+                a(class=('btn btn-primary') href='/companies/'+company.id+'/terminals/'+terminal.id+'/visits/add')
+                    span(class='glyphicon glyphicon-plus-sign')
+                    | &nbsp;
+                    = dict.titles.create_visit
+            if items && items.length
+                div.col-lg-12.margin-top
+
+                    div.table-responsive
+
+                        table.table.table-bordered
+                            thead
+                                tr(class='th-users'): th= dict.titles.visit_date
+                                    th= dict.labels.label_card_number
+                                    th= dict.titles.tariff
+                                    th= dict.titles.visit_login
+                                    th= dict.titles.visit_price
+                                    th= dict.titles.visit_discount
+                            tbody
+                                each item, i in items
+                                    tr
+                                        td= moment(item.date).format("YYYY-MM-DD hh:mm")
+                                        td= item.cardNumber
+                                        td= item.tariffName
+                                        td= item.email
+                                        td= item.price
+                                        td= item.discount
+            if message
+                div.col-lg-4.col-lg-offset-4.col-md-6.col-md-offset-3.col-sm-12.margin-top
+                    span.mess.success #{message}
+
+            if error
+                div.col-lg-4.col-lg-offset-4.col-md-6.col-md-offset-3.col-sm-12.margin-top
+                    span.mess.error #{error}
+
+            if errors
+                div.col-lg-4.col-lg-offset-4.col-md-6.col-md-offset-3.col-sm-12.margin-top
+                    ul.error
+                        for error in errors
+                            li.mess.error!= error.msg

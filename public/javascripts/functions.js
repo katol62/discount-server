@@ -113,6 +113,27 @@ $(document).ready(()=>{
         }
     });
 
+    $('#tariff').on('change', ()=> {
+
+        var selected = $('#tariff').find("option:selected");
+        if (selected.val() == '') {
+            $('#passContainer').css('display', 'none');
+            $('#pass').attr('disabled', true);
+            $("#pass").selectpicker('refresh');
+        } else {
+            var card = selected.data('card');
+            if (card.toString()==='1') {
+                $('#passContainer').css('display', 'block')
+                $('#pass').attr('disabled', false);
+                $("#pass").selectpicker('refresh');
+            } else {
+                $('#passContainer').css('display', 'none')
+                $('#pass').attr('disabled', true);
+                $("#pass").selectpicker('refresh');
+            }
+        }
+
+    });
 
 });
 

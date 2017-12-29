@@ -42,9 +42,9 @@ mixin formSelect(id, label, items, value, disabled, parentId, hideBlank)
             if items && items.length
                 each item in items
                     if item.last
-                        option(value=item.id data-tokens=item.id selected=item.id===value) #{item.name + ' ' + item.last}
+                        option(value=item.id selected=item.id===value) #{item.name + ' ' + item.last}
                     else
-                        option(value=item.id data-tokens=item.id selected = item.id === value) #{item.name}
+                        option(value=item.id selected = item.id === value) #{item.name}
 
 mixin link(aclass, href, icon, label, title, onclick)
     a(class=(aclass? aclass : '') href=href title=title onclick=onclick)

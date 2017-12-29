@@ -4,10 +4,10 @@ var Company = {
 
     getAllCompanies: (role, id, done) => {
 
-        var query = 'SELECT * FROM company';
+        var query = 'SELECT * FROM company order by name';
         var params = [];
         if (role === 'admin') {
-            query = 'SELECT * from company WHERE owner = ?';
+            query = 'SELECT * from company WHERE owner = ? order by name';
             params = [id];
         }
         db.query(query, params, (err, rows)=>{
@@ -69,7 +69,7 @@ var Company = {
     },
 
     getCompaniesTerminals: (owner, done)=>{
-        var query = 'SELECT * from company WHERE owner = ?';
+        var query = 'SELECT * from company WHERE owner = ? order by name';
         db.query(query, [owner], (err, rows)=> {
             if (err) {
                 return done(err)
@@ -87,12 +87,12 @@ var Company = {
                 resRow.terminals = [];
                 count++;
 
-                db.query('SELECT * from terminal WHERE company = ?', [resRow.id], (err, rows)=>{
+                db.query('SELECT * from terminal WHERE company = ? order by name', [resRow.id], (err, rows)=>{
                     if (err) {
                         return done(err)
                     }
                     resRow.terminals = rows;
-                    resultRows.push(resRow);
+                    resultRows[index] = resRow;
 
                     if (count == length) {
                         return done(null, resultRows);

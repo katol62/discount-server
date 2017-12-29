@@ -1,0 +1,1 @@
+ALTER TABLE `cards` ADD `pass` ENUM('0','1','3','6') NOT NULL DEFAULT '0' AFTER `company_id`;
