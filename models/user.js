@@ -223,6 +223,26 @@ var User = {
 
     },
 
+    allowedCompany: (user, cid, done)=>{
+        var query = 'SELECT * FROM reference WHERE user = ? AND company = ?';
+        db.query(query, [user.id, cid], (err, rows)=>{
+            if (err) {
+                return done(err);
+            }
+            done(null, rows)
+        })
+    },
+
+    allowedTerminal: (user, cid, tid, done)=>{
+        var query = 'SELECT * FROM reference WHERE user = ? AND company = ? AND (isnull(terminal) OR terminal = ?)';
+        db.query(query, [user.id, cid, tid], (err, rows)=>{
+            if (err) {
+                return done(err);
+            }
+            done(null, rows)
+        })
+    },
+
 };
 
 module.exports = User;

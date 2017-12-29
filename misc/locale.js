@@ -119,6 +119,8 @@ module.exports = {
         "messages": {
             "user_not_found": "Пользователь не найден",
             "company_not_found": "Компания не найдена",
+            "company_not_allowed": "У вас нет доступа к компании",
+            "terminal_not_allowed": "У вас нет доступа к компании",
             "db_error": "Ошибка обращения к базе",
             "password_invalid": "Пароль неверный",
             "password_required": "Пароль - обязательное поле",

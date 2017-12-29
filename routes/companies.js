@@ -37,7 +37,22 @@ var checkCompany = (req, res, next)=>{
                 req.session.error = dict.messages.company_not_found;
                 return res.redirect('/companies');
             }
-            next();
+            if (req.session.user.role !== 'super') {
+                User.allowedCompany(req.session.user, req.params.cid, (err, rows)=>{
+                    if (err) {
+                        req.session.error = dict.messages.db_error+":"+err.code;
+                        return res.redirect('/companies');
+                    }
+                    if (rows.length == 0) {
+                        req.session.error = dict.messages.company_not_allowed;
+                        return res.redirect('/companies');
+                    } else {
+                        next();
+                    }
+                })
+            } else {
+                next();
+            }
         })
     } else {
         next()
@@ -55,7 +70,22 @@ var checkTerminal = (req, res, next)=>{
                 req.session.error = dict.messages.terminal_not_found;
                 return res.redirect('/companies');
             }
-            next();
+            if (req.session.user.role !== 'super') {
+                User.allowedTerminal(req.session.user, req.params.cid, req.params.tid, (err, rows)=>{
+                    if (err) {
+                        req.session.error = dict.messages.db_error+":"+err.code;
+                        return res.redirect('/companies');
+                    }
+                    if (rows.length == 0) {
+                        req.session.error = dict.messages.terminal_not_allowed;
+                        return res.redirect('/companies');
+                    } else {
+                        next();
+                    }
+                })
+            } else {
+                next();
+            }
         })
     } else {
         next()
@@ -76,7 +106,7 @@ router.use(methodOverride(function (req, res) {
 }));
 
 router.use(function(req, res, next) {
-    if (!req.session.user || req.session.user.role == 'cashier') {
+    if (!req.session.user) {
         return res.redirect('/signin');
     } else {
         next();
@@ -154,8 +184,8 @@ router.get('/', (req, res, next)=>{
                             errors: [{msg: dict.messages.db_error + err.code}]
                         });
                     } else {
-
                         resRow.terminals = rows;
+                        console.log(rows);
                         resultRows[index] = resRow;
 
                         if (count == length) {
@@ -259,14 +289,11 @@ router.post('/create', function(req, res, next) {
             req.session.error = dict.messages.db_error+": "+err.message;
             return res.redirect('/companies/create');
         } else {
-            console.log('======');
-            console.log(row);
-            console.log('======');
             if (row.affectedRows == 0) {
                 req.session.error = dict.messages.company_exists;
                 return res.redirect('/companies/create');
             }
-            User.updateReference(req.body.owner, row.insertId, 0, (err, rows)=>{
+            User.updateReference(req.body.owner, row.insertId, null, (err, rows)=>{
                 if (err) {
                     req.session.error = dict.messages.db_error+": "+err.message;
                     return res.redirect('/companies/create');

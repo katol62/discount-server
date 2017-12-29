@@ -6,8 +6,8 @@ var Company = {
 
         var query = 'SELECT * FROM company order by name';
         var params = [];
-        if (role === 'admin') {
-            query = 'SELECT * from company WHERE owner = ? order by name';
+        if (role === 'admin' || role == 'cashier') {
+            query = 'select c.*, r.* from company c left join reference r on r.company = c.id WHERE r.user = ? order by c.name';
             params = [id];
         }
         db.query(query, params, (err, rows)=>{
@@ -189,7 +189,8 @@ var Company = {
             done(null, rows)
         })
 
-    }
+    },
+
 };
 
 module.exports = Company;
