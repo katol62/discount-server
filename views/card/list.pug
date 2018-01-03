@@ -61,6 +61,13 @@ block content
                                     li
                                         a(href='/cards?page='+p)= p
 
+                if account.role == 'super' || (account.role == 'admin' && account.publisher == '1')
+                    div.col-lg-12.margin-top
+                        form(action='/cards/fromcsv', enctype='multipart/form-data', method='post')
+                            input(type='file', name='file', accept='.csv')
+                            button.btn.btn-primary(type='submit')= dict.titles.import_fromcsv
+
+
 
             if message
                 div.col-lg-4.col-lg-offset-4.col-md-6.col-md-offset-3.col-sm-12.margin-top

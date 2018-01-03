@@ -130,6 +130,17 @@ var Card = {
         })
     },
 
+    getByTranshId: (trid, done)=>{
+        var query = 'SELECT * FROM cards WHERE transh = ?';
+
+        db.query(query, [trid], (err, rows)=>{
+            if (err) {
+                return done(err)
+            }
+            done(null, rows)
+        })
+    },
+
     deleteCardsForTransh: (id, done)=>{
         var query = 'DELETE t, c FROM transh t JOIN cards c ON c.transh = t.id WHERE t.id = ?';
         var params = [id];
@@ -138,6 +149,28 @@ var Card = {
                 return done(err)
             }
             done(null, rows)
+        })
+    },
+
+    updateFromExternal: (cards, done)=>{
+        var queryFinalArray = [];
+        for (var i=0; i<cards.length; i++) {
+            var elm = cards[i];
+            var qr = 'UPDATE cards SET nfs_code="'+elm[2]+'", m_code="'+elm[3]+'" WHERE id='+elm[0]+' AND qr_code="'+elm[1]+'"';
+            console.log(qr);
+            queryFinalArray.push(qr);
+        }
+        var queryFinal = queryFinalArray.join(';');
+
+        db.query(queryFinal, function(err, rows){
+            console.log('== update cards =====')
+            console.log(err)
+            console.log(rows)
+            console.log('== update cards =====')
+            if (err) {
+                return done(err);
+            }
+            done(null, rows);
         })
     },
 

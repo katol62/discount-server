@@ -36,6 +36,8 @@ module.exports = {
             "visit_price": "Стоимость услуги",
             "visit_login": "Логин",
             "visit_discount": "Дисконт",
+            "export_tocsv": "Экспорт в CSV",
+            "import_fromcsv": "Импортировать из CSV",
         },
         "labels": {
             "email_address": "Емейл",

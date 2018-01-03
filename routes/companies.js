@@ -311,7 +311,7 @@ router.post('/create', function(req, res, next) {
  */
 
 //edit company form
-router.get('/:cid/edit', (req, res, next)=> {
+router.get('/:cid/edit', checkCompany, (req, res, next)=> {
 
     var session_message = req.session.message ? req.session.message : null;
     req.session.message = null;
@@ -321,15 +321,6 @@ router.get('/:cid/edit', (req, res, next)=> {
     req.session.validate_error = null;
 
     Company.getById(req.params.cid, (err, rows)=>{
-        if (err) {
-            req.session.error = dict.messages.db_error+': '+err.message;
-            return res.redirect('/companies');
-        }
-
-        if (rows.length === 0) {
-            req.session.error = dict.messages.company_not_found;
-            return res.redirect('/companies');
-        }
         var company = rows[0];
         Location.getCountries((err, rows)=> {
             if (err) {
@@ -429,7 +420,7 @@ router.put('/:cid/edit', function(req, res, next) {
  * Delete company
  */
 
-router.delete('/:cid/delete', function(req, res, next) {
+router.delete('/:cid/delete', checkCompany, function(req, res, next) {
 
     Company.delete(req.params.cid, function(err, rows) {
         if (err) {
@@ -456,7 +447,7 @@ router.get('/:cid/terminals', (req, res, next)=>{
 
 });
 
-router.get('/:cid/terminals/create', (req, res, next)=>{
+router.get('/:cid/terminals/create', checkCompany, (req, res, next)=>{
 
     var session_message = req.session.message ? req.session.message : null;
     req.session.message = null;
@@ -466,16 +457,6 @@ router.get('/:cid/terminals/create', (req, res, next)=>{
     req.session.validate_error = null;
 
     Company.getExtendedByIdAndOwner(req.params.cid, req.session.user, (err, rows)=>{
-        if (err) {
-            req.session.error = dict.messages.db_error+":"+err.code;
-            res.redirect('/companies');
-            return;
-        }
-        if (rows.length === 0) {
-            req.session.error = dict.messages.company_not_found;
-            res.redirect('/companies');
-            return;
-        }
         var company = rows[0];
         var discountTypes = [
             {id: 'pass', name: dict.labels.label_pass},
@@ -543,7 +524,7 @@ router.delete('/:cid/terminals/:tid/delete', (req, res, next)=>{
     });
 });
 
-router.get('/:cid/terminals/:tid/edit', (req, res, next)=>{
+router.get('/:cid/terminals/:tid/edit', checkCompany, checkTerminal, (req, res, next)=>{
 
     var session_message = req.session.message ? req.session.message : null;
     req.session.message = null;
@@ -553,16 +534,6 @@ router.get('/:cid/terminals/:tid/edit', (req, res, next)=>{
     req.session.validate_error = null;
 
     Company.getExtendedByIdAndOwner(req.params.cid, req.session.user, (err, rows)=>{
-        if (err) {
-            req.session.error = dict.messages.db_error+":"+err.code;
-            res.redirect('/companies');
-            return;
-        }
-        if (rows.length === 0) {
-            req.session.error = dict.messages.company_not_found;
-            res.redirect('/companies');
-            return;
-        }
         var company = rows[0];
         var discountTypes = [
             {id: 'pass', name: dict.labels.label_pass},
@@ -570,14 +541,6 @@ router.get('/:cid/terminals/:tid/edit', (req, res, next)=>{
         ];
 
         Terminal.getById(req.params.tid, (err, rows)=>{
-            if (err) {
-                req.session.error = dict.messages.db_error+":"+err.code;
-                return res.redirect('/companies');
-            }
-            if (rows.length === 0) {
-                req.session.error = dict.messages.terminal_not_found;
-                return res.redirect('/companies');
-            }
 
             return res.render('terminal/edit', {
                 pageType: 'companies',
@@ -630,7 +593,7 @@ router.put('/:cid/terminals/:tid/edit', (req, res, next)=>{
  * Company users
  */
 
-router.get('/:cid/users', (req, res, next)=>{
+router.get('/:cid/users', checkCompany, (req, res, next)=>{
 
     var session_message = req.session.message ? req.session.message : null;
     req.session.message = null;
@@ -640,16 +603,6 @@ router.get('/:cid/users', (req, res, next)=>{
     req.session.validate_error = null;
 
     Company.getExtendedByIdAndOwner(req.params.cid, req.session.user, (err, rows)=>{
-        if (err) {
-            req.session.error = dict.messages.db_error+":"+err.code;
-            res.redirect('/companies');
-            return;
-        }
-        if (rows.length === 0) {
-            req.session.error = dict.messages.company_not_found;
-            res.redirect('/companies');
-            return;
-        }
 
         var company = rows[0];
 
@@ -695,7 +648,7 @@ router.get('/:cid/users', (req, res, next)=>{
  * Create user - cashier
  */
 
-router.get('/:cid/users/create', (req, res, next)=>{
+router.get('/:cid/users/create', checkCompany, (req, res, next)=>{
 
     var session_message = req.session.message ? req.session.message : null;
     req.session.message = null;
@@ -705,16 +658,6 @@ router.get('/:cid/users/create', (req, res, next)=>{
     req.session.validate_error = null;
 
     Company.getExtendedByIdAndOwner(req.params.cid, req.session.user, (err, rows)=>{
-        if (err) {
-            req.session.error = dict.messages.db_error+":"+err.code;
-            res.redirect('/companies');
-            return;
-        }
-        if (rows.length === 0) {
-            req.session.error = dict.messages.company_not_found;
-            res.redirect('/companies');
-            return;
-        }
 
         var company = rows[0];
 
@@ -793,7 +736,7 @@ router.post('/:cid/users/create', (req, res, next)=> {
  * Edit user - cashier
  */
 
-router.get('/:cid/users/:uid/edit', (req, res, next)=>{
+router.get('/:cid/users/:uid/edit', checkCompany, (req, res, next)=>{
 
     var session_message = req.session.message ? req.session.message : null;
     req.session.message = null;
@@ -803,16 +746,6 @@ router.get('/:cid/users/:uid/edit', (req, res, next)=>{
     req.session.validate_error = null;
 
     Company.getExtendedByIdAndOwner(req.params.cid, req.session.user, (err, rows)=>{
-        if (err) {
-            req.session.error = dict.messages.db_error+":"+err.code;
-            res.redirect('/companies');
-            return;
-        }
-        if (rows.length === 0) {
-            req.session.error = dict.messages.company_not_found;
-            res.redirect('/companies');
-            return;
-        }
 
         var company = rows[0];
 
@@ -926,7 +859,7 @@ router.put('/:cid/users/:uid/edit', (req, res, next)=> {
  * Tariffs
  */
 
-router.get('/:cid/terminals/:tid/tariffs', (req, res, next)=>{
+router.get('/:cid/terminals/:tid/tariffs', checkCompany, checkTerminal, (req, res, next)=>{
 
     var session_message = req.session.message ? req.session.message : null;
     req.session.message = null;
@@ -936,16 +869,6 @@ router.get('/:cid/terminals/:tid/tariffs', (req, res, next)=>{
     req.session.validate_error = null;
 
     Company.getExtendedByIdAndOwner(req.params.cid, req.session.user, (err, rows)=>{
-        if (err) {
-            req.session.error = dict.messages.db_error+":"+err.code;
-            res.redirect('/companies');
-            return;
-        }
-        if (rows.length === 0) {
-            req.session.error = dict.messages.company_not_found;
-            res.redirect('/companies');
-            return;
-        }
 
         var company = rows[0];
 
@@ -955,20 +878,10 @@ router.get('/:cid/terminals/:tid/tariffs', (req, res, next)=>{
                 res.redirect('/companies');
                 return;
             }
-            if (rows.length === 0) {
-                req.session.error = dict.messages.terminal_not_found;
-                res.redirect('/companies');
-                return;
-            }
 
             var terminals = rows;
 
             Terminal.getById(req.params.tid, (err, rows)=>{
-                if (err) {
-                    req.session.error = dict.messages.db_error+":"+err.code;
-                    res.redirect('/companies');
-                    return;
-                }
                 var terminal = rows[0];
                 Tariff.getForTerminal(req.params.tid, (err, rows)=>{
                     if (err) {
@@ -1002,7 +915,7 @@ router.get('/:cid/terminals/:tid/tariffs', (req, res, next)=>{
  * Create tariff
  */
 
-router.get('/:cid/terminals/:tid/tariffs/create', (req, res, next)=> {
+router.get('/:cid/terminals/:tid/tariffs/create', checkCompany, checkTerminal, (req, res, next)=> {
 
     var session_message = req.session.message ? req.session.message : null;
     req.session.message = null;
@@ -1012,16 +925,6 @@ router.get('/:cid/terminals/:tid/tariffs/create', (req, res, next)=> {
     req.session.validate_error = null;
 
     Company.getExtendedByIdAndOwner(req.params.cid, req.session.user, (err, rows)=>{
-        if (err) {
-            req.session.error = dict.messages.db_error+":"+err.code;
-            res.redirect('/companies');
-            return;
-        }
-        if (rows.length === 0) {
-            req.session.error = dict.messages.company_not_found;
-            res.redirect('/companies');
-            return;
-        }
 
         var company = rows[0];
 
@@ -1031,20 +934,9 @@ router.get('/:cid/terminals/:tid/tariffs/create', (req, res, next)=> {
                 res.redirect('/companies');
                 return;
             }
-            if (rows.length === 0) {
-                req.session.error = dict.messages.terminal_not_found;
-                res.redirect('/companies');
-                return;
-            }
-
             var terminals = rows;
 
             Terminal.getById(req.params.tid, (err, rows)=>{
-                if (err) {
-                    req.session.error = dict.messages.db_error+":"+err.code;
-                    res.redirect('/companies');
-                    return;
-                }
                 var terminal = rows[0];
 
                 var tariffTypes = [{id:""}];
@@ -1114,7 +1006,7 @@ router.delete('/:cid/terminals/:tid/tariffs/:trid/delete', (req, res, next)=>{
     });
 });
 
-router.get('/:cid/terminals/:tid/tariffs/:trid/edit', (req, res, next)=>{
+router.get('/:cid/terminals/:tid/tariffs/:trid/edit', checkCompany, checkTerminal, (req, res, next)=>{
 
     var session_message = req.session.message ? req.session.message : null;
     req.session.message = null;
@@ -1124,16 +1016,6 @@ router.get('/:cid/terminals/:tid/tariffs/:trid/edit', (req, res, next)=>{
     req.session.validate_error = null;
 
     Company.getExtendedByIdAndOwner(req.params.cid, req.session.user, (err, rows)=>{
-        if (err) {
-            req.session.error = dict.messages.db_error+":"+err.code;
-            res.redirect('/companies');
-            return;
-        }
-        if (rows.length === 0) {
-            req.session.error = dict.messages.company_not_found;
-            res.redirect('/companies');
-            return;
-        }
 
         var company = rows[0];
 
@@ -1152,16 +1034,6 @@ router.get('/:cid/terminals/:tid/tariffs/:trid/edit', (req, res, next)=>{
             var terminals = rows;
 
             Terminal.getById(req.params.tid, (err, rows)=>{
-                if (err) {
-                    req.session.error = dict.messages.db_error+":"+err.code;
-                    res.redirect('/companies/'+req.params.cid+'/terminals');
-                    return;
-                }
-                if (rows.length === 0) {
-                    req.session.error = dict.messages.terminal_not_found;
-                    res.redirect('/companies/'+req.params.cid+'/terminals');
-                    return;
-                }
                 var terminal = rows[0];
 
                 Tariff.getById(req.params.trid, (err, rows)=>{

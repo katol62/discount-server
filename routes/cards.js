@@ -10,6 +10,9 @@ var dict = locale[config.locale];
 var log = require('npmlog');
 var md5 = require('md5');
 var globals = require('./../misc/globals');
+var fs = require('fs');
+var csvjson = require('csvjson');
+var formidable = require('formidable');
 
 var generateCardNumber = (id, tid, ai)=> {
     var zero = '0000000000000000';
@@ -768,6 +771,84 @@ router.delete('/transhes/:id/delete', function(req, res, next) {
 
 });
 
+//save cards array to csv
+router.get('/transhes/:trid/tocsv', function(req, res, next) {
+
+    Card.getByTranshId(req.params.trid, (err, rows)=>{
+        if (err) {
+            req.session.error = dict.messages.db_error+": "+err.message;
+            res.redirect('/cards/transhes');
+            return;
+        }
+
+        var data = rows;
+
+        var options = {
+            delimiter   : ",",
+            wrap        : false
+        };
+        var csv = csvjson.toCSV(data, options);
+
+        console.log('++++ CSV ++++++++')
+        console.log(csv)
+        console.log('++++ CSV ++++++++')
+
+        res.setHeader('Content-disposition', 'attachment; filename=transh'+req.params.trid+'.csv');
+        res.set('Content-Type', 'text/csv');
+        res.status(200).send(csv);
+
+    });
+
+});
+
+//from csv
+
+router.post('/fromcsv', function(req, res, next){
+
+    var form = new formidable.IncomingForm();
+    form.parse(req, function(err, fields, files) {
+        // `file` is the name of the <input> field of type `file`
+        var old_path = files.file.path;
+        fs.readFile(old_path, "utf8", (err, data)=> {
+
+            console.log(data);
+            console.log(err);
+
+            if (err) {
+                req.session.error = dict.messages.db_error+": "+err.message;
+                res.redirect('/cards');
+                return;
+            }
+
+            var options = {
+                delimiter   : ",",
+                wrap        : false
+            };
+            var csvdata = csvjson.toArray(data, options);
+
+            csvdata.shift();
+            console.log('====== csvdata =========');
+            console.log(csvdata);
+            console.log('====== csvdata =========');
+
+            Card.updateFromExternal(csvdata, function (err, rows) {
+                if (err) {
+                    req.session.error = dict.messages.db_error+': '+err.message;
+                } else {
+                    if (rows.affectedRows == 0) {
+                        req.session.error = dict.messages.db_error;
+                    } else {
+                        req.session.message = 'Cards updated';
+                    }
+                }
+                res.redirect('/cards');
+            })
+
+        });
+    });
+
+
+});
 
 
 module.exports = router;
