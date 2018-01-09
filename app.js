@@ -14,12 +14,11 @@ var locale = require('./misc/locale');
 //routes
 var index = require('./routes/index');
 var admins = require('./routes/admins');
-var users = require('./routes/users');
 var profiles = require('./routes/profiles');
 var companies = require('./routes/companies');
-var terminals = require('./routes/terminals');
 var locations = require('./routes/locations');
 var cards = require('./routes/cards');
+var api = require('./routes/api/api');
 
 var app = express();
 
@@ -61,12 +60,13 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', index);
 app.use('/admins', admins);
-//app.use('/users', users);
 app.use('/profile', profiles);
 app.use('/companies', companies);
-//app.use('/terminals', terminals);
 app.use('/location', locations);
 app.use('/cards', cards);
+
+//api
+app.use('/api', api);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

@@ -1205,7 +1205,7 @@ router.post('/:cid/terminals/:tid/visits/add', (req, res, next)=> {
         return;
     }
 
-    Card.getByIdOrNumber(req.body.card, (err, rows)=>{
+    Card.getByIdOrNumberForUser(req.body.card, req.session.user, (err, rows)=>{
         if (err) {
             req.session.error = dict.messages.db_error+': '+err.message;
             return res.redirect('/companies/'+req.params.cid+'/terminals/'+req.params.tid+'/visits/add');

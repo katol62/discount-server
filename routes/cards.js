@@ -46,7 +46,7 @@ router.use(methodOverride(function (req, res) {
 }));
 
 router.use((req, res, next)=> {
-    if (!req.session.user || req.session.user.role === 'cashier') {
+    if (!req.session.user || (req.session.user.role === 'cashier' && req.originalUrl !=='/cards/sell')) {
         return res.redirect('/signin');
     } else {
         next();
@@ -847,8 +847,82 @@ router.post('/fromcsv', function(req, res, next){
         });
     });
 
+});
+
+router.get('/sell', (req, res, next)=>{
+
+    var session_message = req.session.message ? req.session.message : null;
+    console.log(session_message);
+    req.session.message = null;
+    var session_error = req.session.error ? req.session.error : null;
+    req.session.error = null;
+    var session_validate_error = req.session.validate_error ? req.session.validate_error : null;
+    req.session.validate_error = null;
+
+    var types = config.tariffTypes;
+    var pass = config.passTypeStrict;
+
+    return res.render('card/sell', {
+        pageType: 'sell',
+        dict: dict,
+        account: req.session.user,
+        types: types,
+        passes: pass,
+        message: session_message,
+        error: session_error,
+        errors: session_validate_error
+    });
 
 });
 
+router.post('/sell', (req, res, nexr)=>{
+    req.checkBody('card', dict.messages.visit_card_number_required).notEmpty();
+
+    var errors = req.validationErrors();
+
+    if (errors) {
+        req.session.validate_error = errors;
+        res.redirect('/cards/sell');
+        return;
+    }
+
+    Card.getByIdOrNumberForUser(req.body.card, req.session.user, (err, rows)=>{
+
+        if (err) {
+            req.session.error = dict.messages.db_error+': '+err.message;
+            return res.redirect('/cards/sell');
+        }
+        if (rows.length == 0) {
+            req.session.error = dict.messages.card_not_found_or_not_allowed;
+            return res.redirect('/cards/sell');
+        }
+
+        var card_number = rows[0].card_nb;
+        if (rows[0].status != 'published') {
+            req.session.error = dict.messages.card_already_sold+": "+card_number;
+            return res.redirect('/cards/sell');
+        }
+
+        var body = req.body;
+        body.id = rows[0].id;
+        body.status = 'sold';
+        Card.sell(body, (err, rows)=>{
+            if (err) {
+                req.session.error = dict.messages.db_error+': '+err.message;
+                return res.redirect('/cards/sell');
+            }
+            if (rows.affectedRows == 0) {
+                req.session.error = dict.messages.card_sell_error;
+                return res.redirect('/cards/sell');
+            }
+            req.session.message = dict.messages.card_sold+": "+card_number;
+            return res.redirect('/cards/sell');
+
+        })
+
+    })
+
+
+});
 
 module.exports = router;

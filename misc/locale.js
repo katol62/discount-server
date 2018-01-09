@@ -38,6 +38,7 @@ module.exports = {
             "visit_discount": "Дисконт",
             "export_tocsv": "Экспорт в CSV",
             "import_fromcsv": "Импортировать из CSV",
+            "sell_cards": "Продажа карт",
         },
         "labels": {
             "email_address": "Емейл",
@@ -57,6 +58,7 @@ module.exports = {
             "label_add":"Добавить",
             "label_update":"Изменить",
             "label_delete":"Удалить",
+            "label_sell":"Продать",
             "label_create_user":"Создать пользователя",
             "label_change_user":"Изменить пользователя",
             "label_can_publish":"Генерить транши",
@@ -193,6 +195,12 @@ module.exports = {
             "visit_create_error": "Ошибка добавления прохода",
             "visit_created": "Проход добавлен",
             "visit_card_activated":"Карта уже активирована",
+            "token_invalid":"Неверный токен",
+            "token_missed":"Отсутствует токен",
+            "card_not_found_or_not_allowed":"Карта не найдена либо вы не можете продавать ее",
+            "card_sell_error": "Ошибка продажи карты",
+            "card_already_sold": "Карта уже продана",
+            "card_sold": "Карта продана",
         }
     }
 };
