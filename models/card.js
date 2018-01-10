@@ -210,13 +210,20 @@ var Card = {
     },
 
     updateStatus: (body, done)=>{
-        var query = 'UPDATE cards SET status=? WHERE id = ?';
-        var params = [body.status, body.id];
+        var updateArray = ['status = ?'];
+        var paramsArray = [body.status];
 
         if (body.pass) {
-            query = 'UPDATE cards SET status=? AND pass=? WHERE id = ?';
-            params = [body.status, body.pass, body.id];
+            updateArray.push('pass = ?');
+            paramsArray.push(body.pass);
         }
+        paramsArray.push(body.id);
+
+        var query = 'UPDATE cards SET '+updateArray.join(',')+' WHERE id = ?';
+        var params = paramsArray;
+
+        console.log(query);
+        console.log(params);
 
         db.query(query, params, (err, rows)=>{
             if (err) {
@@ -241,7 +248,7 @@ var Card = {
         }
         paramsArray.push(body.id);
 
-        var query = 'UPDATE cards SET '+updateArray.join(' AND ')+' WHERE id = ?';
+        var query = 'UPDATE cards SET '+updateArray.join(',')+' WHERE id = ?';
         var params = paramsArray;
 
         console.log(query);
