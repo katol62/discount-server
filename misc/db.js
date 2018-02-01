@@ -2,8 +2,8 @@ var mysql=require('mysql');
 var connection = mysql.createPool({
 
     host:'localhost',
-    user:'admin',
-    password:'xl12qtmwrvXz4VZ8',
+    user:'root',
+    password:'',
     database:'discountdb',
     multipleStatements: true
 

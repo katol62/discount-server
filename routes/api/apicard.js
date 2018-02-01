@@ -9,6 +9,7 @@ var dict = locale[config.locale];
 
 
 router.get('/', (req, res, next)=> {
+    res.json({success:true});
 });
 
 module.exports = router;

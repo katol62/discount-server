@@ -187,10 +187,6 @@ var Card = {
         var queryFinal = queryFinalArray.join(';');
 
         db.query(queryFinal, function(err, rows){
-            console.log('== update cards =====')
-            console.log(err)
-            console.log(rows)
-            console.log('== update cards =====')
             if (err) {
                 return done(err);
             }
@@ -251,14 +247,56 @@ var Card = {
         var query = 'UPDATE cards SET '+updateArray.join(',')+' WHERE id = ?';
         var params = paramsArray;
 
-        console.log(query);
-        console.log(params);
-
         db.query(query, params, (err, rows)=>{
             if (err) {
                 return done(err)
             }
             done(null, rows)
+        })
+    },
+
+    assignSoftCard: (body, done)=>{
+
+        var selectArray = ['status = ?'];
+        var paramsArray = ['published'];
+        if (body.company) {
+            selectArray.push('company_id = ?');
+            paramsArray.push(body.company);
+        }
+
+        var query = 'SELECT * FROM cards WHERE '+selectArray.join(' AND ')+' ORDER BY id LIMIT 1';
+        var params = paramsArray;
+
+        db.query(query, params, (err, rows)=>{
+            if (err) {
+                return done(err)
+            }
+
+            if (rows.length == 0) {
+                return done({status:'error', message: 'Cards now available'});
+            }
+            var card = rows[0];
+            var queryUpdate = 'UPDATE cards SET status=\'sold\' WHERE id = ?';
+
+            db.query(queryUpdate, [card.id], (err, rows)=>{
+                if (err) {
+                    return done(err)
+                }
+                if (rows.affectedRows == 0) {
+                    return done({status:'error', message: 'Cards could not be sold'});
+                }
+                var queryAssign = 'INSERT INTO usercards (user, card) SELECT ?, ? FROM DUAL WHERE NOT EXISTS (SELECT * FROM usercards WHERE user = ? AND card = ?) LIMIT 1';
+                var paramsAssign = [body.user, card.id, body.user, card.id];
+
+                db.query(queryAssign, paramsAssign, (err, rows)=>{
+                    if (err) {
+                        return done(err)
+                    }
+                    done(null, rows)
+                })
+
+            })
+
         })
     },
 

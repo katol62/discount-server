@@ -51,6 +51,38 @@ var User = {
         })
     },
 
+    getSoftUser: (softcode, done)=> {
+        db.query('SELECT * FROm users WHERE softcode = ?', softcode, (err, rows)=>{
+            if (err) {
+                return done(err)
+            }
+            done(null, rows)
+        })
+    },
+
+    createSoftUser: (body, done)=>{
+
+        var name = null;
+        var last = null;
+        var phone = null;
+        var email = body.softcode;
+        var password = body.cryptPwd;
+        var role = 'customer';
+        var parent = '0';
+        var publisher = '0';
+
+        var query = 'INSERT INTO users (name, last, phone, email, password, role, parent, publisher) SELECT ?, ?, ?, ?, ?, ?, ?, ? FROM DUAL WHERE NOT EXISTS (SELECT * FROM users WHERE email=?) LIMIT 1';
+        var params = [name, last, phone, email, password, role, parent, publisher, email];
+
+        db.query(query, params, (err, rows)=>{
+            if (err) {
+                return done(err)
+            }
+            done(null, rows)
+        })
+
+    },
+
     createUser: (body, cryptPwd, done)=> {
 
         var name = body.name;
