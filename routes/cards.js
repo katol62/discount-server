@@ -13,6 +13,7 @@ var globals = require('./../misc/globals');
 var fs = require('fs');
 var csvjson = require('csvjson');
 var formidable = require('formidable');
+var pdf = require('html-pdf');
 
 var generateCardNumber = (id, tid, ai)=> {
     var zero = '0000000000000000';
@@ -68,7 +69,7 @@ router.get('/', (req, res, next)=>{
         }
 
         if (rows.length === 0) {
-            req.session.error = dict.messages.db_error;
+            req.session.error = dict.messages.cards_not_found;
             return res.redirect('/cards');
         }
         var total = rows[0].count;
@@ -399,7 +400,11 @@ router.put('/:id/edit', (req, res, next)=> {
         return;
     }
 
-    Card.updateCard(req.body, (err, rows)=>{
+    var body = req.body;
+    body.updatedBy = req.session.user.id;
+    body.updated = require('moment')().format('YYYY-MM-DD HH:mm:ss');
+
+    Card.updateCard(body, (err, rows)=>{
         if (err) {
             req.session.error = dict.messages.db_error+": "+err.message;
             res.redirect('/cards/'+req.params.id+'/edit');
@@ -732,7 +737,12 @@ router.put('/transhes/:id/edit', (req, res, next)=> {
             res.redirect('/cards/transhes/'+req.params.id+'/edit');
             return;
         }
-        Card.updateCardsForTransh(req.body, (err, rows)=>{
+
+        var body = req.body;
+        body.updatedBy = req.session.user.id;
+        body.updated = require('moment')().format('YYYY-MM-DD HH:mm:ss');
+
+        Card.updateCardsForTransh(body, (err, rows)=>{
             if (err) {
                 req.session.error = dict.messages.db_error+": "+err.message;
                 res.redirect('/cards/transhes/'+req.params.id+'/edit');
@@ -772,7 +782,7 @@ router.delete('/transhes/:id/delete', function(req, res, next) {
 });
 
 //save cards array to csv
-router.get('/transhes/:trid/tocsv', function(req, res, next) {
+router.get('/transhes/:trid/tocsv', (req, res, next)=> {
 
     Card.getByTranshId(req.params.trid, (err, rows)=>{
         if (err) {
@@ -906,6 +916,9 @@ router.post('/sell', (req, res, nexr)=>{
         var body = req.body;
         body.id = rows[0].id;
         body.status = 'sold';
+        body.updatedBy = req.session.user.id;
+        body.updated = require('moment')().format('YYYY-MM-DD HH:mm:ss');
+
         Card.sell(body, (err, rows)=>{
             if (err) {
                 req.session.error = dict.messages.db_error+': '+err.message;
@@ -921,7 +934,128 @@ router.post('/sell', (req, res, nexr)=>{
         })
 
     })
+});
 
+router.get('/sellstocsv', (req, res, next)=> {
+
+    Card.getCardsForUserAndType(req.session.user, 'sold', (err, rows)=>{
+        if (err) {
+            req.session.error = dict.messages.db_error+": "+err.message;
+            res.redirect('/cards');
+            return;
+        }
+
+        var head_array = [dict.labels.export_card_nb, dict.labels.export_card_qr, dict.labels.export_card_type, dict.labels.export_card_owner, dict.labels.export_card_seller, dict.labels.export_card_date];
+        var headers_string = head_array.join(',');
+        console.log(headers_string);
+
+        var data = rows;
+
+        var options = {
+            delimiter   : ",",
+            wrap        : false
+        };
+        var csv = csvjson.toCSV(data, options);
+
+        var csv_array = csv.split('\n');
+        csv_array.splice(0, 1, headers_string);
+        csv = csv_array.join('\n');
+
+        console.log('++-- CSV +++--+++')
+        console.log(csv)
+        console.log('++-- CSV +++--+++')
+
+        var name = req.session.user.id;
+
+        res.setHeader('Content-disposition', 'attachment; filename=soldCards-userid-'+name+'.csv');
+        res.set('Content-Type', 'text/csv');
+        res.status(200).send(csv);
+
+    });
+
+});
+router.get('/sellstopdf', (req, res, next)=> {
+
+    Card.getCardsForUserAndType(req.session.user, 'sold', (err, rows)=>{
+        if (err) {
+            req.session.error = dict.messages.db_error+": "+err.message;
+            res.redirect('/cards');
+            return;
+        }
+
+        var head_array = ['cardnb', 'qrcode', 'type', 'owner', 'seller', 'date'];
+        var headers_string = head_array.join(',');
+        console.log(headers_string);
+
+        var content = '<style>table {width: 100%;font-family:sans-serif;font-size: 0.5em; border: 1px solid;border-spacing: 0;border-collapse: collapse;}table thead {border: 1px solid;background-color:#ccc !important;}tr {border: 1px solid;}th {padding: 0.2em 0.3em;border: 1px solid;} td {padding: 0.2em 0.3em;border: 1px solid;}</style>';
+        content += '<table>';
+        content += '<thead><th>Номер карты</th><th>QR код</th><th>Тип</th><th>Опубликовал</th><th>Продал</th><th>Дата</th></thead>';
+        content += '<tbody>';
+
+        var data = rows;
+        data.forEach((row, index)=>{
+            content += '<tr>';
+            content += '<td>'+row['card_nb']+'</td>';
+            content += '<td>'+row['qr_code']+'</td>';
+            content += '<td>'+row['type']+'</td>';
+            content += '<td>'+row['owner']+'</td>';
+            content += '<td>'+row['seller']+'</td>';
+            content += '<td>'+row['date']+'</td>';
+            content += '</tr>';
+        });
+        content += '</tbody>';
+        content += '</table>';
+
+        var name = req.session.user.id;
+
+        var pdf = require('html-pdf');
+
+        console.log(content);
+
+        var config = {
+            // Export options
+            "directory": "/tmp",       // The directory the file gets written into if not using .toFile(filename, callback). default: '/tmp'
+            "format": "Letter",        // allowed units: A3, A4, A5, Legal, Letter, Tabloid
+            "orientation": "portrait", // portrait or landscape
+            // Page options
+            "border": "10mm",
+
+            paginationOffset: 1,       // Override the initial pagination number
+            "header": {
+                "height": "15mm",
+                "contents": '<div style="text-align: center; width: 100%; border-bottom: 1px solid; font-family: sans-serif; font-size: 1em;">Продажа карт ('+req.session.user.name+' '+req.session.user.last+')</div>'
+            },
+            "footer": {
+                "height": "20mm",
+                "contents": {
+                    // first: 'Cover page',
+                    // 2: 'Second page', // Any page number is working. 1-based index
+                    default: '<div style="text-align: center; width: 100%; color: #444; border-top: 1px solid; font-family: sans-serif; font-size: 0.7em;"><span>{{page}}</span>/<span>{{pages}}</span></div>', // fallback value
+                    // last: 'Last Page'
+                }
+            },
+            // Rendering options
+            // "base": "file:///home/www/your-asset-path", // Base path that's used to load files (images, css, js) when they aren't referenced using a host
+            // Zooming option, can be used to scale images if `options.type` is not pdf
+            "zoomFactor": "1", // default is 1
+            // File options
+            "type": "pdf",             // allowed file types: png, jpeg, pdf
+            "quality": "75",           // only used for types png & jpeg
+        };
+
+        pdf.create(content, config).toStream((err, stream) => {
+            if (err) return res.end(err.stack);
+            res.setHeader('Content-type', 'application/pdf');
+            stream.pipe(res.status(200));
+            // res.status(200).send(stream);
+        })
+
+        // pdf.create(content, config).toFile('./businesscard.pdf', function(err, res) {
+        //     if (err) return console.log(err);
+        //     console.log(res); // { filename: '/app/businesscard.pdf' }
+        // });
+
+    });
 
 });
 

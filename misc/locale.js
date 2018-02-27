@@ -39,6 +39,7 @@ module.exports = {
             "export_tocsv": "Экспорт в CSV",
             "import_fromcsv": "Импортировать из CSV",
             "sell_cards": "Продажа карт",
+            "card_sell_report": "Отчет продаж карт",
         },
         "labels": {
             "email_address": "Емейл",
@@ -119,6 +120,12 @@ module.exports = {
             "label_visit_type":"Скидочная политика",
             "label_visit_price":"Сумма чека",
             "label_visit_pass":"Срок действия карты",
+            "export_card_nb":"Номер карты",
+            "export_card_qr":"QR код",
+            "export_card_type":"Тип карты",
+            "export_card_owner":"Создатель",
+            "export_card_seller":"Продавец",
+            "export_card_date":"Время продажи",
         },
         "messages": {
             "user_not_found": "Пользователь не найден",
@@ -181,6 +188,7 @@ module.exports = {
             "card_updated":"Карта изменена",
             "card_deleted": "Карта удалена",
             "card_not_deleted": "Ошибка удаления карты",
+            "cards_not_found":"Карт не найденo",
             "transh_count_required":"Определите количество карт в транше",
             "transh_create_error":"Ошибка генерации транша",
             "transh_created":"Транш сформирован",

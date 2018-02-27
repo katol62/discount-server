@@ -67,8 +67,8 @@ var Card = {
     },
 
     updateCard: (body, done)=>{
-        var query = 'UPDATE cards SET type=?, status=?, lifetime=?, servicetime=?, company_id=?, owner=?, test=? WHERE id = ?';
-        var params = [body.type, body.status, body.lifetime, body.servicetime, body.company?body.company:null, body.admin!=''?body.admin:body.owner, body.test=='on'?'1':'0', body.id];
+        var query = 'UPDATE cards SET type=?, status=?, lifetime=?, servicetime=?, company_id=?, owner=?, test=?, update_date=?, updated_by=? WHERE id = ?';
+        var params = [body.type, body.status, body.lifetime, body.servicetime, body.company?body.company:null, body.admin!=''?body.admin:body.owner, body.test=='on'?'1':'0', body.updated, body.updatedBy, body.id];
 
         db.query(query, params, (err, rows)=>{
             if (err) {
@@ -119,6 +119,32 @@ var Card = {
         })
     },
 
+    getCardsForUserAndType: (user, type, done)=>{
+
+        var query = 'SELECT c.card_nb, c.qr_code, c.type, u.email as owner, uu.email as seller, CAST(c.update_date as CHAR) as date from cards c left join users u on c.owner=u.id left join users uu on c.updated_by=uu.id where c.status=?';
+        var params = [type];
+        if (user.role == 'admin') {
+            query = 'SELECT c.card_nb, c.qr_code, c.type, u.email as owner, uu.email as seller, CAST(c.update_date as CHAR) as date from cards c \n' +
+                'left join users u on c.owner=u.id \n' +
+                'left join users uu on c.updated_by=uu.id\n' +
+                'where c.status=? and c.owner=?';
+            params = [type, user.id];
+        }
+        if (user.role == 'cashier') {
+            query = 'SELECT c.card_nb, c.qr_code, c.type, u.email as owner, uu.email as seller, CAST(c.update_date as CHAR) as date from cards c \n' +
+                'left join users u on c.owner=u.id \n' +
+                'left join users uu on c.updated_by=uu.id\n' +
+                'where c.status=? and c.updated_by=?';
+            params = [type, user.id];
+        }
+
+        db.query(query, params, (err, rows)=>{
+            if (err) {
+                return done(err)
+            }
+            done(null, rows)
+        })
+    },
 
     delete: (id, done)=>{
         db.query('DELETE FROM cards WHERE id = ?', [id], (err, rows)=>{
@@ -141,9 +167,10 @@ var Card = {
     },
 
     updateCardsForTransh: (body, done)=>{
-        var query = 'UPDATE cards set type=?, status=?, lifetime=?, servicetime=?, company_id=?, owner=? WHERE transh = ?';
+        var query = 'UPDATE cards set type=?, status=?, lifetime=?, servicetime=?, company_id=?, owner=?, update_date=?, updated_by=? WHERE transh = ?';
         console.log(body);
-        var params = [body.type, body.status, body.lifetime, body.servicetime, body.company?body.company:null, (body.admin && body.admin!='')?body.admin:body.owner, body.id];
+        var params = [body.type, body.status, body.lifetime, body.servicetime, body.company?body.company:null, (body.admin && body.admin!='')?body.admin:body.owner, body.updated, body.updatedBy, body.id];
+        console.log('=== query ===');
         console.log(query);
         console.log(params);
         db.query(query, params, (err, rows)=>{
@@ -194,20 +221,9 @@ var Card = {
         })
     },
 
-    setSold: (id, pass, done)=>{
-        var query = 'UPDATE cards SET status=\'sold\', pass = ? WHERE id = ?';
-        var params = [pass, id];
-        db.query(query, params, (err, rows)=>{
-            if (err) {
-                return done(err)
-            }
-            done(null, rows)
-        })
-    },
-
     updateStatus: (body, done)=>{
-        var updateArray = ['status = ?'];
-        var paramsArray = [body.status];
+        var updateArray = ['status = ?', 'update_date=?', 'updated_by=?'];
+        var paramsArray = [body.status, body.updated, body.updatedBy];
 
         if (body.pass) {
             updateArray.push('pass = ?');
@@ -231,8 +247,8 @@ var Card = {
 
     sell: (body, done)=>{
 
-        var updateArray = ['status = ?'];
-        var paramsArray = [body.status];
+        var updateArray = ['status = ?', 'update_date=?', 'updated_by=?'];
+        var paramsArray = [body.status, body.updated, body.updatedBy];
 
         if (body.type) {
             updateArray.push('type = ?');
@@ -246,6 +262,11 @@ var Card = {
 
         var query = 'UPDATE cards SET '+updateArray.join(',')+' WHERE id = ?';
         var params = paramsArray;
+
+        console.log('=====!!!!=========');
+        console.log(query);
+        console.log(params);
+        console.log('==============');
 
         db.query(query, params, (err, rows)=>{
             if (err) {
@@ -276,7 +297,9 @@ var Card = {
                 return done({status:'error', message: 'Cards now available'});
             }
             var card = rows[0];
-            var queryUpdate = 'UPDATE cards SET status=\'sold\' WHERE id = ?';
+            var updated = require('moment')().format('YYYY-MM-DD HH:mm:ss');
+
+            var queryUpdate = 'UPDATE cards SET status=\'sold\', update_date='+updated+' WHERE id = ?';
 
             db.query(queryUpdate, [card.id], (err, rows)=>{
                 if (err) {

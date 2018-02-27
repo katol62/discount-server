@@ -6,7 +6,7 @@ block content
         div.row
             div.col-lg-4.col-lg-offset-4.col-md-6.col-md-offset-3.col-sm-12
                 h2= dict.titles.cards
-            div.col-lg-12.margin-top
+            div.col-lg-6.margin-top
                 a(class=('btn btn-primary') href="/cards/create")
                     span(class='glyphicon glyphicon-plus-sign')
                     | &nbsp;
@@ -16,6 +16,17 @@ block content
                     span(class='glyphicon glyphicon-plus-sign')
                     | &nbsp;
                     = dict.titles.transhes
+            div.col-lg-6.margin-top.text-right
+                div.btn-group
+                    button.btn.btn-primary.dropdown-toggle(type='button', data-toggle='dropdown', aria-haspopup='true', aria-expanded='false')
+                        = dict.titles.card_sell_report
+                        | &nbsp;
+                        span.caret
+                    ul.dropdown-menu
+                        li
+                            a(href='/cards/sellstocsv') CSV
+                        li
+                            a(href='/cards/sellstopdf' target='_blank') PDF
             if items && items.length
                 div.col-lg-12.margin-top
 

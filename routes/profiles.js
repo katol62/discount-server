@@ -1,6 +1,5 @@
 var express = require('express');
 var User = require('./../models/user');
-var Company = require('./../models/company');
 var bcrypt = require('bcrypt');
 var locale = require('./../misc/locale');
 var config = require('./../misc/config');

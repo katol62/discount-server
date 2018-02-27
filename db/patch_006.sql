@@ -1,0 +1,1 @@
+ALTER TABLE `cards` ADD `update_date` DATETIME NULL AFTER `test`, ADD `updated_by` INT NULL AFTER `update_date`;

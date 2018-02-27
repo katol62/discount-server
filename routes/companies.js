@@ -1221,7 +1221,7 @@ router.post('/:cid/terminals/:tid/visits/add', (req, res, next)=> {
         console.log(body);
 
         if (body.pass && body.pass !== '0') {
-            Card.updateStatus({id: body.card, pass: body.pass, status: 'sold'}, (err, rows)=>{
+            Card.updateStatus({id: body.card, pass: body.pass, status: 'sold', updated: body.created, updatedBy: body.user}, (err, rows)=>{
                 if (err) {
                     req.session.error = dict.messages.db_error+': '+err.message;
                     return res.redirect('/companies/'+req.params.cid+'/terminals/'+req.params.tid+'/visits/add');
