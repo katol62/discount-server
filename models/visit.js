@@ -4,7 +4,7 @@ var Visit = {
 
     getExtendedForTerminal: (trid, done)=>{
 
-        var query = 'select v.*, ter.name as terminalName, tar.name as tariffName, tar.discount, c.card_nb as cardNumber, u.email from visit v left join terminal ter on v.terminal=ter.id left join tariff tar on v.tariff=tar.id left join cards c on v.card=c.id left join users u on v.user=u.id where v.terminal=?';
+        var query = 'select v.*, ter.name as terminalName, tar.name as tariffName, tar.discount, tar.price as totalPrice, tar.discountType, c.card_nb as cardNumber, u.email from visit v left join terminal ter on v.terminal=ter.id left join tariff tar on v.tariff=tar.id left join cards c on v.card=c.id left join users u on v.user=u.id where v.terminal=? order by v.date DESC';
         db.query(query, [trid], (err, rows)=>{
             if (err) {
                 return done(err);

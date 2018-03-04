@@ -23,6 +23,8 @@ block content
                             .input-group-addon #{dict.labels.label_to}
                             input.form-control(type='text', name='end' value='' placeholder=dict.labels.label_end_date)
                     +formSelect('type', dict.labels.label_tariff_type, types)
+                    +formSelect('discountType', dict.labels.label_discount_type, discountTypes)
+                    +formTextInput('price', 'number', dict.labels.label_price, dict.labels.label_price, '0')
                     +formTextInput('discount', 'number', dict.labels.label_discount, dict.labels.label_discount, '')
 
                     .form-group

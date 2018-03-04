@@ -16,7 +16,7 @@ block content
                     span(class='glyphicon glyphicon-plus-sign')
                     | &nbsp;
                     = dict.titles.transhes
-            div.col-lg-6.margin-top.text-right
+            div.col-lg-2.margin-top.text-right
                 div.btn-group
                     button.btn.btn-primary.dropdown-toggle(type='button', data-toggle='dropdown', aria-haspopup='true', aria-expanded='false')
                         = dict.titles.card_sell_report
@@ -24,9 +24,15 @@ block content
                         span.caret
                     ul.dropdown-menu
                         li
-                            a(href='/cards/sellstocsv') CSV
+                            a(onclick='toCsv();return false;' style='cursor:pointer') CSV
                         li
-                            a(href='/cards/sellstopdf' target='_blank') PDF
+                            a(onclick='toPdf();return false;' style='cursor:pointer') PDF
+            div.col-lg-4.margin-top.text-right
+                #datepicker.input-group.input-daterange
+                    input.form-control(id='dstart' type='text', name='start' value='' placeholder=dict.labels.label_start_date)
+                    .input-group-addon #{dict.labels.label_to}
+                    input.form-control(id='dend' type='text', name='end' value='' placeholder=dict.labels.label_end_date)
+
             if items && items.length
                 div.col-lg-12.margin-top
 

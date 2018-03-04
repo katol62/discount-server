@@ -467,7 +467,7 @@ router.get('/:cid/terminals/create', checkCompany, (req, res, next)=>{
             pageType: 'companies',
             dict: dict,
             company: company,
-            discounts: discountTypes,
+            discounts: config.discountTypes,
             account: req.session.user,
             message: session_message,
             error: session_error,
@@ -547,7 +547,7 @@ router.get('/:cid/terminals/:tid/edit', checkCompany, checkTerminal, (req, res, 
                 dict: dict,
                 company: company,
                 terminal: rows[0],
-                discounts: discountTypes,
+                discounts: config.discountTypes,
                 account: req.session.user,
                 message: session_message,
                 error: session_error,
@@ -939,8 +939,6 @@ router.get('/:cid/terminals/:tid/tariffs/create', checkCompany, checkTerminal, (
             Terminal.getById(req.params.tid, (err, rows)=>{
                 var terminal = rows[0];
 
-                var tariffTypes = [{id:""}];
-
                 return res.render('tariff/create', {
                     pageType: 'companies',
                     dict: dict,
@@ -948,6 +946,7 @@ router.get('/:cid/terminals/:tid/tariffs/create', checkCompany, checkTerminal, (
                     terminal: terminal,
                     terminals: terminals,
                     types: config.tariffTypes,
+                    discountTypes: config.discountTypes,
                     passes: config.passType,
                     account: req.session.user,
                     message: session_message,
@@ -963,7 +962,9 @@ router.post('/:cid/terminals/:tid/tariffs/create', (req, res, next)=> {
 
     req.checkBody('name', dict.messages.tariff_name_required).notEmpty();
     req.checkBody('type', dict.messages.tariff_type_required).notEmpty();
+    req.checkBody('discountType', dict.messages.discount_type_required).notEmpty();
     req.checkBody('discount', dict.messages.tariff_discount_required).notEmpty();
+    req.checkBody('price', dict.messages.tariff_price_required).notEmpty();
 
     var errors = req.validationErrors();
 
@@ -1056,6 +1057,7 @@ router.get('/:cid/terminals/:tid/tariffs/:trid/edit', checkCompany, checkTermina
                         tariff: rows[0],
                         terminals: terminals,
                         types: config.tariffTypes,
+                        discountTypes: config.discountTypes,
                         passes: config.passType,
                         account: req.session.user,
                         message: session_message,
@@ -1074,7 +1076,9 @@ router.put('/:cid/terminals/:tid/tariffs/:trid/edit', (req, res, next)=>{
 
     req.checkBody('name', dict.messages.tariff_name_required).notEmpty();
     req.checkBody('type', dict.messages.tariff_type_required).notEmpty();
+    req.checkBody('discountType', dict.messages.discount_type_required).notEmpty();
     req.checkBody('discount', dict.messages.tariff_discount_required).notEmpty();
+    req.checkBody('price', dict.messages.tariff_price_required).notEmpty();
 
     var errors = req.validationErrors();
 

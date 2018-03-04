@@ -25,6 +25,8 @@ block content
                             .input-group-addon #{dict.labels.label_to}
                             input.form-control(type='text', name='end' value=tariff.end==='0000-00-00'?'':moment(tariff.end).format("YYYY-MM-DD") placeholder=dict.labels.label_end_date)
                     +formSelect('type', dict.labels.label_tariff_type, types, tariff.type)
+                    +formSelect('discountType', dict.labels.label_discount_type, discountTypes, tariff.discountType)
+                    +formTextInput('price', 'number', dict.labels.label_price, dict.labels.label_price, tariff.price)
                     +formTextInput('discount', 'number', dict.labels.label_discount, dict.labels.label_discount, tariff.discount)
 
                     .form-group

@@ -120,14 +120,22 @@ $(document).ready(()=>{
             $('#passContainer').css('display', 'none');
             $('#pass').attr('disabled', true);
             $("#pass").selectpicker('refresh');
+            $('#typeDisplay').val('');
+            $('#type').val('');
         } else {
             var card = selected.data('card');
+            var price = selected.data('price');
+            var type = selected.data('type');
+            var typeDisplay = selected.data('type') == 'pass' ? 'Пасс' : 'Дисконт';
+            $('#price').val(price);
+            $('#type').val(type);
+            $('#typeDisplay').val(typeDisplay);
             if (card.toString()==='1') {
-                $('#passContainer').css('display', 'block')
+                $('#passContainer').css('display', 'block');
                 $('#pass').attr('disabled', false);
                 $("#pass").selectpicker('refresh');
             } else {
-                $('#passContainer').css('display', 'none')
+                $('#passContainer').css('display', 'none');
                 $('#pass').attr('disabled', true);
                 $("#pass").selectpicker('refresh');
             }
@@ -395,3 +403,15 @@ var confirmDeleteTransh = (id)=>{
     });
 };
 
+var toCsv = ()=> {
+    var start = $('#dstart').val();
+    var end = $('#dend').val();
+    // window.open('/cards/sellstocsv?dstart='+start+'&dend='+end, '_blank');
+    location.href = '/cards/sellstocsv?dstart='+start+'&dend='+end;
+};
+
+var toPdf = ()=> {
+    var start = $('#dstart').val();
+    var end = $('#dend').val();
+    window.open('/cards/sellstopdf?dstart='+start+'&dend='+end, '_blank');
+};

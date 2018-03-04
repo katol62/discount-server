@@ -74,17 +74,11 @@ router.get('/create', (req, res, next)=> {
                 return;
             }
 
-            var discountTypes = [
-                {code: 'pass', name: dict.labels.label_pass},
-                {code: 'discount', name: dict.labels.label_discount},
-            ];
-
             return res.render('terminal/create', {
                 pageType: 'terminals',
                 dict: dict,
                 company: company,
                 users: rows,
-                discounts: discountTypes,
                 account: req.session.user,
                 message: session_message,
                 error: session_error,
@@ -100,7 +94,6 @@ router.get('/create', (req, res, next)=> {
 router.post('/create', (req, res, next)=> {
 
     req.checkBody('name', dict.messages.company_name_required).notEmpty();
-    req.checkBody('type', dict.messages.country_name_required).notEmpty();
 
     var errors = req.validationErrors();
 

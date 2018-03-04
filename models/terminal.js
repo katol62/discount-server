@@ -13,11 +13,11 @@ var Terminal = {
 
     create: (body, done)=>{
 
-        var query = 'INSERT INTO terminal (name, company, place, type) SELECT ?, ?, ?, ? FROM DUAL WHERE NOT EXISTS (SELECT * FROM terminal WHERE name=?) LIMIT 1';
-        var params = [body.name, body.company, body.place, body.type, body.name];
+        var query = 'INSERT INTO terminal (name, company, place) SELECT ?, ?, ? FROM DUAL WHERE NOT EXISTS (SELECT * FROM terminal WHERE name=?) LIMIT 1';
+        var params = [body.name, body.company, body.place, body.name];
         if (body.place === '') {
-            query = 'INSERT INTO terminal (name, company, type) SELECT ?, ?, ? FROM DUAL WHERE NOT EXISTS (SELECT * FROM terminal WHERE name=?) LIMIT 1';
-            params = [body.name, body.company, body.type, body.name];
+            query = 'INSERT INTO terminal (name, company) SELECT ?, ? FROM DUAL WHERE NOT EXISTS (SELECT * FROM terminal WHERE name=?) LIMIT 1';
+            params = [body.name, body.company, body.name];
         }
         db.query(query, params, (err, rows)=> {
             console.log(rows);

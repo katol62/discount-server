@@ -16,7 +16,6 @@ block content
                     input#tid(type='hidden', name='tid', value=terminal.id)
 
                     +formTextInput('name', 'text', dict.labels.label_name, dict.labels.label_name, terminal.name)
-                    +formSelect('type', dict.labels.label_discount_type, discounts, terminal.type)
                     +formTextInput('place', 'text', dict.labels.label_city, dict.labels.label_city, terminal.place)
 
                     button.btn.btn-default(type='submit') #{dict.labels.label_update}

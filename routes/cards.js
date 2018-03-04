@@ -938,7 +938,10 @@ router.post('/sell', (req, res, nexr)=>{
 
 router.get('/sellstocsv', (req, res, next)=> {
 
-    Card.getCardsForUserAndType(req.session.user, 'sold', (err, rows)=>{
+    const dstart = req.query.dstart ? req.query.dstart : '';
+    const dend = req.query.dend ? req.query.dend : '';
+
+    Card.getCardsForUserAndType(req.session.user, 'sold', dstart, dend, (err, rows)=>{
         if (err) {
             req.session.error = dict.messages.db_error+": "+err.message;
             res.redirect('/cards');
@@ -955,11 +958,16 @@ router.get('/sellstocsv', (req, res, next)=> {
             delimiter   : ",",
             wrap        : false
         };
+
         var csv = csvjson.toCSV(data, options);
 
         var csv_array = csv.split('\n');
         csv_array.splice(0, 1, headers_string);
         csv = csv_array.join('\n');
+
+        csv.replace('adult', dict.labels.label_tariff_adult);
+        csv.replace('child', dict.labels.label_tariff_child);
+        csv.replace('other', dict.labels.label_tariff_other);
 
         console.log('++-- CSV +++--+++')
         console.log(csv)
@@ -976,7 +984,10 @@ router.get('/sellstocsv', (req, res, next)=> {
 });
 router.get('/sellstopdf', (req, res, next)=> {
 
-    Card.getCardsForUserAndType(req.session.user, 'sold', (err, rows)=>{
+    const dstart = req.query.dstart ? req.query.dstart : '';
+    const dend = req.query.dend ? req.query.dend : '';
+
+    Card.getCardsForUserAndType(req.session.user, 'sold', dstart, dend, (err, rows)=>{
         if (err) {
             req.session.error = dict.messages.db_error+": "+err.message;
             res.redirect('/cards');
@@ -997,7 +1008,7 @@ router.get('/sellstopdf', (req, res, next)=> {
             content += '<tr>';
             content += '<td>'+row['card_nb']+'</td>';
             content += '<td>'+row['qr_code']+'</td>';
-            content += '<td>'+row['type']+'</td>';
+            content += '<td>'+(row['type']=='adult'?dict.labels.label_tariff_adult:(row['type']=='child'?dict.labels.label_tariff_child:dict.labels.label_tariff_other))+'</td>';
             content += '<td>'+row['owner']+'</td>';
             content += '<td>'+row['seller']+'</td>';
             content += '<td>'+row['date']+'</td>';
@@ -1005,6 +1016,10 @@ router.get('/sellstopdf', (req, res, next)=> {
         });
         content += '</tbody>';
         content += '</table>';
+
+        var checkDate = '';
+        checkDate += dstart != '' ? dstart+' - ' : 'не определено -';
+        checkDate += dend != '' ? dend : ' не определено'
 
         var name = req.session.user.id;
 
@@ -1023,7 +1038,7 @@ router.get('/sellstopdf', (req, res, next)=> {
             paginationOffset: 1,       // Override the initial pagination number
             "header": {
                 "height": "15mm",
-                "contents": '<div style="text-align: center; width: 100%; border-bottom: 1px solid; font-family: sans-serif; font-size: 1em;">Продажа карт ('+req.session.user.name+' '+req.session.user.last+')</div>'
+                "contents": '<div style="text-align: center; width: 100%; border-bottom: 1px solid; font-family: sans-serif; font-size: 1em;">Продажа карт ('+req.session.user.name+' '+req.session.user.last+') ('+checkDate+')</div>'
             },
             "footer": {
                 "height": "20mm",

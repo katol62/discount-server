@@ -24,6 +24,7 @@ block content
                                 tr(class='th-users'): th= dict.titles.visit_date
                                     th= dict.labels.label_card_number
                                     th= dict.titles.tariff
+                                    th= dict.titles.discountType
                                     th= dict.titles.visit_login
                                     th= dict.titles.visit_price
                                     th= dict.titles.visit_discount
@@ -33,6 +34,7 @@ block content
                                         td= moment(item.date).format("YYYY-MM-DD hh:mm")
                                         td= item.cardNumber
                                         td= item.tariffName
+                                        td= item.discountType=='pass' ? dict.labels.label_pass : dict.labels.label_discount
                                         td= item.email
                                         td= item.price
                                         td= item.discount

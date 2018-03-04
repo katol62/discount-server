@@ -15,6 +15,7 @@ block content
                     input#owner(type='hidden', name='owner', value=account.id)
                     input#tid(type='hidden', name='tid', value=terminal.id)
                     input#guest(type='hidden', name='guest', value='0')
+                    input#type(type='hidden', name='type', value='')
 
                     +formTextInput('card', 'number', dict.labels.label_card_number, dict.labels.label_card_number, '')
                     .form-group
@@ -22,8 +23,9 @@ block content
                         select.form-control.selectpicker(id='tariff' name='tariff' type="select")
                             option(value='' title='--Выбрать--')
                             each tariff in tariffs
-                                option(value=tariff.id data-card=tariff.guest) #{tariff.name}
-                    +formSelect('type', dict.labels.label_visit_type, types, terminal.type, false, '', 'hide')
+                                option(value=tariff.id data-card=tariff.guest data-price=tariff.price data-type=tariff.discountType) #{tariff.name}
+                    //+formSelect('type', dict.labels.label_visit_type, types, terminal.type, false, '', 'hide')
+                    +formTextInput('typeDisplay', 'text', dict.labels.label_visit_type, '', '', true)
                     +formTextInput('price', 'number', dict.labels.label_visit_price, dict.labels.label_visit_price, '0')
                     .form-group#passContainer(style='display:none')
                         label(for='pass')= dict.labels.label_visit_pass

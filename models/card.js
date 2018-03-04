@@ -119,7 +119,7 @@ var Card = {
         })
     },
 
-    getCardsForUserAndType: (user, type, done)=>{
+    getCardsForUserAndType: (user, type, start, end, done)=>{
 
         var query = 'SELECT c.card_nb, c.qr_code, c.type, u.email as owner, uu.email as seller, CAST(c.update_date as CHAR) as date from cards c left join users u on c.owner=u.id left join users uu on c.updated_by=uu.id where c.status=?';
         var params = [type];
@@ -136,6 +136,16 @@ var Card = {
                 'left join users uu on c.updated_by=uu.id\n' +
                 'where c.status=? and c.updated_by=?';
             params = [type, user.id];
+        }
+
+        if (start != '') {
+            query += ' and c.update_date >= ?';
+            params.push(start);
+        }
+
+        if (end != '') {
+            query += ' and c.update_date <= ?';
+            params.push(end);
         }
 
         db.query(query, params, (err, rows)=>{

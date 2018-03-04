@@ -24,6 +24,8 @@ block content
                                 tr(class='th-users'): th= dict.labels.label_name
                                     th= dict.labels.label_period
                                     th= dict.labels.label_discount
+                                    th= dict.labels.label_discount_type
+                                    th= dict.labels.label_price
                                     th= dict.labels.label_tariff_type
                                     th= dict.labels.label_guest
                                     th= dict.labels.label_actions
@@ -36,6 +38,8 @@ block content
                                         else
                                             td= dict.labels.label_unlimited
                                         td #{item.discount}
+                                        td #{item.discountType == 'pass' ? dict.labels.label_pass : dict.labels.label_discount}
+                                        td #{item.price}
                                         td #{item.type == 'adult' ? dict.labels.label_tariff_adult : (item.type == 'child' ? dict.labels.label_tariff_child : dict.labels.label_tariff_other)}
                                         td #{item.guest === '1' ? dict.labels.label_yes : dict.labels.label_no}
                                         td(class="col-md-2")
