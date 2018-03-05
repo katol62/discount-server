@@ -37,6 +37,7 @@ var Tariff = {
         var type = body.type;
         var discountType = body.discountType;
         var discount = body.discount;
+        var discountUnit = body.discountUnit;
         var price = body.price;
         var terminal = body.tid;
         var guest = body.guest === 'on' ? '1' : '0';
@@ -46,8 +47,8 @@ var Tariff = {
         console.log(guest)
         console.log('=======')
 
-        var query = 'INSERT INTO tariff (name, start, end, type, discountType, price, discount, terminal, guest, pass) SELECT ?, ?, ?, ?, ?, ?, ?, ?, ?, ? FROM DUAL WHERE NOT EXISTS (SELECT * FROM tariff WHERE name = ? AND type = ? AND terminal = ?) LIMIT 1';
-        var params = [name, start, end, type, discountType, price, discount, terminal, guest, pass, name, type, terminal];
+        var query = 'INSERT INTO tariff (name, start, end, type, discountType, price, discount, discountUnit, terminal, guest, pass) SELECT ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? FROM DUAL WHERE NOT EXISTS (SELECT * FROM tariff WHERE name = ? AND type = ? AND terminal = ?) LIMIT 1';
+        var params = [name, start, end, type, discountType, price, discount, discountUnit, terminal, guest, pass, name, type, terminal];
 
         db.query(query, params, function(err, rows) {
             if (err) {

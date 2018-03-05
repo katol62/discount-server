@@ -29,5 +29,10 @@ module.exports = {
         {id: 'discount', name: dict.labels.label_discount},
     ],
     'passType': [{id: '0', name: dict.labels.label_no_day},{id: '1', name: dict.labels.label_one_day},{id: '3', name: dict.labels.label_three_days},{id: '6', name: dict.labels.label_six_days}],
-    'passTypeStrict': [{id: '1', name: dict.labels.label_one_day},{id: '3', name: dict.labels.label_three_days},{id: '6', name: dict.labels.label_six_days}]
+    'passTypeStrict': [{id: '1', name: dict.labels.label_one_day},{id: '3', name: dict.labels.label_three_days},{id: '6', name: dict.labels.label_six_days}],
+    'discountUtits': [
+        {id:'currency', name:'руб.'},
+        {id:'percent', name:'%'}
+    ]
+
 };

@@ -28,6 +28,7 @@ block content
                     +formSelect('discountType', dict.labels.label_discount_type, discountTypes, tariff.discountType)
                     +formTextInput('price', 'number', dict.labels.label_price, dict.labels.label_price, tariff.price)
                     +formTextInput('discount', 'number', dict.labels.label_discount, dict.labels.label_discount, tariff.discount)
+                    +formRadio('discountUnit', dict.labels.label_discount_unit, discountUnits, tariff.discountUnit)
 
                     .form-group
                         .form-check.form-check-inline

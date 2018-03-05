@@ -25,8 +25,8 @@ block content
                     +formSelect('type', dict.labels.label_tariff_type, types)
                     +formSelect('discountType', dict.labels.label_discount_type, discountTypes)
                     +formTextInput('price', 'number', dict.labels.label_price, dict.labels.label_price, '0')
-                    +formTextInput('discount', 'number', dict.labels.label_discount, dict.labels.label_discount, '')
-
+                    +formTextInput('discount', 'number', dict.labels.label_discount, dict.labels.label_discount, '0')
+                    +formRadio('discountUnit', dict.labels.label_discount_unit, discountUnits, 'currency')
                     .form-group
                         .form-check.form-check-inline
                             label.form-check-label

@@ -33,13 +33,13 @@ block content
                                 each item, i in items
                                     tr
                                         td #{item.name}
-                                        if item.start && item.start != '0000-00-00'
-                                            td #{moment(item.start).format("DD/MM/YYYY") + ' - '+moment(item.end).format("DD/MM/YYYY")}
+                                        if item.start == '0000-00-00' && item.end == '0000-00-00'
+                                            td #{dict.labels.label_unlimited}
                                         else
-                                            td= dict.labels.label_unlimited
-                                        td #{item.discount}
+                                            td #{(item.start != '0000-00-00' ? moment(item.start).format("DD/MM/YYYY"):dict.labels.label_unlimited) + ' - '+(item.end && item.end != '0000-00-00' ? moment(item.end).format("DD/MM/YYYY"):dict.labels.label_unlimited)}
+                                        td #{item.discount+(item.discountUnit=='currency'?' руб.':' %')}
                                         td #{item.discountType == 'pass' ? dict.labels.label_pass : dict.labels.label_discount}
-                                        td #{item.price}
+                                        td #{item.price+' руб.'}
                                         td #{item.type == 'adult' ? dict.labels.label_tariff_adult : (item.type == 'child' ? dict.labels.label_tariff_child : dict.labels.label_tariff_other)}
                                         td #{item.guest === '1' ? dict.labels.label_yes : dict.labels.label_no}
                                         td(class="col-md-2")
