@@ -4,7 +4,7 @@ var dict = locale.ru;
 module.exports = {
 
     'server': {
-        host: 'localhost',
+        host: 'taisgroup.ru',
         port: 3000
     },
     'locale': 'ru',
