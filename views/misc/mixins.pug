@@ -53,4 +53,13 @@ mixin link(aclass, href, icon, label, title, onclick)
             | &nbsp;
         = label
 
+mixin formRadio(id, label, items, selected)
+    .form-group
+        label(for=id) #{label}
+        each item in items
+            .form-check
+                input(id=item.id name=id, type='radio' checked=item.id==selected)
+                label.ml-2(for=item.id) #{item.name}
+
+
 

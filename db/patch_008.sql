@@ -1,0 +1,1 @@
+ALTER TABLE `tariff` ADD `discountUnit` ENUM('currency','percent') NOT NULL DEFAULT 'currency' AFTER `discount`;

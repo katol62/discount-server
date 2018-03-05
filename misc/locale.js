@@ -86,6 +86,7 @@ module.exports = {
             "label_add_terminal":"Добавить терминал",
             "label_pass":"Пасс",
             "label_discount":"Дисконт",
+            "label_discount_unit":"Тип дисконта",
             "label_price":"Цена",
             "label_city":"Город",
             "label_discount_type":"Скидочная политика",
