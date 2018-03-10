@@ -58,8 +58,8 @@ mixin formRadio(id, label, items, selected)
         label(for=id) #{label}
         each item in items
             .form-check
-                input(id=item.id name=id, type='radio' checked=item.id==selected)
-                label.ml-2(for=item.id) #{item.name}
+                input(value=item.id name=id, type='radio' checked=item.id==selected)
+                label.ml-2(for=id) #{item.name}
 
 
 
