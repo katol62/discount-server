@@ -79,15 +79,16 @@ var Tariff = {
         var type = body.type;
         var discount = body.discount;
         var discountType = body.discountType;
+        var discountUnit = body.discountUnit;
         var price = body.price;
         var terminal = body.tid;
         var guest = body.guest === 'on' ? '1' : '0';
         var pass = guest=='1' ? body.pass : '0';
 
-        console.log(guest);
+        var query = 'UPDATE tariff SET name=?, start=?, end=?, type=?, discountType=?, price=?, discount=?, terminal=?, discountUnit=?, guest=?, pass=? WHERE id=?';
+        var params = [name, start, end, type, discountType, price, discount, terminal, discountUnit, guest, pass, id];
 
-        var query = 'UPDATE tariff SET name=?, start=?, end=?, type=?, discountType=?, price=?, discount=?, terminal=?, guest=?, pass=? WHERE id=?';
-        var params = [name, start, end, type, discountType, price, discount, terminal, guest, pass, id];
+        console.log(params);
 
         db.query(query, params, function(err, rows) {
             if (err) {
