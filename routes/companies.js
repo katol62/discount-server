@@ -44,8 +44,8 @@ var checkCompany = (req, res, next)=>{
                         return res.redirect('/companies');
                     }
                     console.log('--count--');
-                    console.log(rows);
-                    if (rows.length == 0 || rows[0].count==0) {
+                    console.log(rows[0]['count']);
+                    if (rows.length == 0 || rows[0]['count']==0) {
                         req.session.error = dict.messages.company_not_allowed;
                         return res.redirect('/companies');
                     } else {
