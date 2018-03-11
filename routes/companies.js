@@ -968,7 +968,7 @@ router.get('/:cid/terminals/:tid/tariffs/create', checkCompany, checkTerminal, (
                     terminal: terminal,
                     terminals: terminals,
                     types: config.tariffTypes,
-                    types: config.discountTypes,
+                    discountTypes: config.discountTypes,
                     discountUnits: config.discountUtits,
                     passes: config.passType,
                     account: req.session.user,
@@ -986,6 +986,7 @@ router.post('/:cid/terminals/:tid/tariffs/create', (req, res, next)=> {
     req.checkBody('name', dict.messages.tariff_name_required).notEmpty();
     req.checkBody('type', dict.messages.tariff_type_required).notEmpty();
     req.checkBody('discount', dict.messages.tariff_discount_required).notEmpty();
+    req.checkBody('discountType', dict.messages.discount_type_required).notEmpty();
 
     var errors = req.validationErrors();
 
@@ -1079,6 +1080,7 @@ router.get('/:cid/terminals/:tid/tariffs/:trid/edit', checkCompany, checkTermina
                         terminals: terminals,
                         types: config.tariffTypes,
                         passes: config.passType,
+                        discountTypes: config.discountTypes,
                         discountUnits: config.discountUtits,
                         account: req.session.user,
                         message: session_message,
@@ -1098,6 +1100,7 @@ router.put('/:cid/terminals/:tid/tariffs/:trid/edit', (req, res, next)=>{
     req.checkBody('name', dict.messages.tariff_name_required).notEmpty();
     req.checkBody('type', dict.messages.tariff_type_required).notEmpty();
     req.checkBody('discount', dict.messages.tariff_discount_required).notEmpty();
+    req.checkBody('discountType', dict.messages.discount_type_required).notEmpty();
 
     var errors = req.validationErrors();
 
