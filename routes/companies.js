@@ -43,7 +43,9 @@ var checkCompany = (req, res, next)=>{
                         req.session.error = dict.messages.db_error+":"+err.code;
                         return res.redirect('/companies');
                     }
-                    if (rows.length == 0) {
+                    console.log('--count--');
+                    console.log(rows);
+                    if (rows.length == 0 || rows[0].count==0) {
                         req.session.error = dict.messages.company_not_allowed;
                         return res.redirect('/companies');
                     } else {
@@ -76,7 +78,7 @@ var checkTerminal = (req, res, next)=>{
                         req.session.error = dict.messages.db_error+":"+err.code;
                         return res.redirect('/companies');
                     }
-                    if (rows.length == 0) {
+                    if (rows.length == 0 || rows[0].count==0) {
                         req.session.error = dict.messages.terminal_not_allowed;
                         return res.redirect('/companies');
                     } else {
