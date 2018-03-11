@@ -43,8 +43,7 @@ var checkCompany = (req, res, next)=>{
                         req.session.error = dict.messages.db_error+":"+err.code;
                         return res.redirect('/companies');
                     }
-                    console.log('>>>count=='+rows[0]['count'].toString());
-                    if (!rows.length || rows[0]['count'].toString() == '0') {
+                    if (rows.length == 0) {
                         req.session.error = dict.messages.company_not_allowed;
                         return res.redirect('/companies');
                     } else {
@@ -77,7 +76,7 @@ var checkTerminal = (req, res, next)=>{
                         req.session.error = dict.messages.db_error+":"+err.code;
                         return res.redirect('/companies');
                     }
-                    if (rows.length == 0 || rows[0].count==0) {
+                    if (rows.length == 0) {
                         req.session.error = dict.messages.terminal_not_allowed;
                         return res.redirect('/companies');
                     } else {
@@ -468,7 +467,7 @@ router.get('/:cid/terminals/create', checkCompany, (req, res, next)=>{
             pageType: 'companies',
             dict: dict,
             company: company,
-            discounts: config.discountTypes,
+            discounts: discountTypes,
             account: req.session.user,
             message: session_message,
             error: session_error,
@@ -548,7 +547,7 @@ router.get('/:cid/terminals/:tid/edit', checkCompany, checkTerminal, (req, res, 
                 dict: dict,
                 company: company,
                 terminal: rows[0],
-                discounts: config.discountTypes,
+                discounts: discountTypes,
                 account: req.session.user,
                 message: session_message,
                 error: session_error,
@@ -940,6 +939,8 @@ router.get('/:cid/terminals/:tid/tariffs/create', checkCompany, checkTerminal, (
             Terminal.getById(req.params.tid, (err, rows)=>{
                 var terminal = rows[0];
 
+                var tariffTypes = [{id:""}];
+
                 return res.render('tariff/create', {
                     pageType: 'companies',
                     dict: dict,
@@ -947,8 +948,6 @@ router.get('/:cid/terminals/:tid/tariffs/create', checkCompany, checkTerminal, (
                     terminal: terminal,
                     terminals: terminals,
                     types: config.tariffTypes,
-                    discountTypes: config.discountTypes,
-                    discountUnits: config.discountUtits,
                     passes: config.passType,
                     account: req.session.user,
                     message: session_message,
@@ -964,9 +963,7 @@ router.post('/:cid/terminals/:tid/tariffs/create', (req, res, next)=> {
 
     req.checkBody('name', dict.messages.tariff_name_required).notEmpty();
     req.checkBody('type', dict.messages.tariff_type_required).notEmpty();
-    req.checkBody('discountType', dict.messages.discount_type_required).notEmpty();
     req.checkBody('discount', dict.messages.tariff_discount_required).notEmpty();
-    req.checkBody('price', dict.messages.tariff_price_required).notEmpty();
 
     var errors = req.validationErrors();
 
@@ -1059,8 +1056,6 @@ router.get('/:cid/terminals/:tid/tariffs/:trid/edit', checkCompany, checkTermina
                         tariff: rows[0],
                         terminals: terminals,
                         types: config.tariffTypes,
-                        discountTypes: config.discountTypes,
-                        discountUnits: config.discountUtits,
                         passes: config.passType,
                         account: req.session.user,
                         message: session_message,
@@ -1079,9 +1074,7 @@ router.put('/:cid/terminals/:tid/tariffs/:trid/edit', (req, res, next)=>{
 
     req.checkBody('name', dict.messages.tariff_name_required).notEmpty();
     req.checkBody('type', dict.messages.tariff_type_required).notEmpty();
-    req.checkBody('discountType', dict.messages.discount_type_required).notEmpty();
     req.checkBody('discount', dict.messages.tariff_discount_required).notEmpty();
-    req.checkBody('price', dict.messages.tariff_price_required).notEmpty();
 
     var errors = req.validationErrors();
 

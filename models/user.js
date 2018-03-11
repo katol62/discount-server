@@ -256,7 +256,7 @@ var User = {
     },
 
     allowedCompany: (user, cid, done)=>{
-        var query = 'SELECT count(*) as count FROM reference WHERE user = ? AND company = ?';
+        var query = 'SELECT * FROM reference WHERE user = ? AND company = ?';
         db.query(query, [user.id, cid], (err, rows)=>{
             if (err) {
                 return done(err);
@@ -266,7 +266,7 @@ var User = {
     },
 
     allowedTerminal: (user, cid, tid, done)=>{
-        var query = 'SELECT count(*) as count FROM reference WHERE user = ? AND company = ? AND (isnull(terminal) OR terminal = ?)';
+        var query = 'SELECT * FROM reference WHERE user = ? AND company = ? AND (isnull(terminal) OR terminal = ?)';
         db.query(query, [user.id, cid, tid], (err, rows)=>{
             if (err) {
                 return done(err);
