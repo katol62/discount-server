@@ -43,8 +43,8 @@ var checkCompany = (req, res, next)=>{
                         req.session.error = dict.messages.db_error+":"+err.code;
                         return res.redirect('/companies');
                     }
-                    console.log('>>>count=='+(rows.length && rows[0]['count'] == 0));
-                    if (rows.length && rows[0]['count'] == 0) {
+                    console.log('>>>count=='+rows[0]['count'].toString());
+                    if (!rows.length || rows[0]['count'].toString() == '0') {
                         req.session.error = dict.messages.company_not_allowed;
                         return res.redirect('/companies');
                     } else {
