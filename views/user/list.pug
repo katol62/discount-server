@@ -36,7 +36,7 @@ block content
                                                 +link('', '/companies/' + company.id + '/users/'+item.id+'/edit', 'glyphicon glyphicon-edit', '', dict.labels.label_update, '')
                                                 | &nbsp;&nbsp;
                                             if item.parent === account.id || account.role === 'super'
-                                                +link('', '', 'glyphicon glyphicon-trash text-danger', '', dict.labels.label_delete, 'confirmDeleteUser(' + item.id + ', "' + item.name + '"); return false;')
+                                                +link('', '', 'glyphicon glyphicon-trash text-danger', '', dict.labels.label_delete, 'confirmDeleteUser('+company.id+', ' + item.id + ', "' + item.name + '"); return false;')
                                                 | &nbsp;&nbsp;
 
             if message

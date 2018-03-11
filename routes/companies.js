@@ -855,6 +855,26 @@ router.put('/:cid/users/:uid/edit', (req, res, next)=> {
 
 });
 
+router.delete('/:cid/users/:uid/delete', function(req, res, next) {
+
+    var delid = req.params.uid;
+
+    User.delete(delid, function(err, rows) {
+        if (err) {
+            req.session.error = 'Delete error: '+err;
+        } else {
+            if (rows.affectedRows) {
+                req.session.message = dict.messages.user_deleted;
+            } else {
+                req.session.error = dict.messages.user_not_deleted;
+            }
+        }
+        return res.status(200).send('ok');
+    });
+
+});
+
+
 /*
  * Tariffs
  */

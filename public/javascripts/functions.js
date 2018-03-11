@@ -146,7 +146,7 @@ $(document).ready(()=>{
 });
 
 
-var confirmDeleteUser = (id, name)=> {
+var confirmDeleteUser = (cid, id, name)=> {
     bootbox.confirm({
         message: "Удалить пользователя "+name+"?",
         buttons: {
@@ -162,7 +162,7 @@ var confirmDeleteUser = (id, name)=> {
         callback: function (result) {
             if (result) {
 
-                var url = '/users/delete/'+id;
+                var url = '/companies/'+cid+'/users/'+id+'/delete';
                 $.ajax({
                     url: url,
                     type: 'DELETE',
@@ -173,8 +173,8 @@ var confirmDeleteUser = (id, name)=> {
                     success:  () => {
                         location.reload();
                     },
-                    error: ()=> {
-
+                    error: (data)=> {
+                        console.log(data);
                     },
                 });
             }
