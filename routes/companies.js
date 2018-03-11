@@ -716,7 +716,7 @@ router.post('/:cid/users/create', (req, res, next)=> {
                 return;
             }
 
-            var tid = req.body.tid ? req.body.tid : '0';
+            var tid = req.body.tid ? req.body.tid : null;
             User.updateReference(row.insertId, req.body.cid, tid, (err, rows)=>{
                 if (err) {
                     req.session.error = dict.messages.db_error+": "+err.message;
