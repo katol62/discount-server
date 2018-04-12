@@ -3,6 +3,7 @@ var api = express();
 
 var auth = require('./apiauth');
 var cards = require('./apicard');
+var company = require('./apicompany');
 var register = require('./apiregister');
 var config = require('./../../misc/config');
 
@@ -11,12 +12,13 @@ var locale = require('./../../misc/locale');
 var dict = locale[config.locale];
 
 var checkToken = (req, res, next) => {
-    var token = req.body.token || req.param('token') || req.headers['x-access-token'];
+    var token = req.body.token || req.params['token'] || req.headers['x-access-token'];
+
     // decode token
     if (token) {
 
         // verifies secret and checks exp
-        jwt.verify(token, app.get('superSecret'), function(err, decoded) {
+        jwt.verify(token, config.secret, function(err, decoded) {
             if (err) {
                 return res.json({ success: false, message: dict.messages.token_invalid });
             } else {
@@ -46,6 +48,7 @@ api.post('/', (req, res, next)=>{
 api.use('/auth', auth);
 api.use('/register', register);
 api.use('/cards', checkToken, cards);
+api.use('/company', checkToken, company);
 
 api.use(function (req, res, next) {
     res.status(404).json({ success: false, message: 'Not found' });

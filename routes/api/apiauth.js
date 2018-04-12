@@ -37,11 +37,12 @@ router.post('/', function(req, res, next) {
                         if (doesMatch){
                             var user = row[0];
                             var payload = {
+                                id: user.id,
                                 email: user.email,
                                 role: user.role
                             };
                             var token = jwt.sign(payload, config.secret, {
-                                expiresIn: 86400 // expires in 24 hours
+                                expiresIn: config.tokenExpireIn
                             });
 
                             res.status(200).json({

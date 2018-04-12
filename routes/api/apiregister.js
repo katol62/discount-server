@@ -49,11 +49,12 @@ router.post('/', (req, res, next)=> {
                 }
 
                 var payload = {
+                    id: userId,
                     email: req.body.softcode,
                     role: 'customer'
                 };
                 var token = jwt.sign(payload, config.secret, {
-                    expiresIn: 86400 // expires in 24 hours
+                    expiresIn: config.tokenExpireIn
                 });
 
                 res.status(200).json({

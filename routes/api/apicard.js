@@ -9,6 +9,10 @@ var dict = locale[config.locale];
 
 
 router.get('/', (req, res, next)=> {
+    var decoded = req.decoded;
+
+    console.log(decoded);
+
     res.json({success:true});
 });
 
