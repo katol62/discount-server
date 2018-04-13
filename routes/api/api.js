@@ -3,7 +3,7 @@ var api = express();
 
 var auth = require('./apiauth');
 var cards = require('./apicard');
-var company = require('./apicompany');
+var process = require('./apiprocess');
 var register = require('./apiregister');
 var config = require('./../../misc/config');
 
@@ -38,17 +38,17 @@ var checkToken = (req, res, next) => {
 };
 
 api.get('/', (req, res, next)=>{
-    return res.status(404).json({ success: false, message: 'Not allowed' });
+    return res.status(405).json({ success: false, message: 'Not allowed' });
 });
 
 api.post('/', (req, res, next)=>{
-    return res.status(404).json({ success: false, message: 'Not allowed' });
+    return res.status(405).json({ success: false, message: 'Not allowed' });
 });
 
 api.use('/auth', auth);
 api.use('/register', register);
 api.use('/cards', checkToken, cards);
-api.use('/company', checkToken, company);
+api.use('/process', checkToken, process);
 
 api.use(function (req, res, next) {
     res.status(404).json({ success: false, message: 'Not found' });

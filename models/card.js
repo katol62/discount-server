@@ -119,6 +119,90 @@ var Card = {
         })
     },
 
+    getByCardForUser: (card, user, done)=>{
+
+        let query = '';
+        let whereArray = [];
+        let params = [];
+        let whereString = '';
+
+        if (user.role === 'super') {
+            query = 'SELECT * FROM cards ';
+            if (card.id) {
+                whereArray.push('id = ?');
+                params.push(card.id);
+            }
+            if (card.card_nb) {
+                whereArray.push('card_nb = ?');
+                params.push(card.card_nb);
+            }
+            if (card.qr_code) {
+                whereArray.push('qr_code = ?');
+                params.push(card.qr_code);
+            }
+            if (card.nfs_code) {
+                whereArray.push('nfs_code = ?');
+                params.push(card.nfs_code);
+            }
+            whereString = ' WHERE '+whereArray.join(' OR ');
+        }
+        if (user.role == 'admin') {
+            query = 'select c.*, u.id as userId from cards c left join users u on c.owner=u.id';
+            if (card.id) {
+                whereArray.push('c.id = ?');
+                params.push(card.id);
+            }
+            if (card.card_nb) {
+                whereArray.push('c.card_nb = ?');
+                params.push(card.card_nb);
+            }
+            if (card.qr_code) {
+                whereArray.push('c.qr_code = ?');
+                params.push(card.qr_code);
+            }
+            if (card.nfs_code) {
+                whereArray.push('c.nfs_code = ?');
+                params.push(card.nfs_code);
+            }
+            params.push(user.id);
+            whereString = ' WHERE ('+whereArray.join(' OR ') + ')  AND u.id = ?';
+        }
+
+        if (user.role == 'cashier') {
+            query = 'select c.*, u.id as userId from cards c left join users u on c.owner=u.parent';
+            if (card.id) {
+                whereArray.push('c.id = ?');
+                params.push(card.id);
+            }
+            if (card.card_nb) {
+                whereArray.push('c.card_nb = ?');
+                params.push(card.card_nb);
+            }
+            if (card.qr_code) {
+                whereArray.push('c.qr_code = ?');
+                params.push(card.qr_code);
+            }
+            if (card.nfs_code) {
+                whereArray.push('c.nfs_code = ?');
+                params.push(card.nfs_code);
+            }
+            params.push(user.id);
+            whereString = ' WHERE ('+whereArray.join(' OR ') + ')  AND u.id = ?';
+        }
+
+        query += whereString;
+
+        console.log(query);
+        console.log(params);
+
+        db.query(query, params, (err, rows)=>{
+            if (err) {
+                return done(err)
+            }
+            done(null, rows)
+        })
+    },
+
     getCardsForUserAndType: (user, type, start, end, done)=>{
 
         var query = 'SELECT c.card_nb, c.qr_code, c.type, u.email as owner, uu.email as seller, CAST(c.update_date as CHAR) as date from cards c left join users u on c.owner=u.id left join users uu on c.updated_by=uu.id where c.status=?';
@@ -178,11 +262,7 @@ var Card = {
 
     updateCardsForTransh: (body, done)=>{
         var query = 'UPDATE cards set type=?, status=?, lifetime=?, servicetime=?, company_id=?, owner=?, update_date=?, updated_by=? WHERE transh = ?';
-        console.log(body);
         var params = [body.type, body.status, body.lifetime, body.servicetime, body.company?body.company:null, (body.admin && body.admin!='')?body.admin:body.owner, body.updated, body.updatedBy, body.id];
-        console.log('=== query ===');
-        console.log(query);
-        console.log(params);
         db.query(query, params, (err, rows)=>{
             if (err) {
                 return done(err)
@@ -218,7 +298,6 @@ var Card = {
         for (var i=0; i<cards.length; i++) {
             var elm = cards[i];
             var qr = 'UPDATE cards SET nfs_code="'+elm[2]+'", m_code="'+elm[3]+'" WHERE id='+elm[0]+' AND qr_code="'+elm[1]+'"';
-            console.log(qr);
             queryFinalArray.push(qr);
         }
         var queryFinal = queryFinalArray.join(';');
@@ -243,9 +322,6 @@ var Card = {
 
         var query = 'UPDATE cards SET '+updateArray.join(',')+' WHERE id = ?';
         var params = paramsArray;
-
-        console.log(query);
-        console.log(params);
 
         db.query(query, params, (err, rows)=>{
             if (err) {
