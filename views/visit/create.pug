@@ -16,6 +16,7 @@ block content
                     input#tid(type='hidden', name='tid', value=terminal.id)
                     input#guest(type='hidden', name='guest', value='0')
                     input#type(type='hidden', name='type', value='')
+                    input#tariffType(type='hidden', name='tariffType', value='')
 
                     +formTextInput('card', 'number', dict.labels.label_card_number, dict.labels.label_card_number, '')
                     .form-group
@@ -23,7 +24,7 @@ block content
                         select.form-control.selectpicker(id='tariff' name='tariff' type="select")
                             option(value='' title='--Выбрать--')
                             each tariff in tariffs
-                                option(value=tariff.id data-card=tariff.guest data-price=tariff.price data-type=tariff.discountType) #{tariff.name}
+                                option(value=tariff.id data-card=tariff.guest data-price=tariff.price data-type=tariff.discountType data-tarifftype=tariff.type) #{tariff.name}
                     //+formSelect('type', dict.labels.label_visit_type, types, terminal.type, false, '', 'hide')
                     +formTextInput('typeDisplay', 'text', dict.labels.label_visit_type, '', '', true)
                     +formTextInput('price', 'number', dict.labels.label_visit_price, dict.labels.label_visit_price, '0')
@@ -32,6 +33,7 @@ block content
                         select.form-control.selectpicker(id='pass' name='pass' type="select" disabled)
                             each pass in passes
                                 option(value=pass.id data-tokens=pass.id) #{pass.name}
+                        small #{dict.labels.label_visit_pass_warning}
 
                     button.btn.btn-primary(type='submit') #{dict.labels.label_add}
 

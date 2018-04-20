@@ -70,7 +70,7 @@ $(document).ready(()=>{
 
     $('#guest').change( ()=>{
         if($('#guest').prop('checked')) {
-            $('#passContainer').css('display', 'block')
+            $('#passContainer').css('display', 'none')
         } else {
             $('#passContainer').css('display', 'none')
         }
@@ -122,13 +122,16 @@ $(document).ready(()=>{
             $("#pass").selectpicker('refresh');
             $('#typeDisplay').val('');
             $('#type').val('');
+            $('#tariffType').val('');
         } else {
             var card = selected.data('card');
             var price = selected.data('price');
-            var type = selected.data('type');
+            var type = selected.data('type');''
+            var tariffType = selected.data('tarifftype');
             var typeDisplay = selected.data('type') == 'pass' ? 'Пасс' : 'Дисконт';
             $('#price').val(price);
             $('#type').val(type);
+            $('#tariffType').val(tariffType);
             $('#typeDisplay').val(typeDisplay);
             if (card.toString()==='1') {
                 $('#passContainer').css('display', 'block');

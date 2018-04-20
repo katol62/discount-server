@@ -92,6 +92,61 @@ var checkTerminal = (req, res, next)=>{
     }
 };
 
+var visitPreActions = (req, res, next)=> {
+    req.checkBody('card', dict.messages.visit_card_number_required).notEmpty();
+    req.checkBody('tariff', dict.messages.visit_tariff_required).notEmpty();
+    req.checkBody('price', dict.messages.tariff_discount_required).notEmpty();
+
+    let errors = req.validationErrors();
+
+    if (errors) {
+        req.session.validate_error = errors;
+        return res.redirect('/companies/'+req.params.cid+'/terminals/'+req.params.tid+'/visits/add');
+    }
+    Card.getByIdOrNumberForUser(req.body.card, req.session.user, (err, rows)=> {
+        if (err) {
+            req.session.error = dict.messages.db_error + ': ' + err.message;
+            return res.redirect('/companies/' + req.params.cid + '/terminals/' + req.params.tid + '/visits/add');
+        }
+        if (rows.length === 0) {
+            req.session.error = dict.messages.card_not_found;
+            return res.redirect('/companies/' + req.params.cid + '/terminals/' + req.params.tid + '/visits/add');
+        }
+
+        req.card = rows[0];
+
+        let card = req.card;
+
+        var body = req.body;
+        body.card = rows[0].id;
+        body.user = req.session.user.id;
+        body.created = require('moment')().format('YYYY-MM-DD HH:mm:ss');
+
+        req.fullbody = body;
+
+        Card.checkExpired(card, (err, result)=>{
+            if (err) {
+                req.session.error = dict.messages.db_error + ': ' + err.message;
+                return res.redirect('/companies/' + req.params.cid + '/terminals/' + req.params.tid + '/visits/add');
+            }
+            Card.checkValidity(body, req.card, (err, result)=>{
+
+                console.log(err);
+                console.log(result);
+
+                if (err) {
+                    req.session.error = dict.messages.db_error + ': ' + err.message;
+                    return res.redirect('/companies/' + req.params.cid + '/terminals/' + req.params.tid + '/visits/add');
+                }
+                if (!result.success) {
+                    req.session.error = dict.messages.card_expired + ': (' + req.card.card_nb + '). Details:' + result.message;
+                    return res.redirect('/companies/' + req.params.cid + '/terminals/' + req.params.tid + '/visits/add');
+                }
+                next();
+            })
+        });
+    })
+};
 
 var methodOverride = require('method-override');
 router.use(methodOverride('X-HTTP-Method-Override'));
@@ -1205,7 +1260,7 @@ router.get('/:cid/terminals/:tid/visits/add', checkCompany, checkTerminal, (req,
                     company: company,
                     terminal: terminal,
                     tariffs: tariffs,
-                    passes: config.passTypeStrict,
+                    passes: config.passType,
                     account: req.session.user,
                     types: config.discountTypes,
                     message: session_message,
@@ -1218,12 +1273,77 @@ router.get('/:cid/terminals/:tid/visits/add', checkCompany, checkTerminal, (req,
 
 });
 
-router.post('/:cid/terminals/:tid/visits/add', (req, res, next)=> {
+router.post('/:cid/terminals/:tid/visits/add', visitPreActions, (req, res, next)=> {
+
+    var body = req.fullbody;
+
+    let card = req.card;
+    console.log(body);
+
+    if (card.pass === '0') {
+
+        var sellBody = {};
+
+        sellBody.id = card.id;
+        sellBody.status = 'sold';
+        sellBody.updatedBy = req.session.user.id;
+        sellBody.updated = require('moment')().format('YYYY-MM-DD HH:mm:ss');
+        sellBody.pass = body.pass;
+        sellBody.type = body.tariffType;
+
+        Card.sell(sellBody, (err, rows)=>{
+
+            console.log('==============');
+            console.log(sellBody);
+
+            if (err) {
+                req.session.error = dict.messages.db_error+': '+err.message;
+                return res.redirect('/companies/'+req.params.cid+'/terminals/'+req.params.tid+'/visits/add');
+            }
+            if (rows.affectedRows == 0) {
+                req.session.error = dict.messages.card_sell_error;
+                return res.redirect('/companies/'+req.params.cid+'/terminals/'+req.params.tid+'/visits/add');
+            }
+
+            Visit.add(body, (err, rows)=>{
+                if (err) {
+                    req.session.error = dict.messages.db_error+': '+err.message;
+                    return res.redirect('/companies/'+req.params.cid+'/terminals/'+req.params.tid+'/visits/add');
+                }
+                if (rows.affectedRows == 0) {
+                    req.session.error = dict.messages.visit_create_error;
+                    return res.redirect('/companies/'+req.params.cid+'/terminals/'+req.params.tid+'/visits/add');
+                }
+                req.session.message = dict.messages.visit_created;
+                res.redirect('/companies/'+req.params.cid+'/terminals/'+req.params.tid+'/visits');
+
+            })
+
+        });
+
+    } else {
+        Visit.add(body, (err, rows)=>{
+            if (err) {
+                req.session.error = dict.messages.db_error+': '+err.message;
+                return res.redirect('/companies/'+req.params.cid+'/terminals/'+req.params.tid+'/visits/add');
+            }
+            if (rows.affectedRows == 0) {
+                req.session.error = dict.messages.visit_create_error;
+                return res.redirect('/companies/'+req.params.cid+'/terminals/'+req.params.tid+'/visits/add');
+            }
+            req.session.message = dict.messages.visit_created;
+            res.redirect('/companies/'+req.params.cid+'/terminals/'+req.params.tid+'/visits');
+
+        })
+    }
+});
+
+router.post('/:cid/terminals/:tid/visits/addold', (req, res, next)=> {
     req.checkBody('card', dict.messages.visit_card_number_required).notEmpty();
     req.checkBody('tariff', dict.messages.visit_tariff_required).notEmpty();
     req.checkBody('price', dict.messages.tariff_discount_required).notEmpty();
 
-    var errors = req.validationErrors();
+    let errors = req.validationErrors();
 
     if (errors) {
         req.session.validate_error = errors;
@@ -1236,26 +1356,45 @@ router.post('/:cid/terminals/:tid/visits/add', (req, res, next)=> {
             req.session.error = dict.messages.db_error+': '+err.message;
             return res.redirect('/companies/'+req.params.cid+'/terminals/'+req.params.tid+'/visits/add');
         }
-        if (rows.length == 0) {
+        if (rows.length === 0) {
             req.session.error = dict.messages.card_not_found;
             return res.redirect('/companies/'+req.params.cid+'/terminals/'+req.params.tid+'/visits/add');
         }
+
         var body = req.body;
+
+        let card = rows[0].id;
+
         body.card = rows[0].id;
         body.user = req.session.user.id;
         body.created = require('moment')().format('YYYY-MM-DD HH:mm:ss');
         console.log(body);
 
-        if (body.pass && body.pass !== '0') {
-            Card.updateStatus({id: body.card, pass: body.pass, status: 'sold', updated: body.created, updatedBy: body.user}, (err, rows)=>{
+        if (rows[0].pass === '0') {
+
+            var sellBody = {};
+
+            sellBody.id = rows[0].id;
+            sellBody.status = 'sold';
+            sellBody.updatedBy = req.session.user.id;
+            sellBody.updated = require('moment')().format('YYYY-MM-DD HH:mm:ss');
+            sellBody.pass = body.pass;
+            sellBody.type = body.tariffType;
+
+            Card.sell(sellBody, (err, rows)=>{
+
+                console.log('==============');
+                console.log(sellBody);
+
                 if (err) {
                     req.session.error = dict.messages.db_error+': '+err.message;
                     return res.redirect('/companies/'+req.params.cid+'/terminals/'+req.params.tid+'/visits/add');
                 }
-                if (rows.length == 0) {
-                    req.session.error = dict.messages.card_update_error;
+                if (rows.affectedRows == 0) {
+                    req.session.error = dict.messages.card_sell_error;
                     return res.redirect('/companies/'+req.params.cid+'/terminals/'+req.params.tid+'/visits/add');
                 }
+
                 Visit.add(body, (err, rows)=>{
                     if (err) {
                         req.session.error = dict.messages.db_error+': '+err.message;
@@ -1269,7 +1408,9 @@ router.post('/:cid/terminals/:tid/visits/add', (req, res, next)=> {
                     res.redirect('/companies/'+req.params.cid+'/terminals/'+req.params.tid+'/visits');
 
                 })
-            })
+
+            });
+
         } else {
             Visit.add(body, (err, rows)=>{
                 if (err) {

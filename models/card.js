@@ -1,4 +1,5 @@
 var db = require('../misc/db');
+var moment = require('moment');
 
 var Card = {
 
@@ -109,8 +110,6 @@ var Card = {
             params = [id, id, user.id];
         }
 
-        console.log(query);
-        console.log(params);
         db.query(query, params, (err, rows)=>{
             if (err) {
                 return done(err)
@@ -331,6 +330,114 @@ var Card = {
         })
     },
 
+    checkExpired: (card, done)=> {
+
+        let overdue = false;
+
+        if (card.date_discount && card.date_pass) {
+            let exp_date_discount = moment(card.date_discount).add(31, 'days');
+            let exp_date_pass = moment(card.date_pass).add(31, 'days');
+            let now = moment();
+
+            if (now>exp_date_discount && now>exp_date_pass) {
+                //both expired
+                overdue = true;
+            } else if (now <= exp_date_pass) {
+                let expire = require('moment')(card.date_pass_update).add(1, 'days');
+                if (now > expire) {
+                    if (card.pass_count + 1 > Number(card.pass)) {
+                        overdue = true;
+                    }
+                }
+            }
+        }
+        if (overdue) {
+            let query = 'update cards set status = "overdue" where id = ?';
+            db.query(query, [card.id], (err, rows)=>{
+                if (err) {
+                    return done(err)
+                }
+                done(null, {success: true, message: ''})
+            })
+        } else {
+            done(null, {success: true, message: ''})
+        }
+    },
+
+    checkValidity: (body, card, done)=> {
+
+        let query = '';
+        let params = [];
+        if (body.type === 'discount') {
+            if (!card.date_discount) {
+                query = 'update cards set date_discount = ? where id = ?';
+                params = [body.created, card.id];
+                db.query(query, params, (err, rows)=>{
+                    if (err) {
+                        return done(err)
+                    }
+                    let res = rows.affectedRows !== null;
+                    let mess = !res ? 'initial discount date not set' : '';
+                    done(null, {success: res, message: mess});
+                })
+            } else {
+                var exp_date = moment(card.date_discount).add(31, 'days');
+                var now = moment();
+
+                if (exp_date >= now) {
+                    done(null, {success: true, message: ''});
+                } else {
+                    done(null, {success: false, message: 'card activity (discount) exceded 31 day'})
+                }
+            }
+
+        } else {
+            if (!card.date_pass) {
+                query = 'update cards set date_pass = ?, date_pass_update = ? where id = ?';
+                params = [body.created, body.created, card.id];
+                db.query(query, params, (err, rows)=>{
+                    if (err) {
+                        return done(err)
+                    }
+                    let res = rows.affectedRows !== null;
+                    let mess = !res ? 'initial pass date not set' : '';
+                    done(null, {success: res, message: mess});
+                })
+            } else {
+
+                var exp_date = moment(card.date_path).add(31, 'days');
+                var now = moment();
+
+                if (now > exp_date) {
+                    done(null, {success: false, message: 'card activity (pass) exceded 31 day'})
+                } else {
+                    let expire = require('moment')(card.date_pass_update).add(1, 'days');
+
+                    if (now > expire) {
+
+                        if (card.pass_count + 1 > Number(card.pass)) {
+                            done(null, {success: false, message: 'card pass count exceded'})
+                        } else {
+                            query = 'update cards set date_pass_update = ?, pass_count = ? where id = ?';
+                            params = [now.format('YYYY-MM-DD HH:mm:ss'), (card.pass_count + 1), card.id];
+
+                            db.query(query, params, (err, rows)=>{
+                                if (err) {
+                                    return done(err)
+                                }
+                                done(null, {success: true, message: ''})
+                            })
+                        }
+
+                    } else {
+                        done(null, {success: true, message: ''})
+                    }
+                }
+            }
+        }
+
+    },
+
     sell: (body, done)=>{
 
         var updateArray = ['status = ?', 'update_date=?', 'updated_by=?'];
@@ -348,11 +455,6 @@ var Card = {
 
         var query = 'UPDATE cards SET '+updateArray.join(',')+' WHERE id = ?';
         var params = paramsArray;
-
-        console.log('=====!!!!=========');
-        console.log(query);
-        console.log(params);
-        console.log('==============');
 
         db.query(query, params, (err, rows)=>{
             if (err) {

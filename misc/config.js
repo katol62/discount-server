@@ -4,7 +4,7 @@ var dict = locale.ru;
 module.exports = {
 
     'server': {
-        host: 'taisgroup.ru',
+        host: 'localhost',
         port: 3000
     },
     'locale': 'ru',
@@ -28,11 +28,12 @@ module.exports = {
         {id: 'pass', name: dict.labels.label_pass},
         {id: 'discount', name: dict.labels.label_discount},
     ],
-    'passType': [{id: '0', name: dict.labels.label_no_day},{id: '1', name: dict.labels.label_one_day},{id: '3', name: dict.labels.label_three_days},{id: '6', name: dict.labels.label_six_days}],
+    'passType': [{id: '0', name: dict.labels.label_zero_day},{id: '1', name: dict.labels.label_one_day},{id: '3', name: dict.labels.label_three_days},{id: '6', name: dict.labels.label_six_days}],
     'passTypeStrict': [{id: '1', name: dict.labels.label_one_day},{id: '3', name: dict.labels.label_three_days},{id: '6', name: dict.labels.label_six_days}],
     'discountUtits': [
         {id:'currency', name:'руб.'},
         {id:'percent', name:'%'}
-    ]
+    ],
+    tokenExpireIn: 86400 // expires in 24 hours
 
 };

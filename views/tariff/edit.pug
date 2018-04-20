@@ -36,7 +36,7 @@ block content
                                 input#guest.form-check-input(type='checkbox', name='guest' checked=tariff.guest==='1')
                                 |  #{dict.labels.label_guest}
 
-                    .form-group#passContainer(style=tariff.guest==='0'?'display:none':'display:block')
+                    .form-group#passContainer(style='display:none')
                         label(for='pass')
                         select.form-control.selectpicker(id='pass' name='pass' type="select" disabled)
                             each pass in passes
