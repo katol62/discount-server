@@ -9,6 +9,7 @@ var Card = require('./../models/card');
 var locale = require('./../misc/locale');
 var config = require('./../misc/config');
 var dict = locale[config.locale];
+var globals = require('./../misc/globals');
 var log = require('npmlog');
 var bcrypt = require('bcrypt');
 
@@ -116,6 +117,11 @@ var visitPreActions = (req, res, next)=> {
         req.card = rows[0];
 
         let card = req.card;
+
+        if (card.status !== 'sold') {
+            req.session.error = dict.messages.visit_card_not_allowed + '. '+dict.labels.label_card_status + ': '+globals.methods.nameById(card.status, config.cardStatus);
+            return res.redirect('/companies/'+req.params.cid+'/terminals/'+req.params.tid+'/visits/add');
+        }
 
         var body = req.body;
         body.card = rows[0].id;
@@ -1274,6 +1280,28 @@ router.get('/:cid/terminals/:tid/visits/add', checkCompany, checkTerminal, (req,
 });
 
 router.post('/:cid/terminals/:tid/visits/add', visitPreActions, (req, res, next)=> {
+
+    var body = req.fullbody;
+
+    let card = req.card;
+
+    Visit.add(body, (err, rows)=>{
+        if (err) {
+            req.session.error = dict.messages.db_error+': '+err.message;
+            return res.redirect('/companies/'+req.params.cid+'/terminals/'+req.params.tid+'/visits/add');
+        }
+        if (rows.affectedRows == 0) {
+            req.session.error = dict.messages.visit_create_error;
+            return res.redirect('/companies/'+req.params.cid+'/terminals/'+req.params.tid+'/visits/add');
+        }
+        req.session.message = dict.messages.visit_created;
+        res.redirect('/companies/'+req.params.cid+'/terminals/'+req.params.tid+'/visits');
+
+    })
+
+});
+
+router.post('/:cid/terminals/:tid/visits/addsell', visitPreActions, (req, res, next)=> {
 
     var body = req.fullbody;
 
