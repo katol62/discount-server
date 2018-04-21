@@ -133,6 +133,7 @@ $(document).ready(()=>{
             $('#type').val(type);
             $('#tariffType').val(tariffType);
             $('#typeDisplay').val(typeDisplay);
+            /*
             if (card.toString()==='1') {
                 $('#passContainer').css('display', 'block');
                 $('#pass').attr('disabled', false);
@@ -142,6 +143,7 @@ $(document).ready(()=>{
                 $('#pass').attr('disabled', true);
                 $("#pass").selectpicker('refresh');
             }
+            */
         }
 
     });
