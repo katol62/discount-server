@@ -110,8 +110,6 @@ router.post('/visit', (req, res, next)=>{
         card.nfs_code = req.body.nfs_code;
     }
 
-    console.log(user);
-
     if (!tid || !card || !trid) {
         return res.status(500).json({ success: false, message: "Parameters missing"});
     }
@@ -124,6 +122,7 @@ router.post('/visit', (req, res, next)=>{
             return res.status(404).json({ success: false, message: 'Card not found' });
         }
 
+        let card = rows[0];
         let cardId = rows[0].id;
 
         Tariff.getById(trid, (err, rows)=>{
@@ -135,50 +134,77 @@ router.post('/visit', (req, res, next)=>{
             }
             let tariff = rows[0];
 
-            console.log(tariff);
+            console.log(card);
 
-            var body = {type: tariff.discountType, price: tariff.price, tariff: tariff.id, tid:tid};
-            body.card = cardId;
-            body.user = user.id;
-            body.created = require('moment')().format('YYYY-MM-DD HH:mm:ss');
+            Card.checkExpired(card, (err, result)=>{
+                if (err) {
+                    return res.status(500).json({ success: false, message: err.message});
+                }
 
-            if (tariff.pass && tariff.pass !== '0') {
-                Card.updateStatus({id: body.card, pass: tariff.pass, status: 'sold', updated: body.created, updatedBy: body.user}, (err, rows)=>{
+                var body = {type: tariff.discountType, price: tariff.price, tariff: tariff.id, tid:tid};
+                body.card = cardId;
+                body.user = user.id;
+                body.date = require('moment')().format('YYYY-MM-DD HH:mm:ss');
+                body.created = require('moment')().format('YYYY-MM-DD HH:mm:ss');
+
+                Card.checkValidity(body, card, (err, result)=>{
+
                     if (err) {
                         return res.status(500).json({ success: false, message: err.message});
                     }
-                    if (rows.length == 0) {
-                        return res.status(204).json({ success: false, message: 'Card not sold' });
+                    if (!result.success) {
+                        return res.status(200).json({ success: false, message: 'Card ('+card.card_nb+') expired. Details: '+result.message });
                     }
-                    Visit.add(body, (err, rows)=>{
-                        if (err) {
-                            return res.status(500).json({ success: false, message: err.message});
-                        }
-                        if (rows.affectedRows == 0) {
-                            return res.status(204).json({ success: false, message: 'Visit not added' });
-                        }
-                        return res.status(200).json({
-                            success: true,
-                            message: 'Visit added',
-                            visit: rows.insertId
-                        });
-                    })
+
+                    if (card.status !== 'sold') {
+
+                        var sellBody = {};
+                        sellBody.id = card.id;
+                        sellBody.status = 'sold';
+                        sellBody.updatedBy = user.id;
+                        sellBody.updated = require('moment')().format('YYYY-MM-DD HH:mm:ss');
+                        sellBody.pass = tariff.pass;
+                        sellBody.type = tariff.type;
+
+                        Card.sell(sellBody, (err, rows)=>{
+                            if (err) {
+                                return res.status(500).json({ success: false, message: err.message});
+                            }
+                            if (rows.length == 0) {
+                                return res.status(200).json({ success: false, message: 'Card not sold' });
+                            }
+                            Visit.add(body, (err, rows)=>{
+                                if (err) {
+                                    return res.status(500).json({ success: false, message: err.message});
+                                }
+                                if (rows.affectedRows == 0) {
+                                    return res.status(200).json({ success: false, message: 'Visit not added' });
+                                }
+                                return res.status(200).json({
+                                    success: true,
+                                    message: 'Visit added',
+                                    visit: rows.insertId
+                                });
+                            })
+                        })
+                    } else {
+                        Visit.add(body, (err, rows)=>{
+                            if (err) {
+                                return res.status(500).json({ success: false, message: err.message});
+                            }
+                            if (rows.affectedRows == 0) {
+                                return res.status(200).json({ success: false, message: 'Visit not added' });
+                            }
+                            return res.status(200).json({
+                                success: true,
+                                message: 'Visit added',
+                                visit: rows.insertId
+                            });
+                        })
+                    }
                 })
-            } else {
-                Visit.add(body, (err, rows)=>{
-                    if (err) {
-                        return res.status(500).json({ success: false, message: err.message});
-                    }
-                    if (rows.affectedRows == 0) {
-                        return res.status(204).json({ success: false, message: 'Visit not added' });
-                    }
-                    return res.status(200).json({
-                        success: true,
-                        message: 'Visit added',
-                        visit: rows.insertId
-                    });
-                })
-            }
+            });
+
         });
     });
 

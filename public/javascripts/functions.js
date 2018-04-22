@@ -70,7 +70,7 @@ $(document).ready(()=>{
 
     $('#guest').change( ()=>{
         if($('#guest').prop('checked')) {
-            $('#passContainer').css('display', 'none')
+            $('#passContainer').css('display', 'block')
         } else {
             $('#passContainer').css('display', 'none')
         }
