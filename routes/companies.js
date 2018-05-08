@@ -543,7 +543,6 @@ router.post('/:cid/terminals/create', (req, res, next)=> {
     var cid = req.params.cid;
 
     req.checkBody('name', dict.messages.terminal_name_required).notEmpty();
-    req.checkBody('type', dict.messages.terminal_type_required).notEmpty();
 
     var errors = req.validationErrors();
 
