@@ -31,8 +31,8 @@ var Transh = {
 
     updateTransh: (body, done)=> {
         var owner = (body.admin && body.admin!='')?body.admin:body.owner;
-        var query = 'UPDATE transh set owner=?';
-        var params = [owner];
+        var query = 'UPDATE transh set owner=? WHERE id = ?';
+        var params = [owner, body.id];
         db.query(query, params, (err, rows)=>{
             if (err) {
                 return (done(err));
