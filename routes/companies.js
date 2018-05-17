@@ -142,11 +142,11 @@ var visitPreActions = (req, res, next)=> {
 
                 if (err) {
                     req.session.error = dict.messages.db_error + ': ' + err.message;
-                    return res.redirect('/companies/' + req.params.cid + '/terminals/' + req.params.tid + '/visits/add');
+                    return res.redirect('/companies/' + req.params.cid + '/terminals/' + req.params.tid + '/visits');
                 }
                 if (!result.success) {
                     req.session.error = dict.messages.card_expired + ': (' + req.card.card_nb + '). Details:' + result.message;
-                    return res.redirect('/companies/' + req.params.cid + '/terminals/' + req.params.tid + '/visits/add');
+                    return res.redirect('/companies/' + req.params.cid + '/terminals/' + req.params.tid + '/visits');
                 }
                 next();
             })
