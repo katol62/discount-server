@@ -335,7 +335,7 @@ var Card = {
         let overdue = false;
 
         if (card.date_discount && card.date_pass) {
-            let exp_date_discount = moment(card.date_discount).add(31, 'days');
+            let exp_date_discount = moment(card.date_discount, 'YYYY-MM-DD h:m').add(31, 'days');
             let exp_date_pass = moment(card.date_pass).add(31, 'days');
             let now = moment();
 
@@ -381,7 +381,7 @@ var Card = {
                     done(null, {success: res, message: mess});
                 })
             } else {
-                var exp_date = moment(card.date_discount).add(31, 'days');
+                var exp_date = moment(card.date_discount, 'YYYY-MM-DD h:m').add(31, 'days');
                 var now = moment();
 
                 if (exp_date >= now) {
@@ -405,13 +405,13 @@ var Card = {
                 })
             } else {
 
-                var exp_date = moment(card.date_path).add(31, 'days');
+                var exp_date = moment(card.date_pass, 'YYYY-MM-DD hh:mm').add(31, 'days');
                 var now = moment();
 
                 if (now > exp_date) {
                     done(null, {success: false, message: 'card activity (pass) exceded 31 day'})
                 } else {
-                    let expire = require('moment')(card.date_pass_update).add(1, 'days');
+                    let expire = moment(card.date_pass_update, 'YYYY-MM-DD hh:mm').add(1, 'days');
 
                     if (now > expire) {
 
