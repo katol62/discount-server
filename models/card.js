@@ -295,18 +295,34 @@ var Card = {
     updateFromExternal: (cards, done)=>{
         var queryFinalArray = [];
         for (var i=0; i<cards.length; i++) {
+            var params = [];
             var elm = cards[i];
-            var qr = 'UPDATE cards SET nfs_code="'+elm[2]+'", m_code="'+elm[3]+'" WHERE id='+elm[0]+' AND qr_code="'+elm[1]+'"';
-            queryFinalArray.push(qr);
+            var nfscode = elm[2];
+            var mcode = elm[3];
+            if (nfscode != "") {
+                params.push('nfs_code="'+nfscode+'"');
+            }
+            if (mcode != "") {
+                params.push('m_code="'+mcode+'"');
+            }
+            if (params.length) {
+                var qr = 'UPDATE cards SET '+params.join(',')+' WHERE id='+elm[0]+' AND qr_code="'+elm[1]+'"';
+                queryFinalArray.push(qr);
+            }
         }
         var queryFinal = queryFinalArray.join(';');
 
-        db.query(queryFinal, function(err, rows){
-            if (err) {
-                return done(err);
-            }
-            done(null, rows);
-        })
+        if (queryFinal.length) {
+            db.query(queryFinal, function(err, rows){
+                if (err) {
+                    return done(err);
+                }
+                done(null, rows);
+            })
+        } else {
+            return done({message: 'Nothing to update'});
+        }
+
     },
 
     updateStatus: (body, done)=>{
