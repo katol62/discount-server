@@ -434,15 +434,30 @@ var Card = {
                         if (card.pass_count + 1 > Number(card.pass)) {
                             done(null, {success: false, message: 'card pass count exceded'})
                         } else {
-                            query = 'update cards set date_pass_update = ?, pass_count = ? where id = ?';
-                            params = [now.format('YYYY-MM-DD HH:mm:ss'), (card.pass_count + 1), card.id];
 
+                            query = 'select count(*) from visit where card = ? and terminal = ?';
+                            params = [card.id, body.terminal];
                             db.query(query, params, (err, rows)=>{
                                 if (err) {
                                     return done(err)
                                 }
-                                done(null, {success: true, message: ''})
+                                if (rows) {
+                                    done(null, {success: false, message: 'pass already applied for terminal'})
+                                    return;
+                                }
+
+                                query = 'update cards set date_pass_update = ?, pass_count = ? where id = ?';
+                                params = [now.format('YYYY-MM-DD HH:mm:ss'), (card.pass_count + 1), card.id];
+
+                                db.query(query, params, (err, rows)=>{
+                                    if (err) {
+                                        return done(err)
+                                    }
+                                    done(null, {success: true, message: ''})
+                                })
+
                             })
+
                         }
 
                     } else {
