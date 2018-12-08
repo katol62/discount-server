@@ -62,9 +62,9 @@ var User = {
 
     createSoftUser: (body, done)=>{
 
-        var name = null;
-        var last = null;
-        var phone = null;
+        var name = body.name ? body.name : null;
+        var last = body.last ? body.last : null;
+        var phone = body.phone ? body.phone : null;
         var email = body.softcode;
         var password = body.cryptPwd;
         var role = 'customer';

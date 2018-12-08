@@ -518,7 +518,7 @@ var Card = {
             var card = rows[0];
             var updated = require('moment')().format('YYYY-MM-DD HH:mm:ss');
 
-            var queryUpdate = 'UPDATE cards SET status=\'sold\', update_date='+updated+' WHERE id = ?';
+            var queryUpdate = 'UPDATE cards SET status=\'sold\', update_date=\''+updated+'\' WHERE id = ?';
 
             db.query(queryUpdate, [card.id], (err, rows)=>{
                 if (err) {
