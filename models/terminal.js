@@ -51,11 +51,11 @@ var Terminal = {
 
     update: (body, done)=>{
 
-        var query = 'UPDATE terminal SET name = ?, company = ?, place = ?, type = ? WHERE id = ?';
-        var params = [body.name, body.cid, body.place, body.type, body.tid];
+        var query = 'UPDATE terminal SET name = ?, company = ?, place = ? WHERE id = ?';
+        var params = [body.name, body.cid, body.place, body.tid];
         if (body.place === '') {
-            query = 'UPDATE terminal SET name = ?, company = ?, type = ? WHERE id = ?';
-            params = [body.name, body.cid, body.type, body.tid];
+            query = 'UPDATE terminal SET name = ?, company = ? WHERE id = ?';
+            params = [body.name, body.cid, body.tid];
         }
         db.query(query, params, (err, rows)=> {
             if (err) {

@@ -624,7 +624,7 @@ router.get('/:cid/terminals/:tid/edit', checkCompany, checkTerminal, (req, res, 
 router.put('/:cid/terminals/:tid/edit', (req, res, next)=>{
 
     req.checkBody('name', dict.messages.terminal_name_required).notEmpty();
-    req.checkBody('type', dict.messages.terminal_type_required).notEmpty();
+    //req.checkBody('type', dict.messages.terminal_type_required).notEmpty();
 
     var errors = req.validationErrors();
 
