@@ -5,7 +5,7 @@ module.exports = {
 
     'server': {
         host: 'taisgroup.ru',
-        host: 'localhost',
+        port: 3000
     },
     'locale': 'ru',
     'secret': 'Mxmbawlx50XOpKkUMcY2wNjoRmU06g3ComNXJfxfnyt9ESuAKSQxe8FXG',
