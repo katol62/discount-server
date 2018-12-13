@@ -420,3 +420,11 @@ var toPdf = ()=> {
     var end = $('#dend').val();
     window.open('/cards/sellstopdf?dstart='+start+'&dend='+end, '_blank');
 };
+
+var visitsToPdf = (company, terminal, type)=> {
+    var start = $('#dstart').val();
+    var end = $('#dend').val();
+    let url = '/companies/visitsToPdf?company='+company+'&terminal='+terminal+'&type='+type+'&dstart='+start+'&dend='+end;
+    window.open(url, '_blank');
+};
+

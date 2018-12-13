@@ -42,6 +42,9 @@ module.exports = {
             "import_fromcsv": "Импортировать из CSV",
             "sell_cards": "Продажа карт",
             "card_sell_report": "Отчет продаж карт",
+            "visits_report": "Отчет проходов",
+            "visits_report_discount": "Дисконт",
+            "visits_report_pass": "Пасс",
         },
         "labels": {
             "email_address": "Емейл",

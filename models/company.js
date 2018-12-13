@@ -42,7 +42,7 @@ var Company = {
 
 
     getExtendedById: function (id, done) {
-        var query = 'select c.id, c.name, c.owner, c.region, state.name as countryname, foc.name as focname, region.name as regionname from company c join loc_states state on c.country = state.id join loc_fos foc on c.foc = foc.id join loc_regions region on c.region = region.id where c.id = ?';
+        var query = 'select c.*, state.name as countryname, foc.name as focname, region.name as regionname from company c join loc_states state on c.country = state.id join loc_fos foc on c.foc = foc.id join loc_regions region on c.region = region.id where c.id = ?';
         db.query(query, [id], function (err, rows) {
             if (err) {
                 return done(err)

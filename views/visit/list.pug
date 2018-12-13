@@ -9,11 +9,30 @@ block content
                 p(style='font-weight:bold') Компания: #{company.name}
                 p= company.countryname + ', ' + company.focname + ', ' + company.regionname
                 p(style='font-weight:bold') Терминал: #{terminal.name}
-            div.col-lg-12.margin-top
+            div.col-lg-6.margin-top
                 a(class=('btn btn-primary') href='/companies/'+company.id+'/terminals/'+terminal.id+'/visits/add')
                     span(class='glyphicon glyphicon-plus-sign')
                     | &nbsp;
                     = dict.titles.create_visit
+            div.col-lg-2.margin-top.text-right
+                div.btn-group
+                    button.btn.btn-primary.dropdown-toggle(type='button', data-toggle='dropdown', aria-haspopup='true', aria-expanded='false')
+                        = dict.titles.visits_report
+                        | &nbsp;
+                        span.caret
+                    ul.dropdown-menu
+                        li
+                            a(onclick='visitsToPdf("'+company.id+'", "'+terminal.id+'", "discount");return false;' style='cursor:pointer')
+                                = dict.titles.visits_report_discount
+                        li
+                            a(onclick='visitsToPdf("'+company.id+'", "'+terminal.id+'", "pass");return false;' style='cursor:pointer')
+                                = dict.titles.visits_report_pass
+            div.col-lg-4.margin-top.text-right
+                #datepicker.input-group.input-daterange
+                    input.form-control(id='dstart' type='text', name='start' value='' placeholder=dict.labels.label_start_date)
+                    .input-group-addon #{dict.labels.label_to}
+                    input.form-control(id='dend' type='text', name='end' value='' placeholder=dict.labels.label_end_date)
+
             if items && items.length
                 div.col-lg-12.margin-top
 

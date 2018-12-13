@@ -12,6 +12,7 @@ var dict = locale[config.locale];
 var globals = require('./../misc/globals');
 var log = require('npmlog');
 var bcrypt = require('bcrypt');
+var moment = require('moment');
 
 var router = express.Router();
 
@@ -919,7 +920,7 @@ router.delete('/:cid/users/:uid/delete', function(req, res, next) {
 
     var delid = req.params.uid;
 
-    User.delete(delid, function(err, rows) {
+    User.delete(delid, (err, rows) => {
         if (err) {
             req.session.error = 'Delete error: '+err;
         } else {
@@ -1482,5 +1483,347 @@ router.get('/super/:id/companies', function (req, res, next) {
 
 });
 
+//report
+
+var getDate = (dateString) => {
+    let dt = new Date(dateString);
+    if (dt) {
+        return moment(dateString).format("DD.MM.YYYY");
+    }
+    return '';
+};
+
+var generateReport = (company, visits, type) => {
+
+    // let todayDate = new Date(company.dogovordate).toISOString().slice(0,10);
+
+    let html = '';
+
+    html += '    <style>\n' +
+        '        body {font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 14px;}\n' +
+        '        table {border-collapse: collapse; table-layout:fixed; font-size: 12px;font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;}\n' +
+        '        td, th {vertical-align: middle; padding: 5px;}\n' +
+        '        .header-1 {padding: 5px 0}\n' +
+        '        .header-2 {padding: 10px 0; font-size: 16px; font-weight: bold;border-bottom: 1px black solid; border-top: 1px black solid;}\n' +
+        '        .header-3 {padding: 5px;}\n' +
+        '        .header-left {width: 100px;}\n' +
+        '        .border-top {border-top: 1px black solid;}\n' +
+        '        .border-bottom {border-bottom: 1px black solid;}\n' +
+        '        .header-right {font-weight: bold;}\n' +
+        '        .bold {font-weight: bold}\n' +
+        '        .align-right {text-align: right}\n' +
+        '        .align-left {text-align: left}\n' +
+        '        .c-5 {width: 5%}\n' +
+        '        .c-10 {width: 10%}\n' +
+        '        .c-15 {width: 15%}\n' +
+        '        .c-20 {width: 20%}\n' +
+        '        .pt-10 {padding-top: 10px}\n' +
+        '        .pt-20 {padding-top: 20px}\n' +
+        '    </style>\n';
+    html += '<table border=0 cellpadding=0 cellspacing=0 width=540>\n' +
+        '    <tr>\n' +
+        '        <td colspan="2" class="header-1 align-right">\n' +
+        '            Приложение № 2 к Договору № '+company.dogovor+' от '+getDate(company.dogovordate)+' \n' +
+        '        </td>\n' +
+        '    </tr>\n' +
+        '    <tr>\n' +
+        '        <td colspan="2"  class="header-2 align-left">\n' +
+        '            Акт № '+company.dogovor+' от '+getDate(company.dogovordate)+'\n' +
+        '        </td>\n' +
+        '    </tr>\n' +
+        '</table>\n';
+    html += '<table border=0 cellpadding=0 cellspacing=0 width=540>\n' +
+        '    <tr>\n' +
+        '        <td class="header-3 header-left">\n' +
+        '            Исполнитель:\n' +
+        '        </td>\n' +
+        '        <td class="header-3 header-right">\n' +
+        '            ООО "КАРТА ГОСТЯ КРЫМА", ИНН 9102222457, 295034, Крым Респ, Симферополь г, Победы пр-кт, дом № 28, литера А, офис 204, р/с 40702810902390002565, в банке АО "АЛЬФА-БАНК", БИК 044525593, к/с 30101810200000000593\n' +
+        '        </td>\n' +
+        '    </tr>\n' +
+        '    <tr>\n' +
+        '        <td class="header-3 header-left">\n' +
+        '            Заказчик:\n' +
+        '        </td>\n' +
+        '        <td class="header-3 header-right">\n' +
+        '            '+company.name+', ИНН '+company.inn+', '+company.juradress+' \n' +
+        '        </td>\n' +
+        '    </tr>\n' +
+        '    <tr>\n' +
+        '        <td class="header-3 header-left">\n' +
+        '            Основание:\n' +
+        '        </td>\n' +
+        '        <td class="header-3 header-right">\n' +
+        '            ПАРТНЕРСКИЙ ДОГОВОР № Д-002 от 03.04.2017\n' +
+        '        </td>\n' +
+        '    </tr>\n' +
+        '</table>\n';
+    html += '<table border=1 cellpadding=0 cellspacing=0 width=540>\n' +
+        '    <thead>\n' +
+        '        <tr>\n' +
+        '            <th class="c-10">№</th>\n' +
+        '            <th>Наименование работ, услуг с 01.09.2018 г. по 30.09.2018 г.</th>\n' +
+        '            <th class="c-10">Кол-во</th>\n' +
+        '            <th class="c-10">Ед.</th>\n' +
+        '            <th class="c-10">Цена</th>\n' +
+        '            <th class="c-15">Сумма</th>\n' +
+        '        </tr>\n' +
+        '    </thead>\n' +
+        '    <tbody>\n';
+    let total = 0;
+    let totalDiscount = 0;
+    visits.forEach((visit, index)=> {
+        total += visit.price;
+        let discount = visit.discountUnit === 'percent' ? visit.price * visit.discount / 100 : visit.discount
+        totalDiscount += discount;
+        html += '        <tr>\n' +
+        '            <td>'+(index+1)+'</td>\n' +
+        '            <td>Карта Гостя № '+visit.cardNumber+' - '+getDate(visit.date)+'</td>\n' +
+        '            <td>1</td>\n' +
+        '            <td>руб</td>\n' +
+        '            <td>'+visit.price+',00</td>\n' +
+        '            <td>'+visit.price+',00</td>\n' +
+        '        </tr>\n';
+    });
+
+    html +=
+        '    </tbody>\n' +
+        '</table>\n';
+
+    html += '<table border=0 cellpadding=0 cellspacing=0 width=540>\n' +
+        '    <tr>\n' +
+        '        <td class="header-1 align-right">\n' +
+        '            <span class="bold">Итого:</span>     '+total+'<br>\n' +
+        '            <span class="bold">Без налога (НДС)</span><br>\n' +
+        '        </td>\n' +
+        '    </tr>\n';
+    if (type === 'discount') {
+           html +=
+               '    <tr>\n' +
+               '        <td class="header-1 align-right">\n' +
+               '            <span>Сумма скидки Туристу: '+totalDiscount+'</span><br>\n' +
+               '            <span>Сумма с учетом скидки\t\t\t\t\t'+(total - totalDiscount)+'</span>\n' +
+               '        </td>\n' +
+               '    </tr>\n' +
+               '    <tr>\n' +
+               '        <td class="header-1 align-right">\n' +
+               '            <span>К оплате 2% от суммы скидки: '+(totalDiscount * 0.02)+'</span>\n' +
+               '        </td>\n' +
+               '    </tr>\n' +
+               '    <tr>\n' +
+               '        <td class="header-1 align-left">\n' +
+               '            <span>Всего оказано услуг на сумму <b>'+(totalDiscount * 0.02)+' RUB</b></span>\n' +
+               '        </td>\n' +
+               '    </tr>\n';
+
+    };
+    html +=
+        '    <tr>\n' +
+        '        <td class="header-1 align-left">\n' +
+        '            <span>Вышеперечисленные услуги выполнены полностью и в срок. Заказчик претензий по объему, качеству и срокам оказания услуг не имеет.</span>\n' +
+        '        </td>\n' +
+        '    </tr>\n' +
+        '</table>\n' +
+        '<table border=0 cellpadding=0 cellspacing=0 width=540>\n' +
+        '    <tr>\n' +
+        '        <td class="align-left">\n' +
+        '            <span class="bold">ИСПОЛНИТЕЛЬ</span><br>\n' +
+        '            <span>Коммерческий директор ООО "КАРТА ГОСТЯ КРЫМА"</span>\n' +
+        '        </td>\n' +
+        '        <td class="c-5"></td>\n' +
+        '        <td class="align-left">\n' +
+        '            <span class="bold">ЗАКАЗЧИК</span><br>\n' +
+        '            <span>'+company.name+'</span>\n' +
+        '        </td>\n' +
+        '    </tr>\n' +
+        '    <tr>\n' +
+        '        <td class="align-left border-bottom pt-20">\n' +
+        '        </td>\n' +
+        '        <td class="c-5 pt-20"></td>\n' +
+        '        <td class="align-left border-bottom pt-20">\n' +
+        '        </td>\n' +
+        '    </tr>\n' +
+        '    <tr>\n' +
+        '        <td class="align-left">Ибадходжаев С. С.</td>\n' +
+        '        <td class="c-5"></td>\n' +
+        '        <td class="align-left"></td>\n' +
+        '    </tr>\n' +
+        '</table>';
+
+
+    return html;
+};
+
+router.get('/visitsToPdf', (req, res, next)=> {
+
+    const dstart = req.query.dstart ? req.query.dstart : '';
+    const dend = req.query.dend ? req.query.dend : '';
+    const cid = req.query.company ? req.query.company : '';
+    const tid = req.query.terminal ? req.query.terminal : '';
+    const type = req.query.type ? req.query.type : '';
+
+    Company.getExtendedById(cid, (err, rows) => {
+        if (err) {
+            req.session.error = dict.messages.db_error+": "+err.message;
+            res.redirect('/companies/'+cid+'/terminals/'+tid+'/visits');
+            return;
+        }
+        if (rows.length === 0) {
+            req.session.error = dict.messages.company_not_found;
+            res.redirect('/companies/'+cid+'/terminals/'+tid+'/visits');
+            return;
+        }
+        const company = rows[0];
+        console.log('===========');
+        console.log(company);
+        console.log('===========');
+
+        Visit.getExtendedForTerminal(tid, (err, rows) => {
+            if (err) {
+                req.session.error = dict.messages.db_error+": "+err.message;
+                res.redirect('/companies/'+cid+'/terminals/'+tid+'/visits');
+                return;
+            }
+
+            let visits = rows;
+            visits = type !== '' ? visits.filter( elm => elm.type === type.toLowerCase()) : visits;
+            console.log(visits);
+
+            let content = generateReport(company, visits, type);
+            console.log(content);
+
+            var checkDate = '';
+            checkDate += dstart != '' ? dstart+' - ' : 'не определено -';
+            checkDate += dend != '' ? dend : ' не определено'
+
+            var pdf = require('html-pdf');
+
+            var config = {
+                // Export options
+                "directory": "/tmp",       // The directory the file gets written into if not using .toFile(filename, callback). default: '/tmp'
+                "format": "Letter",        // allowed units: A3, A4, A5, Legal, Letter, Tabloid
+                "orientation": "portrait", // portrait or landscape
+                // Page options
+                "border": "10mm",
+
+                paginationOffset: 1,       // Override the initial pagination number
+                "header": {
+                    "height": "15mm",
+                    "contents": '<div style="text-align: center; width: 100%; border-bottom: 1px solid; font-family: sans-serif; font-size: 1em;">Акт ('+company.name+') ('+checkDate+')</div>'
+                },
+                "footer": {
+                    "height": "20mm",
+                    "contents": {
+                        // first: 'Cover page',
+                        // 2: 'Second page', // Any page number is working. 1-based index
+                        default: '<div style="text-align: center; width: 100%; color: #444; border-top: 1px solid; font-family: sans-serif; font-size: 0.7em;"><span>{{page}}</span>/<span>{{pages}}</span></div>', // fallback value
+                        // last: 'Last Page'
+                    }
+                },
+                // Rendering options
+                // "base": "file:///home/www/your-asset-path", // Base path that's used to load files (images, css, js) when they aren't referenced using a host
+                // Zooming option, can be used to scale images if `options.type` is not pdf
+                "zoomFactor": "1", // default is 1
+                // File options
+                "type": "pdf",             // allowed file types: png, jpeg, pdf
+                "quality": "75",           // only used for types png & jpeg
+            };
+
+            pdf.create(content, config).toStream((err, stream) => {
+                if (err) return res.end(err.stack);
+                res.setHeader('Content-type', 'application/pdf');
+                stream.pipe(res.status(200));
+                // res.status(200).send(stream);
+            })
+
+
+        })
+
+    });
+
+    /*
+    Card.getCardsForUserAndType(req.session.user, 'sold', dstart, dend, (err, rows)=>{
+        if (err) {
+            req.session.error = dict.messages.db_error+": "+err.message;
+            res.redirect('/cards');
+            return;
+        }
+
+        var head_array = ['cardnb', 'qrcode', 'type', 'owner', 'seller', 'date'];
+        var headers_string = head_array.join(',');
+        console.log(headers_string);
+
+        var content = '<style>table {width: 100%;font-family:sans-serif;font-size: 0.5em; border: 1px solid;border-spacing: 0;border-collapse: collapse;}table thead {border: 1px solid;background-color:#ccc !important;}tr {border: 1px solid;}th {padding: 0.2em 0.3em;border: 1px solid;} td {padding: 0.2em 0.3em;border: 1px solid;}</style>';
+        content += '<table>';
+        content += '<thead><th>Номер карты</th><th>QR код</th><th>Тип</th><th>Опубликовал</th><th>Продал</th><th>Дата</th></thead>';
+        content += '<tbody>';
+
+        var data = rows;
+        data.forEach((row, index)=>{
+            content += '<tr>';
+            content += '<td>'+row['card_nb']+'</td>';
+            content += '<td>'+row['qr_code']+'</td>';
+            content += '<td>'+(row['type']=='adult'?dict.labels.label_tariff_adult:(row['type']=='child'?dict.labels.label_tariff_child:dict.labels.label_tariff_other))+'</td>';
+            content += '<td>'+row['owner']+'</td>';
+            content += '<td>'+row['seller']+'</td>';
+            content += '<td>'+row['date']+'</td>';
+            content += '</tr>';
+        });
+        content += '</tbody>';
+        content += '</table>';
+
+        var checkDate = '';
+        checkDate += dstart != '' ? dstart+' - ' : 'не определено -';
+        checkDate += dend != '' ? dend : ' не определено'
+
+        var name = req.session.user.id;
+
+        var pdf = require('html-pdf');
+
+        console.log(content);
+
+        var config = {
+            // Export options
+            "directory": "/tmp",       // The directory the file gets written into if not using .toFile(filename, callback). default: '/tmp'
+            "format": "Letter",        // allowed units: A3, A4, A5, Legal, Letter, Tabloid
+            "orientation": "portrait", // portrait or landscape
+            // Page options
+            "border": "10mm",
+
+            paginationOffset: 1,       // Override the initial pagination number
+            "header": {
+                "height": "15mm",
+                "contents": '<div style="text-align: center; width: 100%; border-bottom: 1px solid; font-family: sans-serif; font-size: 1em;">Продажа карт ('+req.session.user.name+' '+req.session.user.last+') ('+checkDate+')</div>'
+            },
+            "footer": {
+                "height": "20mm",
+                "contents": {
+                    // first: 'Cover page',
+                    // 2: 'Second page', // Any page number is working. 1-based index
+                    default: '<div style="text-align: center; width: 100%; color: #444; border-top: 1px solid; font-family: sans-serif; font-size: 0.7em;"><span>{{page}}</span>/<span>{{pages}}</span></div>', // fallback value
+                    // last: 'Last Page'
+                }
+            },
+            // Rendering options
+            // "base": "file:///home/www/your-asset-path", // Base path that's used to load files (images, css, js) when they aren't referenced using a host
+            // Zooming option, can be used to scale images if `options.type` is not pdf
+            "zoomFactor": "1", // default is 1
+            // File options
+            "type": "pdf",             // allowed file types: png, jpeg, pdf
+            "quality": "75",           // only used for types png & jpeg
+        };
+
+        pdf.create(content, config).toStream((err, stream) => {
+            if (err) return res.end(err.stack);
+            res.setHeader('Content-type', 'application/pdf');
+            stream.pipe(res.status(200));
+            // res.status(200).send(stream);
+        })
+
+
+    });
+    */
+
+});
 
 module.exports = router;
