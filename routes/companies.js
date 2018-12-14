@@ -1548,7 +1548,7 @@ var generateReport = (company, visits, type, detailType, checkDate) => {
         '            Заказчик:\n' +
         '        </td>\n' +
         '        <td class="header-3 header-right">\n' +
-        '            '+company.name+', ИНН '+company.inn+', '+company.juradress+', '+company.bankdetails+' \n' +
+        '            '+company.name+', ИНН '+company.inn+', '+company.juradress+', '+(company.bankdetails != null ? company.bankdetails : "[реквизиты не определены]")+' \n' +
         '        </td>\n' +
         '    </tr>\n' +
         '    <tr>\n' +
