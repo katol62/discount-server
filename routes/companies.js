@@ -1696,9 +1696,6 @@ router.get('/pdf', (req, res, next)=> {
             return;
         }
         const company = rows[0];
-        console.log('===========');
-        console.log(company);
-        console.log('===========');
 
         Visit.getExtendedForTerminal(tid, (err, rows) => {
             if (err) {
@@ -1716,7 +1713,6 @@ router.get('/pdf', (req, res, next)=> {
             checkDate += dend != '' ? getDate(dend) : ' н/о';
 
             let content = generateReport(company, visits, type, detailType, checkDate);
-            console.log(content);
 
             var pdf = require('html-pdf');
 
