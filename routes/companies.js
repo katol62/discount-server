@@ -1497,8 +1497,6 @@ var getDate = (dateString) => {
 
 var generateReport = (company, visits, type, detailType, checkDate) => {
 
-    // let todayDate = new Date(company.dogovordate).toISOString().slice(0,10);
-
     let html = '';
 
     html += '    <style>\n' +
@@ -1564,7 +1562,7 @@ var generateReport = (company, visits, type, detailType, checkDate) => {
         '    <thead>\n' +
         '        <tr>\n' +
         '            <th class="c-10">№</th>\n' +
-        '            <th>Наименование работ, услуг с 01.09.2018 г. по 30.09.2018 г.</th>\n' +
+        '            <th>Наименование работ, услуг ['+checkDate+']</th>\n' +
         '            <th class="c-10">Кол-во</th>\n' +
         '            <th class="c-10">Ед.</th>\n' +
         '            <th class="c-10">Цена</th>\n' +
@@ -1760,5 +1758,246 @@ router.get('/pdf', (req, res, next)=> {
     });
 
 });
+
+//JOURNAL
+
+router.get('/journal', (req, res, next)=>{
+
+    var session_message = req.session.message ? req.session.message : null;
+    req.session.message = null;
+    var session_error = req.session.error ? req.session.error : null;
+    req.session.error = null;
+    var session_validate_error = req.session.validate_error ? req.session.validate_error : null;
+    req.session.validate_error = null;
+
+    Visit.getTotalCount(req.session.user, (err, result)=> {
+        if (err) {
+            req.session.error = 'Company error: '+err.message;
+            return res.redirect('/companies');
+        }
+
+        var total = result;
+        var limit = config.paginationLimit;
+        var pagen = req.query.page ? Number(req.query.page) : 1;
+        var offset = (pagen-1)*limit;
+
+        Visit.getListWithCompany(req.session.user, offset, limit,(err, rows)=>{
+            if (err) {
+                req.session.error = 'Company error: '+err.message;
+                return res.redirect('/companies');
+            }
+
+            if (!rows.length) {
+                req.session.error = dict.messages.company_not_found;
+                res.redirect('/companies/'+cid+'/terminals/'+tid+'/visits');
+                return;
+            }
+
+            var pageObj = {offset: offset, limit: limit, page: pagen, total: total};
+            //console.log(pageObj);
+            var pCount = Math.ceil(total/limit);
+            console.log(pCount+' '+total+' '+(total/limit));
+            pageObj.pages = [];
+            for (var i=1; i<=pCount; i++) {
+                pageObj.pages.push(i);
+            }
+
+            return res.render('visit/journal', {
+                pageType: 'companies',
+                dict: dict,
+                items: rows,
+                account: req.session.user,
+                message: session_message,
+                page: pageObj,
+                error: session_error,
+                errors: session_validate_error
+            });
+
+        })
+
+    });
+
+});
+
+router.get('/journal_pdf', (req, res, next)=> {
+
+    const dstart = req.query.dstart ? req.query.dstart : '';
+    const dend = req.query.dend ? req.query.dend : '';
+    const type = req.query.type ? req.query.type : '';
+    const detailType = req.query.detailType ? req.query.detailType : 'all';
+
+    Visit.getExtended((err, rows) => {
+        if (err) {
+            req.session.error = dict.messages.db_error+": "+err.message;
+            res.redirect('/companies/journal');
+            return;
+        }
+
+        let visits = rows;
+        visits = type !== '' ? visits.filter( elm => elm.type === type.toLowerCase()) : visits;
+        console.log(visits);
+
+        var checkDate = '';
+        checkDate += dstart != '' ? getDate(dstart)+' - ' : 'н/о -';
+        checkDate += dend != '' ? getDate(dend) : ' н/о';
+
+        let content = generateFullReport(visits, type, detailType, checkDate);
+
+        var pdf = require('html-pdf');
+
+        var config = {
+            // Export options
+            "directory": "/tmp",       // The directory the file gets written into if not using .toFile(filename, callback). default: '/tmp'
+            "format": "Letter",        // allowed units: A3, A4, A5, Legal, Letter, Tabloid
+            "orientation": "portrait", // portrait or landscape
+            // Page options
+            "border": "10mm",
+
+            paginationOffset: 1,       // Override the initial pagination number
+            "header": {
+                "height": "15mm",
+                "contents": '<div style="text-align: center; width: 100%; border-bottom: 1px solid; font-family: sans-serif; font-size: 0.7em;">Отчет проходов (период: '+checkDate+')</div>'
+            },
+            "footer": {
+                "height": "20mm",
+                "contents": {
+                    // first: 'Cover page',
+                    // 2: 'Second page', // Any page number is working. 1-based index
+                    default: '<div style="text-align: center; width: 100%; color: #444; border-top: 1px solid; font-family: sans-serif; font-size: 0.7em;"><span>{{page}}</span>/<span>{{pages}}</span></div>', // fallback value
+                    // last: 'Last Page'
+                }
+            },
+            // Rendering options
+            // "base": "file:///home/www/your-asset-path", // Base path that's used to load files (images, css, js) when they aren't referenced using a host
+            // Zooming option, can be used to scale images if `options.type` is not pdf
+            "zoomFactor": "1", // default is 1
+            // File options
+            "type": "pdf",             // allowed file types: png, jpeg, pdf
+            "quality": "75",           // only used for types png & jpeg
+        };
+
+        pdf.create(content, config).toStream((err, stream) => {
+            if (err) return res.end(err.stack);
+            res.setHeader('Content-type', 'application/pdf');
+            stream.pipe(res.status(200));
+            // res.status(200).send(stream);
+        })
+
+    })
+
+});
+
+var generateFullReport = (visits, type, detailType, checkDate) => {
+
+    let html = '';
+
+    html += '    <style>\n' +
+        '        body {font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 12px;}\n' +
+        '        table {border-collapse: collapse; table-layout:fixed; font-size: 10px;font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;}\n' +
+        '        td, th {vertical-align: middle; padding: 5px; word-wrap:break-word;word-break: break-all;}\n' +
+        '        .header-1 {padding: 5px 0}\n' +
+        '        .header-2 {padding: 10px 0; font-size: 16px; font-weight: bold;border-bottom: 1px black solid; border-top: 1px black solid;}\n' +
+        '        .header-3 {padding: 5px;}\n' +
+        '        .header-left {width: 100px;}\n' +
+        '        .border-top {border-top: 1px black solid;}\n' +
+        '        .border-bottom {border-bottom: 1px black solid;}\n' +
+        '        .header-right {font-weight: bold;}\n' +
+        '        .bold {font-weight: bold}\n' +
+        '        .align-right {text-align: right}\n' +
+        '        .align-left {text-align: left}\n' +
+        '        .c-5 {width: 5%}\n' +
+        '        .c-10 {width: 10%}\n' +
+        '        .c-15 {width: 15%}\n' +
+        '        .c-20 {width: 20%}\n' +
+        '        .pt-10 {padding-top: 10px}\n' +
+        '        .pt-20 {padding-top: 20px}\n' +
+        '    </style>\n';
+    html += '<table border=1 cellpadding=0 cellspacing=0 width=540>\n' +
+        '    <thead>\n' +
+        '        <tr>\n' +
+        '            <th class="c-10">№</th>\n' +
+        '            <th>Наименование работ, услуг ['+checkDate+']</th>\n' +
+        '            <th class="c-15">Компания</th>\n' +
+        '            <th class="c-5">Кол-во</th>\n' +
+        '            <th class="c-10">Ед.</th>\n' +
+        '            <th class="c-10">Цена</th>\n' +
+        '            <th class="c-15">Сумма</th>\n' +
+        '        </tr>\n' +
+        '    </thead>\n' +
+        '    <tbody>\n';
+    let total = 0;
+    let totalDiscount = 0;
+
+    if (detailType === 'detailed') {
+        visits.forEach((visit, index)=> {
+            total += visit.price;
+            let discount = visit.discountUnit === 'percent' ? visit.price * visit.discount / 100 : visit.discount
+            totalDiscount += discount;
+            html += '        <tr>\n' +
+                '            <td>'+(index+1)+'</td>\n' +
+                '            <td>Карта Гостя № '+visit.cardNumber+' - '+getDate(visit.date)+'</td>\n' +
+                '            <td>'+visit.companyName+'</td>\n' +
+                '            <td>1</td>\n' +
+                '            <td>руб</td>\n' +
+                '            <td>'+visit.price.toFixed(2)+'</td>\n' +
+                '            <td>'+visit.price.toFixed(2)+'</td>\n' +
+                '        </tr>\n';
+        });
+
+        html +=
+            '    </tbody>\n' +
+            '</table>\n';
+    } else {
+        visits.forEach((visit, index)=> {
+            total += visit.price;
+            let discount = visit.discountUnit === 'percent' ? visit.price * visit.discount / 100 : visit.discount
+            totalDiscount += discount;
+        });
+        html += '        <tr>\n' +
+            '            <td>1</td>\n' +
+            '            <td>Премия организатора ЗА ПЕРИОД  '+ checkDate +'</td>\n' +
+            '            <td></td>\n' +
+            '            <td>'+visits.length+'</td>\n' +
+            '            <td>руб</td>\n' +
+            '            <td>'+total.toFixed(2)+'</td>\n' +
+            '            <td>'+total.toFixed(2)+'</td>\n' +
+            '        </tr>\n' +
+            '    </tbody>\n' +
+            '</table>\n';
+    }
+
+    html += '<table border=0 cellpadding=0 cellspacing=0 width=540>\n' +
+        '    <tr>\n' +
+        '        <td class="header-1 align-right">\n' +
+        '            <span class="bold">Итого:</span>     '+total.toFixed(2)+'<br>\n' +
+        '            <span class="bold">Без налога (НДС)</span><br>\n' +
+        '        </td>\n' +
+        '    </tr>\n';
+    if (type === 'discount') {
+        html +=
+            '    <tr>\n' +
+            '        <td class="header-1 align-right">\n' +
+            '            <span>Сумма скидки Туристу: '+totalDiscount.toFixed(2)+'</span><br>\n' +
+            '            <span>Сумма с учетом скидки\t\t\t\t\t'+(total - totalDiscount).toFixed(2)+'</span>\n' +
+            '        </td>\n' +
+            '    </tr>\n' +
+            '    <tr>\n' +
+            '        <td class="header-1 align-right">\n' +
+            '            <span>К оплате 2% от суммы скидки: '+((total - totalDiscount) * 0.02).toFixed(2)+'</span>\n' +
+            '        </td>\n' +
+            '    </tr>\n' +
+            '    <tr>\n' +
+            '        <td class="header-1 align-left">\n' +
+            '            <span>Всего оказано услуг на сумму <b>'+((total - totalDiscount) * 0.02).toFixed(2)+' RUB</b></span>\n' +
+            '        </td>\n' +
+            '    </tr>\n';
+
+    };
+
+    console.log(html);
+
+    return html;
+};
+
 
 module.exports = router;

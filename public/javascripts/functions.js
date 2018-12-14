@@ -428,3 +428,10 @@ var visitsToPdf = (company, terminal, type, detailType)=> {
     window.open(url, '_blank');
 };
 
+var journalToPdf = (type, detailType)=> {
+    var start = $('#dstart').val();
+    var end = $('#dend').val();
+    let url = '/companies/journal_pdf?type='+type+'&detailType='+detailType+'&dstart='+start+'&dend='+end;
+    window.open(url, '_blank');
+};
+
