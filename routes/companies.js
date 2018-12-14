@@ -1622,7 +1622,7 @@ var generateReport = (company, visits, type, detailType, checkDate) => {
            html +=
                '    <tr>\n' +
                '        <td class="header-1 align-right">\n' +
-               '            <span>Сумма скидки Туристу: '+totalDiscount+'</span><br>\n' +
+               '            <span>Сумма скидки Туристу: '+totalDiscount.toFixed(2)+'</span><br>\n' +
                '            <span>Сумма с учетом скидки\t\t\t\t\t'+(total - totalDiscount).toFixed(2)+'</span>\n' +
                '        </td>\n' +
                '    </tr>\n' +
