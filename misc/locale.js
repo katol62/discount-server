@@ -44,7 +44,9 @@ module.exports = {
             "card_sell_report": "Отчет продаж карт",
             "visits_report": "Отчет проходов",
             "visits_report_discount": "Дисконт",
+            "visits_report_discount_detailed": "Дисконт детальный",
             "visits_report_pass": "Пасс",
+            "visits_report_pass_detailed": "Пасс детальный",
         },
         "labels": {
             "email_address": "Емейл",
@@ -78,6 +80,7 @@ module.exports = {
             "label_company_ogrn":"ОГРН",
             "label_company_juradress":"Юридический адрес",
             "label_company_adress":"Фактический адрес",
+            "label_company_bankdetails":"Банковские реквизиты",
             "label_company_nds":"НДС",
             "label_company_dogovor":"Договор",
             "label_company_dogovor_date":"Дата договора",

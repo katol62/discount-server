@@ -1,0 +1,1 @@
+ALTER table company ADD column bankdetails TEXT after adress;

@@ -421,10 +421,10 @@ var toPdf = ()=> {
     window.open('/cards/sellstopdf?dstart='+start+'&dend='+end, '_blank');
 };
 
-var visitsToPdf = (company, terminal, type)=> {
+var visitsToPdf = (company, terminal, type, detailType)=> {
     var start = $('#dstart').val();
     var end = $('#dend').val();
-    let url = '/companies/visitsToPdf?company='+company+'&terminal='+terminal+'&type='+type+'&dstart='+start+'&dend='+end;
+    let url = '/companies/pdf?company='+company+'&terminal='+terminal+'&type='+type+'&detailType='+detailType+'&dstart='+start+'&dend='+end;
     window.open(url, '_blank');
 };
 

@@ -346,6 +346,7 @@ router.post('/create', function(req, res, next) {
         return;
     }
 
+    console.log(req.body);
     Company.create(req.body, function(err, row){
         if (err) {
             req.session.error = dict.messages.db_error+": "+err.message;
@@ -462,6 +463,7 @@ router.put('/:cid/edit', function(req, res, next) {
         req.session.validate_error = errors;
         return res.redirect('/companies/'+req.body.id+'/edit');
     }
+    console.log(req.body);
 
     Company.update(req.body, (err, rows)=>{
         if (err) {
@@ -1493,7 +1495,7 @@ var getDate = (dateString) => {
     return '';
 };
 
-var generateReport = (company, visits, type) => {
+var generateReport = (company, visits, type, detailType, checkDate) => {
 
     // let todayDate = new Date(company.dogovordate).toISOString().slice(0,10);
 
@@ -1546,7 +1548,7 @@ var generateReport = (company, visits, type) => {
         '            Заказчик:\n' +
         '        </td>\n' +
         '        <td class="header-3 header-right">\n' +
-        '            '+company.name+', ИНН '+company.inn+', '+company.juradress+' \n' +
+        '            '+company.name+', ИНН '+company.inn+', '+company.juradress+', '+company.bankdetails+' \n' +
         '        </td>\n' +
         '    </tr>\n' +
         '    <tr>\n' +
@@ -1554,7 +1556,7 @@ var generateReport = (company, visits, type) => {
         '            Основание:\n' +
         '        </td>\n' +
         '        <td class="header-3 header-right">\n' +
-        '            ПАРТНЕРСКИЙ ДОГОВОР № Д-002 от 03.04.2017\n' +
+        '            ПАРТНЕРСКИЙ ДОГОВОР № '+company.dogovor+' от '+getDate(company.dogovordate)+'\n' +
         '        </td>\n' +
         '    </tr>\n' +
         '</table>\n';
@@ -1572,28 +1574,47 @@ var generateReport = (company, visits, type) => {
         '    <tbody>\n';
     let total = 0;
     let totalDiscount = 0;
-    visits.forEach((visit, index)=> {
-        total += visit.price;
-        let discount = visit.discountUnit === 'percent' ? visit.price * visit.discount / 100 : visit.discount
-        totalDiscount += discount;
-        html += '        <tr>\n' +
-        '            <td>'+(index+1)+'</td>\n' +
-        '            <td>Карта Гостя № '+visit.cardNumber+' - '+getDate(visit.date)+'</td>\n' +
-        '            <td>1</td>\n' +
-        '            <td>руб</td>\n' +
-        '            <td>'+visit.price+',00</td>\n' +
-        '            <td>'+visit.price+',00</td>\n' +
-        '        </tr>\n';
-    });
 
-    html +=
-        '    </tbody>\n' +
-        '</table>\n';
+    if (detailType === 'detailed') {
+        visits.forEach((visit, index)=> {
+            total += visit.price;
+            let discount = visit.discountUnit === 'percent' ? visit.price * visit.discount / 100 : visit.discount
+            totalDiscount += discount;
+            html += '        <tr>\n' +
+                '            <td>'+(index+1)+'</td>\n' +
+                '            <td>Карта Гостя № '+visit.cardNumber+' - '+getDate(visit.date)+'</td>\n' +
+                '            <td>1</td>\n' +
+                '            <td>руб</td>\n' +
+                '            <td>'+visit.price.toFixed(2)+'</td>\n' +
+                '            <td>'+visit.price.toFixed(2)+'</td>\n' +
+                '        </tr>\n';
+        });
+
+        html +=
+            '    </tbody>\n' +
+            '</table>\n';
+    } else {
+        visits.forEach((visit, index)=> {
+            total += visit.price;
+            let discount = visit.discountUnit === 'percent' ? visit.price * visit.discount / 100 : visit.discount
+            totalDiscount += discount;
+        });
+        html += '        <tr>\n' +
+            '            <td>1</td>\n' +
+            '            <td>Премия организатора согласно ПАРТНЕРСКОГО ДОГОВОРА №'+company.dogovor+' от '+getDate(company.dogovordate)+' ЗА ПЕРИОД  '+ checkDate +'</td>\n' +
+            '            <td>'+visits.length+'</td>\n' +
+            '            <td>руб</td>\n' +
+            '            <td>'+total.toFixed(2)+'</td>\n' +
+            '            <td>'+total.toFixed(2)+'</td>\n' +
+            '        </tr>\n' +
+            '    </tbody>\n' +
+            '</table>\n';
+    }
 
     html += '<table border=0 cellpadding=0 cellspacing=0 width=540>\n' +
         '    <tr>\n' +
         '        <td class="header-1 align-right">\n' +
-        '            <span class="bold">Итого:</span>     '+total+'<br>\n' +
+        '            <span class="bold">Итого:</span>     '+total.toFixed(2)+'<br>\n' +
         '            <span class="bold">Без налога (НДС)</span><br>\n' +
         '        </td>\n' +
         '    </tr>\n';
@@ -1602,17 +1623,17 @@ var generateReport = (company, visits, type) => {
                '    <tr>\n' +
                '        <td class="header-1 align-right">\n' +
                '            <span>Сумма скидки Туристу: '+totalDiscount+'</span><br>\n' +
-               '            <span>Сумма с учетом скидки\t\t\t\t\t'+(total - totalDiscount)+'</span>\n' +
+               '            <span>Сумма с учетом скидки\t\t\t\t\t'+(total - totalDiscount).toFixed(2)+'</span>\n' +
                '        </td>\n' +
                '    </tr>\n' +
                '    <tr>\n' +
                '        <td class="header-1 align-right">\n' +
-               '            <span>К оплате 2% от суммы скидки: '+(totalDiscount * 0.02)+'</span>\n' +
+               '            <span>К оплате 2% от суммы скидки: '+((total - totalDiscount) * 0.02).toFixed(2)+'</span>\n' +
                '        </td>\n' +
                '    </tr>\n' +
                '    <tr>\n' +
                '        <td class="header-1 align-left">\n' +
-               '            <span>Всего оказано услуг на сумму <b>'+(totalDiscount * 0.02)+' RUB</b></span>\n' +
+               '            <span>Всего оказано услуг на сумму <b>'+((total - totalDiscount) * 0.02).toFixed(2)+' RUB</b></span>\n' +
                '        </td>\n' +
                '    </tr>\n';
 
@@ -1654,13 +1675,14 @@ var generateReport = (company, visits, type) => {
     return html;
 };
 
-router.get('/visitsToPdf', (req, res, next)=> {
+router.get('/pdf', (req, res, next)=> {
 
     const dstart = req.query.dstart ? req.query.dstart : '';
     const dend = req.query.dend ? req.query.dend : '';
     const cid = req.query.company ? req.query.company : '';
     const tid = req.query.terminal ? req.query.terminal : '';
     const type = req.query.type ? req.query.type : '';
+    const detailType = req.query.detailType ? req.query.detailType : 'all';
 
     Company.getExtendedById(cid, (err, rows) => {
         if (err) {
@@ -1689,12 +1711,12 @@ router.get('/visitsToPdf', (req, res, next)=> {
             visits = type !== '' ? visits.filter( elm => elm.type === type.toLowerCase()) : visits;
             console.log(visits);
 
-            let content = generateReport(company, visits, type);
-            console.log(content);
-
             var checkDate = '';
-            checkDate += dstart != '' ? dstart+' - ' : 'не определено -';
-            checkDate += dend != '' ? dend : ' не определено'
+            checkDate += dstart != '' ? getDate(dstart)+' - ' : 'н/о -';
+            checkDate += dend != '' ? getDate(dend) : ' н/о';
+
+            let content = generateReport(company, visits, type, detailType, checkDate);
+            console.log(content);
 
             var pdf = require('html-pdf');
 
@@ -1709,7 +1731,7 @@ router.get('/visitsToPdf', (req, res, next)=> {
                 paginationOffset: 1,       // Override the initial pagination number
                 "header": {
                     "height": "15mm",
-                    "contents": '<div style="text-align: center; width: 100%; border-bottom: 1px solid; font-family: sans-serif; font-size: 1em;">Акт ('+company.name+') ('+checkDate+')</div>'
+                    "contents": '<div style="text-align: center; width: 100%; border-bottom: 1px solid; font-family: sans-serif; font-size: 0.7em;">Акт ('+company.name+') (период: '+checkDate+')</div>'
                 },
                 "footer": {
                     "height": "20mm",
@@ -1740,89 +1762,6 @@ router.get('/visitsToPdf', (req, res, next)=> {
         })
 
     });
-
-    /*
-    Card.getCardsForUserAndType(req.session.user, 'sold', dstart, dend, (err, rows)=>{
-        if (err) {
-            req.session.error = dict.messages.db_error+": "+err.message;
-            res.redirect('/cards');
-            return;
-        }
-
-        var head_array = ['cardnb', 'qrcode', 'type', 'owner', 'seller', 'date'];
-        var headers_string = head_array.join(',');
-        console.log(headers_string);
-
-        var content = '<style>table {width: 100%;font-family:sans-serif;font-size: 0.5em; border: 1px solid;border-spacing: 0;border-collapse: collapse;}table thead {border: 1px solid;background-color:#ccc !important;}tr {border: 1px solid;}th {padding: 0.2em 0.3em;border: 1px solid;} td {padding: 0.2em 0.3em;border: 1px solid;}</style>';
-        content += '<table>';
-        content += '<thead><th>Номер карты</th><th>QR код</th><th>Тип</th><th>Опубликовал</th><th>Продал</th><th>Дата</th></thead>';
-        content += '<tbody>';
-
-        var data = rows;
-        data.forEach((row, index)=>{
-            content += '<tr>';
-            content += '<td>'+row['card_nb']+'</td>';
-            content += '<td>'+row['qr_code']+'</td>';
-            content += '<td>'+(row['type']=='adult'?dict.labels.label_tariff_adult:(row['type']=='child'?dict.labels.label_tariff_child:dict.labels.label_tariff_other))+'</td>';
-            content += '<td>'+row['owner']+'</td>';
-            content += '<td>'+row['seller']+'</td>';
-            content += '<td>'+row['date']+'</td>';
-            content += '</tr>';
-        });
-        content += '</tbody>';
-        content += '</table>';
-
-        var checkDate = '';
-        checkDate += dstart != '' ? dstart+' - ' : 'не определено -';
-        checkDate += dend != '' ? dend : ' не определено'
-
-        var name = req.session.user.id;
-
-        var pdf = require('html-pdf');
-
-        console.log(content);
-
-        var config = {
-            // Export options
-            "directory": "/tmp",       // The directory the file gets written into if not using .toFile(filename, callback). default: '/tmp'
-            "format": "Letter",        // allowed units: A3, A4, A5, Legal, Letter, Tabloid
-            "orientation": "portrait", // portrait or landscape
-            // Page options
-            "border": "10mm",
-
-            paginationOffset: 1,       // Override the initial pagination number
-            "header": {
-                "height": "15mm",
-                "contents": '<div style="text-align: center; width: 100%; border-bottom: 1px solid; font-family: sans-serif; font-size: 1em;">Продажа карт ('+req.session.user.name+' '+req.session.user.last+') ('+checkDate+')</div>'
-            },
-            "footer": {
-                "height": "20mm",
-                "contents": {
-                    // first: 'Cover page',
-                    // 2: 'Second page', // Any page number is working. 1-based index
-                    default: '<div style="text-align: center; width: 100%; color: #444; border-top: 1px solid; font-family: sans-serif; font-size: 0.7em;"><span>{{page}}</span>/<span>{{pages}}</span></div>', // fallback value
-                    // last: 'Last Page'
-                }
-            },
-            // Rendering options
-            // "base": "file:///home/www/your-asset-path", // Base path that's used to load files (images, css, js) when they aren't referenced using a host
-            // Zooming option, can be used to scale images if `options.type` is not pdf
-            "zoomFactor": "1", // default is 1
-            // File options
-            "type": "pdf",             // allowed file types: png, jpeg, pdf
-            "quality": "75",           // only used for types png & jpeg
-        };
-
-        pdf.create(content, config).toStream((err, stream) => {
-            if (err) return res.end(err.stack);
-            res.setHeader('Content-type', 'application/pdf');
-            stream.pipe(res.status(200));
-            // res.status(200).send(stream);
-        })
-
-
-    });
-    */
 
 });
 
