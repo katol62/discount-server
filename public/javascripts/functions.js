@@ -435,3 +435,7 @@ var journalToPdf = (type, detailType)=> {
     window.open(url, '_blank');
 };
 
+var clearDateFields = ()=> {
+    $('#dstart').val('');
+    $('#dend').val('');
+};

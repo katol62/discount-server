@@ -47,6 +47,7 @@ module.exports = {
             "visits_report_discount_detailed": "Дисконт детальный",
             "visits_report_pass": "Пасс",
             "visits_report_pass_detailed": "Пасс детальный",
+            "clear_date": "Очистить",
         },
         "labels": {
             "email_address": "Емейл",

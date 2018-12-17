@@ -6,7 +6,8 @@ block content
         div.row
             div.col-lg-4.col-lg-offset-4.col-md-6.col-md-offset-3.col-sm-12
                 h2= dict.titles.visits
-            div.col-lg-6.margin-top.text-left
+        div.row
+            div.col-lg-4.margin-top.text-left
                 div.btn-group
                     button.btn.btn-primary.dropdown-toggle(type='button', data-toggle='dropdown', aria-haspopup='true', aria-expanded='false')
                         = dict.titles.visits_report
@@ -31,7 +32,13 @@ block content
                     .input-group-addon #{dict.labels.label_to}
                     input.form-control(id='dend' type='text', name='end' value='' placeholder=dict.labels.label_end_date)
 
+            div.col-lg-2.margin-top.text-right
+                button(class=('btn btn-primary') onclick="clearDateFields()")
+                        = dict.titles.clear_date
+
+
             if items && items.length
+            div.row
                 div.col-lg-12.margin-top
 
                     div.table-responsive

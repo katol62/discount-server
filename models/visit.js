@@ -14,7 +14,33 @@ var Visit = {
 
     },
 
-    getExtended: (done)=>{
+    getExtendedForTerminalDate: (trid, start, end, done)=>{
+
+        var query = 'select v.*, ter.name as terminalName, tar.name as tariffName, tar.discount, tar.discountUnit as discountUnit, tar.price as totalPrice, tar.discountType, c.card_nb as cardNumber, u.email from visit v left join terminal ter on v.terminal=ter.id left join tariff tar on v.tariff=tar.id left join cards c on v.card=c.id left join users u on v.user=u.id where v.terminal=? ';
+        let params = [trid];
+
+        if (start != '') {
+            query += ' and v.date >= ?';
+            params.push(start);
+        }
+
+        if (end != '') {
+            query += ' and v.date <= ?';
+            params.push(end);
+        }
+
+        query += ' order by v.date DESC';
+
+        db.query(query, params, (err, rows)=>{
+            if (err) {
+                return done(err);
+            }
+            done(null, rows);
+        })
+
+    },
+
+    getExtended: (start, end, done)=>{
 
         var query = 'select v.*,\n' +
             '       ter.name as terminalName,\n' +
@@ -31,9 +57,25 @@ var Visit = {
             '         left join company cm on ter.company=cm.id\n' +
             '         left join tariff tar on v.tariff=tar.id\n' +
             '         left join cards c on v.card=c.id\n' +
-            '         left join users u on v.user=u.id\n' +
-            'order by v.date DESC';
-        db.query(query, (err, rows)=>{
+            '         left join users u on v.user=u.id ' +
+            ' where 1=1';
+        let params = [];
+
+        if (start != '') {
+            query += ' and v.date >= ?';
+            params.push(start);
+        }
+
+        if (end != '') {
+            query += ' and v.date <= ?';
+            params.push(end);
+        }
+        query += ' order by v.date DESC';
+
+        console.log(query);
+        console.log(params);
+
+        db.query(query, params, (err, rows)=>{
             if (err) {
                 return done(err);
             }

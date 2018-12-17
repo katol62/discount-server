@@ -1695,7 +1695,7 @@ router.get('/pdf', (req, res, next)=> {
         }
         const company = rows[0];
 
-        Visit.getExtendedForTerminal(tid, (err, rows) => {
+        Visit.getExtendedForTerminalDate(tid, dstart, dend, (err, rows) => {
             if (err) {
                 req.session.error = dict.messages.db_error+": "+err.message;
                 res.redirect('/companies/'+cid+'/terminals/'+tid+'/visits');
@@ -1826,7 +1826,7 @@ router.get('/journal_pdf', (req, res, next)=> {
     const type = req.query.type ? req.query.type : '';
     const detailType = req.query.detailType ? req.query.detailType : 'all';
 
-    Visit.getExtended((err, rows) => {
+    Visit.getExtended(dstart, dend,(err, rows) => {
         if (err) {
             req.session.error = dict.messages.db_error+": "+err.message;
             res.redirect('/companies/journal');
@@ -1835,7 +1835,6 @@ router.get('/journal_pdf', (req, res, next)=> {
 
         let visits = rows;
         visits = type !== '' ? visits.filter( elm => elm.type === type.toLowerCase()) : visits;
-        console.log(visits);
 
         var checkDate = '';
         checkDate += dstart != '' ? getDate(dstart)+' - ' : 'н/о -';
@@ -1993,8 +1992,6 @@ var generateFullReport = (visits, type, detailType, checkDate) => {
             '    </tr>\n';
 
     };
-
-    console.log(html);
 
     return html;
 };
