@@ -67,7 +67,7 @@ block content
                                         td= item.price+' руб.'
                                         td= item.discount+(item.discountUnit=='currency'?' руб.':' %')
 
-                if page.total > page.limit
+                if page.total > page.limit && page.pages.length > page.limit
                     div.col-lg-12
                         ul(class='pagination')
                             each p in page.pages

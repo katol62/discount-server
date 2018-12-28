@@ -1812,7 +1812,6 @@ router.get('/journal', (req, res, next)=>{
 
             if (!rows.length) {
                 session_error = dict.messages.visits_not_found;
-                total = 0;
             }
 
             var pageObj = {offset: offset, limit: limit, page: pagen, total: total};
