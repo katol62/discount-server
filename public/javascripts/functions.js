@@ -438,4 +438,14 @@ var journalToPdf = (type, detailType)=> {
 var clearDateFields = ()=> {
     $('#dstart').val('');
     $('#dend').val('');
+    var start = $('#dstart').val();
+    var end = $('#dend').val();
+    window.location.href = window.location.protocol + '//' + window.location.host + '/companies/journal'
+};
+
+var reloadFields = () => {
+    var start = $('#dstart').val();
+    var end = $('#dend').val();
+    const href = window.location.protocol + '//' + window.location.host + '/companies/journal?dstart='+start+'&dend='+end;
+    window.location.href = href;
 };

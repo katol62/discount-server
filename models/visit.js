@@ -123,8 +123,9 @@ var Visit = {
         })
     },
 
-    getListWithCompany: (user, offset, limit, done)=> {
-        const query =
+    getListWithCompany: (user, offset, limit, dstart, dend, done)=> {
+        let params = [limit, offset];
+        let query =
             'select v.*, ' +
             'ter.name as terminalName, ' +
             ' tar.name as tariffName, ' +
@@ -142,9 +143,21 @@ var Visit = {
             ' left join tariff tar on v.tariff=tar.id' +
             ' left join cards c on v.card=c.id' +
             ' left join users u on v.user=u.id' +
-            ' order by v.date DESC' +
+            ' where 1=1 ';
+        if (dstart != '' ) {
+            query += ' and date >= ? ';
+            params.unshift(dstart);
+        }
+        if (dend != '' ) {
+            query += ' and date <= ? ';
+            if (dstart != '') {
+                params.splice(1, 0, dend)
+            } else {
+                params.unshift(dend);
+            }
+        }
+        query +=' order by v.date DESC' +
             ' LIMIT ? OFFSET ?';
-        let params = [limit, offset];
         console.log(query);
         db.query(query, params, (err, rows)=>{
             if (err) {

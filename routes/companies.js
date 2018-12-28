@@ -1682,6 +1682,9 @@ router.get('/pdf', (req, res, next)=> {
     const type = req.query.type ? req.query.type : '';
     const detailType = req.query.detailType ? req.query.detailType : 'all';
 
+    const dstartfull = dstart != '' ? dstart + ' 00:00:00' : '';
+    const dendfull = dend != '' ? dend + ' 23:59:59' : '';
+
     Company.getExtendedById(cid, (err, rows) => {
         if (err) {
             req.session.error = dict.messages.db_error+": "+err.message;
@@ -1695,7 +1698,7 @@ router.get('/pdf', (req, res, next)=> {
         }
         const company = rows[0];
 
-        Visit.getExtendedForTerminalDate(tid, dstart, dend, (err, rows) => {
+        Visit.getExtendedForTerminalDate(tid, dstartfull, dendfull, (err, rows) => {
             if (err) {
                 req.session.error = dict.messages.db_error+": "+err.message;
                 res.redirect('/companies/'+cid+'/terminals/'+tid+'/visits');
@@ -1769,6 +1772,26 @@ router.get('/journal', (req, res, next)=>{
     req.session.error = null;
     var session_validate_error = req.session.validate_error ? req.session.validate_error : null;
     req.session.validate_error = null;
+    let dstart = req.query.dstart ? req.query.dstart : '';
+    let dend = req.query.dend ? req.query.dend : '';
+
+    console.log('dstart='+dstart);
+
+    let queryarray = [];
+    let dstartfull = '';
+    let dendfull = '';
+    if (dstart != '') {
+        dstartfull = dstart + ' 00:00:00';
+        queryarray.push('dstart='+dstart);
+    }
+    if (dend != '') {
+        dendfull = dend +' 23:59:59';
+        queryarray.push('dend='+dend);
+    }
+    let querystr = (dstart != '' || dend != '') ? '?' : '';
+    querystr += queryarray.join('&');
+
+    console.log(dstartfull + ' == ' + dendfull);
 
     Visit.getTotalCount(req.session.user, (err, result)=> {
         if (err) {
@@ -1781,16 +1804,15 @@ router.get('/journal', (req, res, next)=>{
         var pagen = req.query.page ? Number(req.query.page) : 1;
         var offset = (pagen-1)*limit;
 
-        Visit.getListWithCompany(req.session.user, offset, limit,(err, rows)=>{
+        Visit.getListWithCompany(req.session.user, offset, limit, dstartfull, dendfull,(err, rows)=>{
             if (err) {
-                req.session.error = 'Company error: '+err.message;
-                return res.redirect('/companies');
+                session_error = 'Visit error: '+err.message;
+                //return res.redirect('/companies/journal'+querystr);
             }
 
             if (!rows.length) {
-                req.session.error = dict.messages.company_not_found;
-                res.redirect('/companies/'+cid+'/terminals/'+tid+'/visits');
-                return;
+                session_error = dict.messages.visits_not_found;
+                total = 0;
             }
 
             var pageObj = {offset: offset, limit: limit, page: pagen, total: total};
@@ -1807,6 +1829,8 @@ router.get('/journal', (req, res, next)=>{
                 dict: dict,
                 items: rows,
                 account: req.session.user,
+                dstart: dstart,
+                dend: dend,
                 message: session_message,
                 page: pageObj,
                 error: session_error,
@@ -1821,12 +1845,15 @@ router.get('/journal', (req, res, next)=>{
 
 router.get('/journal_pdf', (req, res, next)=> {
 
-    const dstart = req.query.dstart ? req.query.dstart : '';
-    const dend = req.query.dend ? req.query.dend : '';
+    let dstart = req.query.dstart ? req.query.dstart : '';
+    let dend = req.query.dend ? req.query.dend : '';
     const type = req.query.type ? req.query.type : '';
     const detailType = req.query.detailType ? req.query.detailType : 'all';
 
-    Visit.getExtended(dstart, dend,(err, rows) => {
+    const dstartfull = dstart != '' ? dstart + ' 00:00:00' : '';
+    const dendfull = dend != '' ? dend + ' 23:59:59' : '';
+
+    Visit.getExtended(dstartfull, dendfull,(err, rows) => {
         if (err) {
             req.session.error = dict.messages.db_error+": "+err.message;
             res.redirect('/companies/journal');
@@ -1837,6 +1864,7 @@ router.get('/journal_pdf', (req, res, next)=> {
         visits = type !== '' ? visits.filter( elm => elm.type === type.toLowerCase()) : visits;
 
         var checkDate = '';
+
         checkDate += dstart != '' ? getDate(dstart)+' - ' : 'н/о -';
         checkDate += dend != '' ? getDate(dend) : ' н/о';
 

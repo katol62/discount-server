@@ -7,7 +7,7 @@ block content
             div.col-lg-4.col-lg-offset-4.col-md-6.col-md-offset-3.col-sm-12
                 h2= dict.titles.visits
         div.row
-            div.col-lg-4.margin-top.text-left
+            div.col-lg-6.margin-top.text-left
                 div.btn-group
                     button.btn.btn-primary.dropdown-toggle(type='button', data-toggle='dropdown', aria-haspopup='true', aria-expanded='false')
                         = dict.titles.visits_report
@@ -26,16 +26,18 @@ block content
                         li
                             a(onclick='journalToPdf("pass", "detailed");return false;' style='cursor:pointer')
                                 = dict.titles.visits_report_pass_detailed
-            div.col-lg-6.margin-top.text-right
+            div.col-lg-4.margin-top.text-right
                 #datepicker.input-group.input-daterange
-                    input.form-control(id='dstart' type='text', name='start' value='' placeholder=dict.labels.label_start_date)
+                    input.form-control(id='dstart' type='text', name='start' value=dstart placeholder=dict.labels.label_start_date)
                     .input-group-addon #{dict.labels.label_to}
-                    input.form-control(id='dend' type='text', name='end' value='' placeholder=dict.labels.label_end_date)
-
+                    input.form-control(id='dend' type='text', name='end' value=dend placeholder=dict.labels.label_end_date)
             div.col-lg-2.margin-top.text-right
-                button(class=('btn btn-primary') onclick="clearDateFields()")
-                        = dict.titles.clear_date
 
+                a(class=('btn btn-primary') onclick="reloadFields()" title='Обновить')
+                    i(class='glyphicon glyphicon-repeat')
+                    | &nbsp;
+                a(class=('btn btn-primary ml-2') onclick="clearDateFields()" title='Очистить')
+                    i(class='glyphicon glyphicon-remove')
 
             if items && items.length
             div.row

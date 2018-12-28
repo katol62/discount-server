@@ -222,6 +222,7 @@ module.exports = {
             "visit_created": "Проход добавлен",
             "visit_card_activated":"Карта уже активирована",
             "visit_card_not_allowed":"Карта не разрешена для прохода",
+            "visits_not_found": "Проходы не найдены",
             "token_invalid":"Неверный токен",
             "token_missed":"Отсутствует токен",
             "card_not_found_or_not_allowed":"Карта не найдена либо вы не можете продавать ее",
