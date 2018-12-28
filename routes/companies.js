@@ -1793,7 +1793,7 @@ router.get('/journal', (req, res, next)=>{
 
     console.log(dstartfull + ' == ' + dendfull);
 
-    Visit.getTotalCount(req.session.user, (err, result)=> {
+    Visit.getTotalCount(req.session.user, dstartfull, dendfull, (err, result)=> {
         if (err) {
             req.session.error = 'Company error: '+err.message;
             return res.redirect('/companies');

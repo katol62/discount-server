@@ -105,15 +105,34 @@ var Visit = {
         })
     },
 
-    getTotalCount: (user, done)=> {
+    getTotalCount: (user, dstart, dend, done)=> {
         let query = 'select id from visit';
         let params = [];
         if (user.role == 'admin' || user.role == 'cashier') {
+            params = [user.id]
             query = 'select v.id, v.terminal, t.company, r.company from visit v ' +
             'left join terminal t on v.terminal=t.id ' +
             'left join reference r on t.company=r.company ' +
             'where r.user=?';
-            params = [user.id]
+
+            if (dstart != '' ) {
+                query += ' and v.date >= ? ';
+                params.push(dstart);
+            }
+            if (dend != '' ) {
+                query += ' and v.date <= ? ';
+                params.push(dend);
+            }
+        } else {
+            if (dstart != '' ) {
+                query += ' where date >= ? ';
+                params.push(dstart);
+            }
+            if (dend != '' ) {
+                let pre = (dstart != '') ? ' and' : ' where';
+                query += pre + ' date <= ? ';
+                params.push(dend);
+            }
         }
         db.query(query, params, (err, rows)=>{
             if (err) {
