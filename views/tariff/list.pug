@@ -40,7 +40,7 @@ block content
                                         td #{item.discount+(item.discountUnit=='currency'?' руб.':' %')}
                                         td #{item.discountType == 'pass' ? dict.labels.label_pass : dict.labels.label_discount}
                                         td #{item.price+' руб.'}
-                                        td #{item.type == 'adult' ? dict.labels.label_tariff_adult : (item.type == 'child' ? dict.labels.label_tariff_child : dict.labels.label_tariff_other)}
+                                        td #{item.type == 'adult' ? dict.labels.label_tariff_adult : (item.type == 'child' ? dict.labels.label_tariff_child : (item.type == 'group' ? dict.labels.label_tariff_group : dict.labels.label_tariff_other))}
                                         td #{item.guest === '1' ? dict.labels.label_yes : dict.labels.label_no}
                                         td(class="col-md-2")
                                             +link('', '/companies/' + company.id + '/terminals/'+terminal.id+'/tariffs/'+item.id+'/edit', 'glyphicon glyphicon-edit', '', dict.labels.label_update)
@@ -48,15 +48,15 @@ block content
                                             +link('', '', 'glyphicon glyphicon-trash text-danger', '', dict.labels.label_delete, 'confirmDeleteTariff('+company.id+','+terminal.id+','+item.id+',"'+item.name+'"); return false;')
 
             if message
-                div.col-lg-4.col-lg-offset-4.col-md-6.col-md-offset-3.col-sm-12.margin-top
+                div.col-lg-12.margin-top.text-center
                     span.mess.success #{message}
 
             if error
-                div.col-lg-4.col-lg-offset-4.col-md-6.col-md-offset-3.col-sm-12.margin-top
+                div.col-lg-12.margin-top.text-center
                     span.mess.error #{error}
 
             if errors
-                div.col-lg-4.col-lg-offset-4.col-md-6.col-md-offset-3.col-sm-12.margin-top
+                div.col-lg-12.margin-top.text-center
                     ul.error
                         for error in errors
                             li.mess.error!= error.msg

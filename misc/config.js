@@ -15,6 +15,7 @@ module.exports = {
     'tariffTypes': [
         {id:'adult', name:dict.labels.label_tariff_adult},
         {id:'child', name:dict.labels.label_tariff_child},
+        {id:'group', name:dict.labels.label_tariff_group},
         {id:'other', name:dict.labels.label_tariff_other}
     ],
     'cardStatus': [

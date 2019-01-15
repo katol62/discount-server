@@ -23,6 +23,8 @@ block content
                             .input-group-addon #{dict.labels.label_to}
                             input.form-control(type='text', name='end' value='' placeholder=dict.labels.label_end_date)
                     +formSelect('type', dict.labels.label_tariff_type, types)
+                    .form-group#cardContainer(style='display:none')
+                        +formTextInput('card', 'number', dict.labels.label_card, dict.labels.label_card, '')
                     +formSelect('discountType', dict.labels.label_discount_type, discountTypes)
                     +formTextInput('price', 'number', dict.labels.label_price, dict.labels.label_price, '0')
                     +formTextInput('discount', 'number', dict.labels.label_discount, dict.labels.label_discount, '0')
@@ -44,15 +46,15 @@ block content
                     button.btn.btn-primary(type='submit') #{dict.labels.label_create}
 
             if message
-                div.col-lg-4.col-lg-offset-4.col-md-6.col-md-offset-3.col-sm-12.margin-top
+                div.col-lg-12.margin-top.text-center
                     span.mess.success #{message}
 
             if error
-                div.col-lg-4.col-lg-offset-4.col-md-6.col-md-offset-3.col-sm-12.margin-top
+                div.col-lg-12.margin-top.text-center
                     span.mess.error #{error}
 
             if errors
-                div.col-lg-4.col-lg-offset-4.col-md-6.col-md-offset-3.col-sm-12.margin-top
+                div.col-lg-12.margin-top.text-center
                     ul.error
                         for error in errors
                             li.mess.error!= error.msg

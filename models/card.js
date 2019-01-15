@@ -542,6 +542,18 @@ var Card = {
         })
     },
 
+    checkCardAssignedGroup: (card, done)=>{
+        var query = 'SELECT * FROM tariff_card WHERE card = ?';
+        var params = [card.card_nb];
+
+        db.query(query, params, (err, rows)=>{
+            if (err) {
+                return done(err)
+            }
+            return done(null, rows);
+        })
+    }
+
 };
 
 module.exports = Card;

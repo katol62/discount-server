@@ -129,10 +129,12 @@ $(document).ready(()=>{
             var type = selected.data('type');''
             var tariffType = selected.data('tarifftype');
             var typeDisplay = selected.data('type') == 'pass' ? 'Пасс' : 'Дисконт';
+            var cardNumber = selected.data('cardnb');
             $('#price').val(price);
             $('#type').val(type);
             $('#tariffType').val(tariffType);
             $('#typeDisplay').val(typeDisplay);
+            $('#cardNumber').val(cardNumber);
             /*
             if (card.toString()==='1') {
                 $('#passContainer').css('display', 'block');
@@ -145,7 +147,15 @@ $(document).ready(()=>{
             }
             */
         }
+    });
 
+    $('#type').on('change', ()=> {
+        var selected = $('#type').find("option:selected");
+        if (selected.val() === 'group') {
+            $('#cardContainer').css('display', 'block');
+        } else {
+            $('#cardContainer').css('display', 'none');
+        }
     });
 
 });

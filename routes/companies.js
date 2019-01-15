@@ -125,11 +125,27 @@ var visitPreActions = (req, res, next)=> {
         }
 
         var body = req.body;
+        body.cardFull = rows[0];
         body.card = rows[0].id;
+
+        if (body.tariffType === 'group') {
+            if (body.cardFull.card_nb !== body.cardNumber) {
+                req.session.error = dict.messages.visit_card_tariff_error;
+                return res.redirect('/companies/'+req.params.cid+'/terminals/'+req.params.tid+'/visits/add');
+            }
+        } else {
+            if (card.type === 'group') {
+                req.session.error = dict.messages.tariff_card_not_allowed;
+                return res.redirect('/companies/'+req.params.cid+'/terminals/'+req.params.tid+'/visits/add');
+            }
+        }
+
         body.user = req.session.user.id;
         body.created = require('moment')().format('YYYY-MM-DD HH:mm:ss');
 
         req.fullbody = body;
+
+        console.log(body);
 
         Card.checkExpired(card, (err, result)=>{
             if (err) {
@@ -137,9 +153,6 @@ var visitPreActions = (req, res, next)=> {
                 return res.redirect('/companies/' + req.params.cid + '/terminals/' + req.params.tid + '/visits/add');
             }
             Card.checkValidity(body, req.card, (err, result)=>{
-
-                console.log(err);
-                console.log(result);
 
                 if (err) {
                     req.session.error = dict.messages.db_error + ': ' + err.message;
@@ -153,6 +166,125 @@ var visitPreActions = (req, res, next)=> {
             })
         });
     })
+};
+
+var tariffPreActions = (req, res, next)=> {
+    req.checkBody('name', dict.messages.tariff_name_required).notEmpty();
+    req.checkBody('type', dict.messages.tariff_type_required).notEmpty();
+    req.checkBody('discount', dict.messages.tariff_discount_required).notEmpty();
+    req.checkBody('discountType', dict.messages.discount_type_required).notEmpty();
+    if (req.body.type === 'group') {
+        req.checkBody('card', dict.messages.tariff_card_required).notEmpty();
+    }
+
+    console.log(req.body);
+
+    var errors = req.validationErrors();
+
+    if (errors) {
+        req.session.validate_error = errors;
+        res.redirect('/companies/'+req.params.cid+'/terminals/'+req.params.tid+'/tariffs/create');
+        return;
+    }
+    if (req.body.type === 'group') {
+        Card.getByIdOrNumberForUser(req.body.card, req.session.user, (err, rows)=> {
+            if (err) {
+                req.session.error = dict.messages.db_error + ': ' + err.message;
+                return res.redirect('/companies/'+req.params.cid+'/terminals/'+req.params.tid+'/tariffs/create');
+            }
+            if (rows.length === 0) {
+                req.session.error = dict.messages.card_not_found;
+                return res.redirect('/companies/'+req.params.cid+'/terminals/'+req.params.tid+'/tariffs/create');
+            }
+
+            req.body.card = rows[0];
+
+            let card = req.body.card;
+
+            if (card.status !== 'sold') {
+                req.session.error = dict.messages.tariff_card_not_sold;
+                return res.redirect('/companies/'+req.params.cid+'/terminals/'+req.params.tid+'/tariffs/create');
+            }
+
+            if (card.type !== 'group') {
+                req.session.error = dict.messages.tariff_card_not_allowed;
+                return res.redirect('/companies/'+req.params.cid+'/terminals/'+req.params.tid+'/tariffs/create');
+            }
+
+            Card.checkCardAssignedGroup(card, (err, rows)=>{
+                if (err) {
+                    req.session.error = dict.messages.db_error + ': ' + err.message;
+                    return res.redirect('/companies/'+req.params.cid+'/terminals/'+req.params.tid+'/tariffs/create');
+                }
+                if (rows.length > 0) {
+                    req.session.error = dict.messages.card_already_assigned;
+                    return res.redirect('/companies/'+req.params.cid+'/terminals/'+req.params.tid+'/tariffs/create');
+                }
+                next();
+            });
+
+        })
+    }
+
+};
+
+var tariffEditPreActions = (req, res, next)=> {
+    req.checkBody('name', dict.messages.tariff_name_required).notEmpty();
+    req.checkBody('type', dict.messages.tariff_type_required).notEmpty();
+    req.checkBody('discount', dict.messages.tariff_discount_required).notEmpty();
+    req.checkBody('discountType', dict.messages.discount_type_required).notEmpty();
+    if (req.body.type === 'group') {
+        req.checkBody('card', dict.messages.tariff_card_required).notEmpty();
+    }
+
+    console.log(req.body);
+
+    var errors = req.validationErrors();
+
+    if (errors) {
+        req.session.validate_error = errors;
+        return res.redirect('/companies/'+req.params.cid+'/terminals/'+req.params.tid+'/tariffs/'+req.params.trid+'/edit');
+    }
+    if (req.body.type === 'group' && req.body.card) {
+        Card.getByIdOrNumberForUser(req.body.card, req.session.user, (err, rows)=> {
+            if (err) {
+                req.session.error = dict.messages.db_error + ': ' + err.message;
+                return res.redirect('/companies/'+req.params.cid+'/terminals/'+req.params.tid+'/tariffs/'+req.params.trid+'/edit');
+            }
+            if (rows.length === 0) {
+                req.session.error = dict.messages.card_not_found;
+                return res.redirect('/companies/'+req.params.cid+'/terminals/'+req.params.tid+'/tariffs/'+req.params.trid+'/edit');
+            }
+
+            req.body.card = rows[0];
+
+            let card = req.body.card;
+
+            console.log('===CARD===')
+            console.log(card)
+            console.log('===CARD===')
+
+            if (card.status !== 'sold') {
+                req.session.error = dict.messages.tariff_card_not_sold;
+                return res.redirect('/companies/'+req.params.cid+'/terminals/'+req.params.tid+'/tariffs/'+req.params.trid+'/edit');
+            }
+
+            if (card.type !== 'group') {
+                req.session.error = dict.messages.tariff_card_not_allowed;
+                return res.redirect('/companies/'+req.params.cid+'/terminals/'+req.params.tid+'/tariffs/'+req.params.trid+'/edit');
+            }
+
+            Card.checkCardAssignedGroup(card, (err, rows)=>{
+                if (err) {
+                    req.session.error = dict.messages.db_error + ': ' + err.message;
+                    return res.redirect('/companies/'+req.params.cid+'/terminals/'+req.params.tid+'/tariffs/'+req.params.trid+'/edit');
+                }
+                next();
+            });
+
+        })
+    }
+
 };
 
 var methodOverride = require('method-override');
@@ -1044,34 +1176,24 @@ router.get('/:cid/terminals/:tid/tariffs/create', checkCompany, checkTerminal, (
     })
 });
 
-router.post('/:cid/terminals/:tid/tariffs/create', (req, res, next)=> {
+router.post('/:cid/terminals/:tid/tariffs/create', tariffPreActions, (req, res, next)=> {
 
-    req.checkBody('name', dict.messages.tariff_name_required).notEmpty();
-    req.checkBody('type', dict.messages.tariff_type_required).notEmpty();
-    req.checkBody('discount', dict.messages.tariff_discount_required).notEmpty();
-    req.checkBody('discountType', dict.messages.discount_type_required).notEmpty();
+    console.log(req.body);
 
-    var errors = req.validationErrors();
-
-    if (errors) {
-        req.session.validate_error = errors;
-        res.redirect('/companies/'+req.params.cid+'/terminals/'+req.params.tid+'/tariffs/create');
-        return;
-    }
     Tariff.create(req.body, (err, rows)=>{
         if (err) {
             req.session.error = dict.messages.db_error+": "+err.message;
-            res.redirect('/companies/'+req.params.cid+'/terminals/'+req.params.tid+'/tariffs/create');
-            return;
+            return res.redirect('/companies/'+req.params.cid+'/terminals/'+req.params.tid+'/tariffs/create');
         }
+
+        console.log(rows);
+
         if (rows.affectedRows === 0) {
             req.session.error = dict.messages.tariff_create_error;
-            res.redirect('/companies/'+req.params.cid+'/terminals/'+req.params.tid+'/tariffs/create');
-            return;
+            return res.redirect('/companies/'+req.params.cid+'/terminals/'+req.params.tid+'/tariffs/create');
         }
         req.session.message = dict.messages.tariff_created;
-        res.redirect('/companies/'+req.params.cid+'/terminals/'+req.params.tid+'/tariffs');
-        return;
+        return res.redirect('/companies/'+req.params.cid+'/terminals/'+req.params.tid+'/tariffs');
     })
 
 });
@@ -1122,7 +1244,7 @@ router.get('/:cid/terminals/:tid/tariffs/:trid/edit', checkCompany, checkTermina
             Terminal.getById(req.params.tid, (err, rows)=>{
                 var terminal = rows[0];
 
-                Tariff.getById(req.params.trid, (err, rows)=>{
+                Tariff.getByIdCard(req.params.trid, (err, rows)=>{
                     if (err) {
                         req.session.error = dict.messages.db_error+":"+err.code;
                         res.redirect('/companies/'+req.params.cid+'/terminals/'+req.params.tid+'/tariffs');
@@ -1158,20 +1280,8 @@ router.get('/:cid/terminals/:tid/tariffs/:trid/edit', checkCompany, checkTermina
 
 });
 
-router.put('/:cid/terminals/:tid/tariffs/:trid/edit', (req, res, next)=>{
+router.put('/:cid/terminals/:tid/tariffs/:trid/edit', tariffEditPreActions, (req, res, next)=>{
 
-    req.checkBody('name', dict.messages.tariff_name_required).notEmpty();
-    req.checkBody('type', dict.messages.tariff_type_required).notEmpty();
-    req.checkBody('discount', dict.messages.tariff_discount_required).notEmpty();
-    req.checkBody('discountType', dict.messages.discount_type_required).notEmpty();
-
-    var errors = req.validationErrors();
-
-    if (errors) {
-        req.session.validate_error = errors;
-        res.redirect('/companies/'+req.params.cid+'/terminals/'+req.params.tid+'/tariffs/'+req.params.trid+'/edit');
-        return;
-    }
     Tariff.update(req.body, (err, rows)=>{
         if (err) {
             req.session.error = dict.messages.db_error+": "+err.message;

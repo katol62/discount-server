@@ -238,8 +238,6 @@ router.post('/create', (req, res, next)=> {
         body.test = req.body.test;
         body.owner = (req.body.admin && req.body.admin != '') ? req.body.admin : req.body.owner;
 
-        console.log(body);
-
         Card.createCard(body, (err, rows)=>{
             if (err) {
                 req.session.error = dict.messages.db_error+": "+err.message;
@@ -586,10 +584,6 @@ router.post('/transhes/create', (req, res, next)=> {
 
             var finalArray = [];
 
-            console.log(Number(start));
-            console.log(Number(count));
-            console.log(Number(start)+Number(count));
-
             for (var i=Number(start); i<Number(start)+Number(count); i++) {
                 var card_number = generateCardNumber(req.session.user.id, Number(req.body.codetype), i);
                 var qr_code = md5(card_number);
@@ -607,8 +601,6 @@ router.post('/transhes/create', (req, res, next)=> {
 
                 finalArray.push(card);
             }
-
-            console.log(finalArray);
 
             Card.createCardTransh(finalArray, (err, rows)=>{
                 if (err) {
