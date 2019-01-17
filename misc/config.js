@@ -35,6 +35,10 @@ module.exports = {
         {id:'currency', name:'руб.'},
         {id:'percent', name:'%'}
     ],
+
+    'pass': [{days: 1, count: 5},{days: 3, count: 12},{days: 6, count: 25}],
+
+    expireDays: 31,
     tokenExpireIn: 86400 // expires in 24 hours
 
 };

@@ -12,7 +12,7 @@ block content
 
                     +formTextInput('card', 'number', dict.labels.label_card_number, dict.labels.label_card_number, '')
                     +formSelect('type', dict.labels.label_card_type, types, '')
-                    +formSelect('pass', dict.labels.label_visit_pass, passes, '')
+                    +formSelect('pass', dict.labels.label_visit_pass, passes, '0')
 
                     button.btn.btn-primary(type='submit') #{dict.labels.label_sell}
 

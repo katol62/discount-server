@@ -20,6 +20,16 @@ var globals = {
             console.log(codeString);
             var code = Number(codeString);
             return code;
+        },
+        getPassCount: (pass)=> {
+            const passArray = config.pass;
+            var count = 0;
+            passArray.forEach( (item)=>{
+                if (item.days.toString() == pass.toString()) {
+                    count = item.count;
+                }
+            });
+            return count;
         }
 
     },

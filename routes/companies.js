@@ -147,6 +147,8 @@ var visitPreActions = (req, res, next)=> {
 
         console.log(body);
 
+        card.passCount = globals.methods.getPassCount(card.pass);
+
         Card.checkExpired(card, (err, result)=>{
             if (err) {
                 req.session.error = dict.messages.db_error + ': ' + err.message;

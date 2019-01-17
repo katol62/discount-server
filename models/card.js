@@ -1,5 +1,7 @@
 var db = require('../misc/db');
 var moment = require('moment');
+var config = require('../misc/config');
+
 
 var Card = {
 
@@ -351,21 +353,32 @@ var Card = {
         let overdue = false;
 
         if (card.date_discount && card.date_pass) {
-            let exp_date_discount = moment(card.date_discount, 'YYYY-MM-DD h:m').add(31, 'days');
-            let exp_date_pass = moment(card.date_pass).add(31, 'days');
+            let exp_date_discount = moment(card.date_discount, 'YYYY-MM-DD h:m').add(config.expireDays, 'days');
+            let exp_date_pass = moment(card.date_pass).add(config.expireDays, 'days');
             let now = moment();
 
-            if (now>exp_date_discount && now>exp_date_pass) {
-                //both expired
+            if (now>exp_date_discount) {
                 overdue = true;
-            } else if (now <= exp_date_pass) {
+            }
+            if (now>exp_date_pass) {
                 let expire = require('moment')(card.date_pass_update).add(1, 'days');
                 if (now > expire) {
-                    if (card.pass_count + 1 > Number(card.pass)) {
+                    if (card.pass_count + 1 > Number(card.passCount)) {
                         overdue = true;
                     }
                 }
             }
+            // if (now>exp_date_discount && now>exp_date_pass) {
+            //     //both expired
+            //     overdue = true;
+            // } else if (now <= exp_date_pass) {
+            //     let expire = require('moment')(card.date_pass_update).add(1, 'days');
+            //     if (now > expire) {
+            //         if (card.pass_count + 1 > Number(card.passCount)) {
+            //             overdue = true;
+            //         }
+            //     }
+            // }
         }
         if (overdue) {
             let query = 'update cards set status = "overdue" where id = ?';
@@ -397,13 +410,13 @@ var Card = {
                     done(null, {success: res, message: mess});
                 })
             } else {
-                var exp_date = moment(card.date_discount, 'YYYY-MM-DD h:m').add(31, 'days');
+                var exp_date = moment(card.date_discount, 'YYYY-MM-DD h:m').add(config.expireDays, 'days');
                 var now = moment();
 
                 if (exp_date >= now) {
                     done(null, {success: true, message: ''});
                 } else {
-                    done(null, {success: false, message: 'card activity (discount) exceded 31 day'})
+                    done(null, {success: false, message: 'card activity (discount) exceded '+config.expireDays+' days'})
                 }
             }
 
@@ -421,20 +434,19 @@ var Card = {
                 })
             } else {
 
-                var exp_date = moment(card.date_pass, 'YYYY-MM-DD hh:mm').add(31, 'days');
+                var exp_date = moment(card.date_pass, 'YYYY-MM-DD hh:mm').add(config.expireDays, 'days');
                 var now = moment();
 
                 if (now > exp_date) {
-                    done(null, {success: false, message: 'card activity (pass) exceded 31 day'})
+                    done(null, {success: false, message: 'card activity (pass) exceded ' + config.expireDays + ' day'})
                 } else {
                     let expire = moment(card.date_pass_update, 'YYYY-MM-DD hh:mm').add(1, 'days');
 
-                    if (now > expire) {
+                    if (now > expire){
 
-                        if (card.pass_count + 1 > Number(card.pass)) {
+                        if (card.pass_count + 1 > Number(card.passCount)) {
                             done(null, {success: false, message: 'card pass count exceded'})
                         } else {
-
                             query = 'select count(*) from visit where card = ? and terminal = ?';
                             params = [card.id, body.terminal];
                             db.query(query, params, (err, rows)=>{
@@ -457,16 +469,13 @@ var Card = {
                                 })
 
                             })
-
                         }
-
                     } else {
                         done(null, {success: true, message: ''})
                     }
                 }
             }
         }
-
     },
 
     sell: (body, done)=>{

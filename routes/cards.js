@@ -862,7 +862,7 @@ router.get('/sell', (req, res, next)=>{
     req.session.validate_error = null;
 
     var types = config.tariffTypes;
-    var pass = config.passTypeStrict;
+    var pass = config.passType;
 
     return res.render('card/sell', {
         pageType: 'sell',
