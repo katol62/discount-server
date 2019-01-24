@@ -1,7 +1,8 @@
 var db = require('../misc/db');
 var moment = require('moment');
+var locale = require('./../misc/locale');
 var config = require('../misc/config');
-
+var dict = locale[config.locale];
 
 var Card = {
 
@@ -434,45 +435,53 @@ var Card = {
                 })
             } else {
 
+                console.log('=============');
                 var exp_date = moment(card.date_pass, 'YYYY-MM-DD hh:mm').add(config.expireDays, 'days');
                 var now = moment();
 
                 if (now > exp_date) {
                     done(null, {success: false, message: 'card activity (pass) exceded ' + config.expireDays + ' day'})
                 } else {
-                    let expire = moment(card.date_pass_update, 'YYYY-MM-DD hh:mm').add(1, 'days');
 
-                    if (now > expire){
-
-                        if (card.pass_count + 1 > Number(card.passCount)) {
-                            done(null, {success: false, message: 'card pass count exceded'})
-                        } else {
-                            query = 'select count(*) from visit where card = ? and terminal = ?';
-                            params = [card.id, body.terminal];
-                            db.query(query, params, (err, rows)=>{
-                                if (err) {
-                                    return done(err)
-                                }
-                                if (rows) {
-                                    done(null, {success: false, message: 'pass already applied for terminal'})
-                                    return;
-                                }
-
-                                query = 'update cards set date_pass_update = ?, pass_count = ? where id = ?';
-                                params = [now.format('YYYY-MM-DD HH:mm:ss'), (card.pass_count + 1), card.id];
-
-                                db.query(query, params, (err, rows)=>{
-                                    if (err) {
-                                        return done(err)
-                                    }
-                                    done(null, {success: true, message: ''})
-                                })
-
-                            })
+                    query = 'select count(*) from visit where card = ? and terminal = ?';
+                    params = [card.id, body.terminal];
+                    console.log(query);
+                    console.log(params);
+                    db.query(query, params, (err, rows)=>{
+                        if (err) {
+                            return done(err);
                         }
-                    } else {
-                        done(null, {success: true, message: ''})
-                    }
+                        if (rows) {
+                            return done(null, {success: false, message: dict.messages.visits_card_already_passed});
+                        } else {
+                            let expire = moment(card.date_pass_update, 'YYYY-MM-DD hh:mm').add(1, 'days');
+
+                            console.log('!!!!!=============');
+                            console.log('!!!!!==== now: ' + now);
+                            console.log('!!!!!==== expire: ' + expire);
+                            if (now > expire){
+
+                                if (card.pass_count + 1 > Number(card.passCount)) {
+                                    done(null, {success: false, message: dict.messages.visits_card_pass_count_exceded});
+                                    return;
+                                } else {
+                                    query = 'update cards set date_pass_update = ?, pass_count = ? where id = ?';
+                                    params = [now.format('YYYY-MM-DD HH:mm:ss'), (card.pass_count + 1), card.id];
+
+                                    db.query(query, params, (err, rows)=>{
+                                        if (err) {
+                                            return done(err)
+                                        }
+                                        done(null, {success: true, message: ''})
+                                    });
+                                }
+                            } else {
+                                done(null, {success: true, message: ''})
+                            }
+
+                        }
+                    });
+
                 }
             }
         }

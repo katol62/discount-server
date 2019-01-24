@@ -128,6 +128,11 @@ var visitPreActions = (req, res, next)=> {
         body.cardFull = rows[0];
         body.card = rows[0].id;
 
+        if (body.tariffType !== card.type) {
+            req.session.error = dict.messages.visit_card_tariff_type_error + ' (' + globals.methods.nameById(body.tariffType, config.tariffTypes) + ' <> ' + globals.methods.nameById(card.type, config.tariffTypes) + ')';
+            return res.redirect('/companies/'+req.params.cid+'/terminals/'+req.params.tid+'/visits/add');
+        }
+
         if (body.tariffType === 'group') {
             if (body.cardFull.card_nb !== body.cardNumber) {
                 req.session.error = dict.messages.visit_card_tariff_error;
@@ -161,7 +166,7 @@ var visitPreActions = (req, res, next)=> {
                     return res.redirect('/companies/' + req.params.cid + '/terminals/' + req.params.tid + '/visits');
                 }
                 if (!result.success) {
-                    req.session.error = dict.messages.card_expired + ': (' + req.card.card_nb + '). Details:' + result.message;
+                    req.session.error = dict.messages.card_invalid + ': (' + req.card.card_nb + '). Details: ' + result.message;
                     return res.redirect('/companies/' + req.params.cid + '/terminals/' + req.params.tid + '/visits');
                 }
                 next();
