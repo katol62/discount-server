@@ -1608,13 +1608,16 @@ router.get('/super/:id/companies', function (req, res, next) {
 
 var getDate = (dateString) => {
     let dt = new Date(dateString);
-    if (dt) {
+    if (dt && dt instanceof Date && !isNaN(dt)) {
         return moment(dateString).format("DD.MM.YYYY");
     }
     return '';
 };
 
-var generateReport = (company, visits, type, detailType, checkDate) => {
+var generateReport = (company, visits, type, detailType, checkDate, datestart, dateend) => {
+
+    let prilNumber = (detailType === 'detailed') ? '2' : '3';
+    let prilTitle = (detailType === 'detailed') ? 'Акт № '+company.dogovor+' от '+getDate(company.dogovordate) : 'Выгрузка по проходам  за период с ' + datestart + ' по ' +dateend;
 
     let html = '';
 
@@ -1642,12 +1645,11 @@ var generateReport = (company, visits, type, detailType, checkDate) => {
     html += '<table border=0 cellpadding=0 cellspacing=0 width=540>\n' +
         '    <tr>\n' +
         '        <td colspan="2" class="header-1 align-right">\n' +
-        '            Приложение № 2 к Договору № '+company.dogovor+' от '+getDate(company.dogovordate)+' \n' +
+        '            Приложение № ' + prilNumber + ' к Договору № '+company.dogovor+' от '+getDate(company.dogovordate)+' \n' +
         '        </td>\n' +
         '    </tr>\n' +
         '    <tr>\n' +
-        '        <td colspan="2"  class="header-2 align-left">\n' +
-        '            Акт № '+company.dogovor+' от '+getDate(company.dogovordate)+'\n' +
+        '        <td colspan="2"  class="header-2 align-left">\n' + prilTitle + '\n' +
         '        </td>\n' +
         '    </tr>\n' +
         '</table>\n';
@@ -1832,7 +1834,10 @@ router.get('/pdf', (req, res, next)=> {
             checkDate += dstart != '' ? getDate(dstart)+' - ' : 'н/о -';
             checkDate += dend != '' ? getDate(dend) : ' н/о';
 
-            let content = generateReport(company, visits, type, detailType, checkDate);
+            var datestart = dstart != '' ? getDate(dstart)+' - ' : 'н/о';
+            var dateend = dend != '' ? getDate(dend)+' - ' : 'н/о';
+
+            let content = generateReport(company, visits, type, detailType, checkDate, datestart, dateend);
 
             var pdf = require('html-pdf');
 
