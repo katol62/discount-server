@@ -1614,10 +1614,19 @@ var getDate = (dateString) => {
     return '';
 };
 
-var generateReport = (company, visits, type, detailType, checkDate, datestart, dateend) => {
+var getMonth = (dateString) => {
+    let dt = new Date(dateString);
+    if (dt && dt instanceof Date && !isNaN(dt)) {
+        return moment(dateString).format("MM");
+    }
+    return '';
+};
+
+
+var generateReport = (company, visits, type, detailType, checkDate, datestart, dateend, month) => {
 
     let prilNumber = (detailType === 'detailed') ? '2' : '3';
-    let prilTitle = (detailType === 'detailed') ? 'Выгрузка по проходам  за период с ' + datestart + ' по ' +dateend : 'Акт № '+company.dogovor+' от '+getDate(company.dogovordate);
+    let prilTitle = (detailType === 'detailed') ? 'Выгрузка по проходам  за период с ' + datestart + ' по ' +dateend : 'Акт № '+company.dogovor + month + ' от '+ dateend;
 
     let html = '';
 
@@ -1834,10 +1843,12 @@ router.get('/pdf', (req, res, next)=> {
             checkDate += dstart != '' ? getDate(dstart)+' - ' : 'н/о -';
             checkDate += dend != '' ? getDate(dend) : ' н/о';
 
-            var datestart = dstart != '' ? getDate(dstart)+' - ' : 'н/о';
-            var dateend = dend != '' ? getDate(dend)+' - ' : 'н/о';
+            var datestart = dstart != '' ? getDate(dstart) : 'н/о';
+            var dateend = dend != '' ? getDate(dend) : 'н/о';
 
-            let content = generateReport(company, visits, type, detailType, checkDate, datestart, dateend);
+            var month = dend != '' ? getMonth(dend) : '';
+
+            let content = generateReport(company, visits, type, detailType, checkDate, datestart, dateend, month);
 
             var pdf = require('html-pdf');
 
