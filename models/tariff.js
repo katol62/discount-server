@@ -43,8 +43,8 @@ var Tariff = {
     create: (body, done)=> {
 
         var name = body.name;
-        var start = (body.start && body.start!=='' ? body.start : '0000-00-00');
-        var end = (body.end && body.end!==''? body.end : '0000-00-00');
+        var start = (body.start && body.start!=='' ? body.start : null);
+        var end = (body.end && body.end!==''? body.end : null);
         var type = body.type;
         var discountType = body.discountType;
         var discount = body.discount;
@@ -97,8 +97,8 @@ var Tariff = {
 
         var id = body.id;
         var name = body.name;
-        var start = (body.start && body.start!=='' ? body.start : '0000-00-00');
-        var end = (body.end && body.end!==''? body.end : '0000-00-00');
+        var start = (body.start && body.start!=='' ? body.start : null);
+        var end = (body.end && body.end!==''? body.end : null);
         var type = body.type;
         var discount = body.discount;
         var discountType = body.discountType;
