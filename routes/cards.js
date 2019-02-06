@@ -236,6 +236,7 @@ router.post('/create', (req, res, next)=> {
         body.company = req.body.company !='' ? req.body.company : null;
         body.transh = '0';
         body.test = req.body.test;
+        body.prim = req.body.prim;
         body.owner = (req.body.admin && req.body.admin != '') ? req.body.admin : req.body.owner;
 
         Card.createCard(body, (err, rows)=>{

@@ -126,6 +126,7 @@ module.exports = {
             "label_card_lifetime": "Срок действия (сут.) с 1-го считывания",
             "label_card_servicetime": "Срок службы (сут.) с момента продажи",
             "label_card_codetype": "Код услуги",
+            "label_card_prim": "Примечание",
             "label_card_type":"Тип карты",
             "label_card_status":"Статус карты",
             "label_card_test":"Тестовая карта",

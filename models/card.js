@@ -59,8 +59,8 @@ var Card = {
     },
 
     createCard: (body, done)=>{
-        var query = 'INSERT INTO cards (qr_code, card_nb, type, status, lifetime, servicetime, company_id, transh, owner, test) SELECT ?, ?, ?, ?, ?, ?, ?, ?, ?, ? FROM DUAL WHERE NOT EXISTS (SELECT * FROM cards WHERE card_nb = ?) LIMIT 1';
-        var params = [body.qr_code, body.card_nb, body.type, body.status, body.lifetime, body.servicetime, body.company?body.company:null, body.transh?body.transh:null, body.owner, body.test=='on'?'1':'0', body.card_nb];
+        var query = 'INSERT INTO cards (qr_code, card_nb, type, status, lifetime, servicetime, company_id, transh, owner, test, prim) SELECT ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? FROM DUAL WHERE NOT EXISTS (SELECT * FROM cards WHERE card_nb = ?) LIMIT 1';
+        var params = [body.qr_code, body.card_nb, body.type, body.status, body.lifetime, body.servicetime, body.company?body.company:null, body.transh?body.transh:null, body.owner, body.test=='on'?'1':'0', body.prim?body.prim:null, body.card_nb];
 
         db.query(query, params, (err, rows)=>{
             if (err) {
@@ -71,8 +71,8 @@ var Card = {
     },
 
     updateCard: (body, done)=>{
-        var query = 'UPDATE cards SET type=?, status=?, lifetime=?, servicetime=?, company_id=?, owner=?, test=?, update_date=?, updated_by=? WHERE id = ?';
-        var params = [body.type, body.status, body.lifetime, body.servicetime, body.company?body.company:null, body.admin?body.admin:body.owner, body.test=='on'?'1':'0', body.updated, body.updatedBy, body.id];
+        var query = 'UPDATE cards SET type=?, status=?, lifetime=?, servicetime=?, company_id=?, owner=?, test=?, prim=?, update_date=?, updated_by=? WHERE id = ?';
+        var params = [body.type, body.status, body.lifetime, body.servicetime, body.company?body.company:null, body.admin?body.admin:body.owner, body.test=='on'?'1':'0', body.prim?body.prim:null, body.updated, body.updatedBy, body.id];
 
         db.query(query, params, (err, rows)=>{
             if (err) {

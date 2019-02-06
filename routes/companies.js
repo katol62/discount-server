@@ -1617,7 +1617,7 @@ var getDate = (dateString) => {
 var generateReport = (company, visits, type, detailType, checkDate, datestart, dateend) => {
 
     let prilNumber = (detailType === 'detailed') ? '2' : '3';
-    let prilTitle = (detailType === 'detailed') ? 'Акт № '+company.dogovor+' от '+getDate(company.dogovordate) : 'Выгрузка по проходам  за период с ' + datestart + ' по ' +dateend;
+    let prilTitle = (detailType === 'detailed') ? 'Выгрузка по проходам  за период с ' + datestart + ' по ' +dateend : 'Акт № '+company.dogovor+' от '+getDate(company.dogovordate);
 
     let html = '';
 
@@ -1852,14 +1852,14 @@ router.get('/pdf', (req, res, next)=> {
                 paginationOffset: 1,       // Override the initial pagination number
                 "header": {
                     "height": "15mm",
-                    "contents": '<div style="text-align: center; width: 100%; border-bottom: 1px solid; font-family: sans-serif; font-size: 0.7em;">Акт ('+company.name+') (период: '+checkDate+')</div>'
+                    "contents": '<div style="text-align: center; width: 100%; border-bottom: 1px solid; font-family: sans-serif; font-size: 0.5em;">Акт ('+company.name+') (период: '+checkDate+')</div>'
                 },
                 "footer": {
                     "height": "20mm",
                     "contents": {
                         // first: 'Cover page',
                         // 2: 'Second page', // Any page number is working. 1-based index
-                        default: '<div style="text-align: center; width: 100%; color: #444; border-top: 1px solid; font-family: sans-serif; font-size: 0.7em;"><span>{{page}}</span>/<span>{{pages}}</span></div>', // fallback value
+                        default: '<div style="text-align: center; width: 100%; color: #444; border-top: 1px solid; font-family: sans-serif; font-size: 0.5em;"><span>{{page}}</span>/<span>{{pages}}</span></div>', // fallback value
                         // last: 'Last Page'
                     }
                 },
@@ -1996,6 +1996,7 @@ router.get('/journal_pdf', (req, res, next)=> {
         var pdf = require('html-pdf');
 
         var config = {
+
             // Export options
             "directory": "/tmp",       // The directory the file gets written into if not using .toFile(filename, callback). default: '/tmp'
             "format": "Letter",        // allowed units: A3, A4, A5, Legal, Letter, Tabloid
