@@ -83,13 +83,16 @@ var Tariff = {
 
     delete: (trid, done)=>{
         //TODO: additional deletes for tariff
-        var query = 'DELETE t, c FROM tariff t JOIN tariff_card c ON c.tariff = t.id WHERE t.id = ?';
-        db.query(query, [trid], (err, rows)=> {
-            if (err) {
-                return done(err)
-            }
-            done(null, rows)
-        })
+        let q = 'DELETE FROM tariff_card WHERE tariff=?';
+        db.query(q, [trid], (err, rows)=>{
+            var query = 'DELETE FROM tariff WHERE id = ?';
+            db.query(query, [trid], (err, rows)=> {
+                if (err) {
+                    return done(err)
+                }
+                done(null, rows)
+            })
+        });
     },
     update: (body, done)=> {
 
