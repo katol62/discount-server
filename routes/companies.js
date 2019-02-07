@@ -1626,7 +1626,7 @@ var getMonth = (dateString) => {
 var generateReport = (company, visits, type, detailType, checkDate, datestart, dateend, month) => {
 
     let prilNumber = (detailType === 'detailed') ? '2' : '3';
-    let prilTitle = (detailType === 'detailed') ? 'Выгрузка по проходам  за период с ' + datestart + ' по ' +dateend : 'Акт № '+company.dogovor + month + ' от '+ dateend;
+    let prilTitle = (detailType === 'detailed') ? 'Выгрузка по проходам  за период с ' + datestart + ' по ' +dateend : 'Акт № '+company.dogovor + '/' +month + ' от '+ dateend;
 
     let html = '';
 
