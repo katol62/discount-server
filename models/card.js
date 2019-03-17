@@ -104,14 +104,14 @@ var Card = {
 
         var query = 'SELECT * FROM cards WHERE id = ? OR card_nb = ?';
         var params = [id, id];
-        if (user.role == 'admin') {
-            query = 'select c.*, u.id as userId from cards c left join users u on c.owner=u.id WHERE (c.id = ? OR c.card_nb = ?) AND u.id=?';
-            params = [id, id, user.id];
-        }
-        if (user.role == 'cashier') {
-            query = 'select c.*, u.id as userId from cards c left join users u on c.owner=u.parent WHERE (c.id = ? OR c.card_nb = ?) AND u.id=?';
-            params = [id, id, user.id];
-        }
+        // if (user.role == 'admin') {
+        //     query = 'select c.*, u.id as userId from cards c left join users u on c.owner=u.id WHERE (c.id = ? OR c.card_nb = ?) AND u.id=?';
+        //     params = [id, id, user.id];
+        // }
+        // if (user.role == 'cashier') {
+        //     query = 'select c.*, u.id as userId from cards c left join users u on c.owner=u.parent WHERE (c.id = ? OR c.card_nb = ?) AND u.id=?';
+        //     params = [id, id, user.id];
+        // }
 
         db.query(query, params, (err, rows)=>{
             if (err) {
