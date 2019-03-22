@@ -443,15 +443,15 @@ var Card = {
                     done(null, {success: false, message: 'card activity (pass) exceded ' + config.expireDays + ' day'})
                 } else {
 
-                    query = 'select count(*) from visit where card = ? and terminal = ?';
-                    params = [card.id, body.terminal];
+                    query = 'select count(*) as count from visit where card = ? and terminal = ?';
+                    params = [card.id, body.tid];
                     console.log(query);
                     console.log(params);
                     db.query(query, params, (err, rows)=>{
                         if (err) {
                             return done(err);
                         }
-                        if (rows) {
+                        if (rows && rows[0].count > 0) {
                             return done(null, {success: false, message: dict.messages.visits_card_already_passed});
                         } else {
                             let expire = moment(card.date_pass_update, 'YYYY-MM-DD hh:mm').add(1, 'days');
