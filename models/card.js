@@ -361,7 +361,7 @@ var Card = {
             if (now>exp_date_discount) {
                 overdue = true;
             }
-            if (now>exp_date_pass) {
+            if (now => exp_date_pass) {
                 let expire = require('moment')(card.date_pass_update).add(1, 'days');
                 if (now > expire) {
                     if (card.pass_count + 1 > Number(card.passCount)) {
