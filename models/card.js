@@ -123,11 +123,12 @@ var Card = {
 
     getByCardForUser: (card, user, done)=>{
 
-        let query = '';
+        let query = 'SELECT * FROM cards ';
         let whereArray = [];
         let params = [];
-        let whereString = '';
+        // let whereString = '';
 
+        /*
         if (user.role === 'super') {
             query = 'SELECT * FROM cards ';
             if (card.id) {
@@ -191,6 +192,26 @@ var Card = {
             params.push(user.id);
             whereString = ' WHERE ('+whereArray.join(' OR ') + ')  AND u.id = ?';
         }
+        */
+
+        // let query = 'SELECT * FROM cards ';
+        if (card.id) {
+            whereArray.push('id = ?');
+            params.push(card.id);
+        }
+        if (card.card_nb) {
+            whereArray.push('card_nb = ?');
+            params.push(card.card_nb);
+        }
+        if (card.qr_code) {
+            whereArray.push('qr_code = ?');
+            params.push(card.qr_code);
+        }
+        if (card.nfs_code) {
+            whereArray.push('nfs_code = ?');
+            params.push(card.nfs_code);
+        }
+        let whereString = ' WHERE '+whereArray.join(' OR ');
 
         query += whereString;
 
