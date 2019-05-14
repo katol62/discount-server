@@ -292,7 +292,9 @@ var tariffEditPreActions = (req, res, next)=> {
             });
 
         })
-    }
+    } else (
+        next()
+    )
 
 };
 
@@ -1291,6 +1293,7 @@ router.get('/:cid/terminals/:tid/tariffs/:trid/edit', checkCompany, checkTermina
 
 router.put('/:cid/terminals/:tid/tariffs/:trid/edit', tariffEditPreActions, (req, res, next)=>{
 
+    console.log('do update');
     Tariff.update(req.body, (err, rows)=>{
         if (err) {
             req.session.error = dict.messages.db_error+": "+err.message;
