@@ -218,17 +218,18 @@ var tariffPreActions = (req, res, next)=> {
                 return res.redirect('/companies/'+req.params.cid+'/terminals/'+req.params.tid+'/tariffs/create');
             }
 
-            Card.checkCardAssignedGroup(card, (err, rows)=>{
-                if (err) {
-                    req.session.error = dict.messages.db_error + ': ' + err.message;
-                    return res.redirect('/companies/'+req.params.cid+'/terminals/'+req.params.tid+'/tariffs/create');
-                }
-                if (rows.length > 0) {
-                    req.session.error = dict.messages.card_already_assigned;
-                    return res.redirect('/companies/'+req.params.cid+'/terminals/'+req.params.tid+'/tariffs/create');
-                }
-                next();
-            });
+            next();
+            // Card.checkCardAssignedGroup(card, (err, rows)=>{
+            //     if (err) {
+            //         req.session.error = dict.messages.db_error + ': ' + err.message;
+            //         return res.redirect('/companies/'+req.params.cid+'/terminals/'+req.params.tid+'/tariffs/create');
+            //     }
+            //     if (rows.length > 0) {
+            //         req.session.error = dict.messages.card_already_assigned;
+            //         return res.redirect('/companies/'+req.params.cid+'/terminals/'+req.params.tid+'/tariffs/create');
+            //     }
+            //     next();
+            // });
 
         })
     } else {
@@ -283,13 +284,14 @@ var tariffEditPreActions = (req, res, next)=> {
                 return res.redirect('/companies/'+req.params.cid+'/terminals/'+req.params.tid+'/tariffs/'+req.params.trid+'/edit');
             }
 
-            Card.checkCardAssignedGroup(card, (err, rows)=>{
-                if (err) {
-                    req.session.error = dict.messages.db_error + ': ' + err.message;
-                    return res.redirect('/companies/'+req.params.cid+'/terminals/'+req.params.tid+'/tariffs/'+req.params.trid+'/edit');
-                }
-                next();
-            });
+            // Card.checkCardAssignedGroup(card, (err, rows)=>{
+            //     if (err) {
+            //         req.session.error = dict.messages.db_error + ': ' + err.message;
+            //         return res.redirect('/companies/'+req.params.cid+'/terminals/'+req.params.tid+'/tariffs/'+req.params.trid+'/edit');
+            //     }
+            //     next();
+            // });
+            next();
 
         })
     } else (
