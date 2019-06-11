@@ -1636,8 +1636,8 @@ var generateReport = (company, visits, type, detailType, checkDate, datestart, d
     let html = '';
 
     html += '    <style>\n' +
-        '        body {font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 14px;}\n' +
-        '        table {border-collapse: collapse; table-layout:fixed; font-size: 12px;font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;}\n' +
+        '        body {font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 12px;}\n' +
+        '        table {border-collapse: collapse; table-layout:fixed; font-size: 10px;font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;}\n' +
         '        td, th {vertical-align: middle; padding: 5px;}\n' +
         '        .header-1 {padding: 5px 0}\n' +
         '        .header-2 {padding: 10px 0; font-size: 16px; font-weight: bold;border-bottom: 1px black solid; border-top: 1px black solid;}\n' +
@@ -2059,11 +2059,11 @@ var generateFullReport = (visits, type, detailType, checkDate) => {
     let html = '';
 
     html += '    <style>\n' +
-        '        body {font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 12px;}\n' +
+        '        body {font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 10px;}\n' +
         '        table {border-collapse: collapse; table-layout:fixed; font-size: 10px;font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;}\n' +
         '        td, th {vertical-align: middle; padding: 5px; word-wrap:break-word;word-break: break-all;}\n' +
         '        .header-1 {padding: 5px 0}\n' +
-        '        .header-2 {padding: 10px 0; font-size: 16px; font-weight: bold;border-bottom: 1px black solid; border-top: 1px black solid;}\n' +
+        '        .header-2 {padding: 10px 0; font-size: 10px; font-weight: bold;border-bottom: 1px black solid; border-top: 1px black solid;}\n' +
         '        .header-3 {padding: 5px;}\n' +
         '        .header-left {width: 100px;}\n' +
         '        .border-top {border-top: 1px black solid;}\n' +
@@ -2085,7 +2085,7 @@ var generateFullReport = (visits, type, detailType, checkDate) => {
         '            <th class="c-10">№</th>\n' +
         '            <th>Наименование работ, услуг ['+checkDate+']</th>\n' +
         '            <th class="c-15">Компания</th>\n' +
-        '            <th class="c-5">Кол-во</th>\n' +
+        '            <th class="c-5">К-во</th>\n' +
         '            <th class="c-10">Ед.</th>\n' +
         '            <th class="c-10">Цена</th>\n' +
         '            <th class="c-15">Сумма</th>\n' +
