@@ -33,6 +33,18 @@ block content
                     .input-group-addon #{dict.labels.label_to}
                     input.form-control(id='dend' type='text', name='end' value='' placeholder=dict.labels.label_end_date)
 
+            div.col-lg-12.margin-top
+                div.row
+                    div.col-lg-3
+                        +formSelect('filter', '', filters, (filterObject.filter ? filterObject.filter : ''))
+                    div.col-lg-3.text-right
+                        input.form-control(id='filterValue' type='text', name='filterValue' value=(filterObject.filterValue ? filterObject.filterValue : '') placeholder=dict.labels.enter_filter_name)
+                    div.col-lg-2
+                        a(class='btn btn-primary' onclick='searchCards(); return false;' style='cursor:pointer')
+                            = dict.titles.search
+                        a(class=('btn btn-primary ml-2') onclick="clearCardSearch()" title='Очистить')
+                            i(class='glyphicon glyphicon-remove')
+
             if items && items.length
                 div.col-lg-12.margin-top
 

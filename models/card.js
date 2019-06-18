@@ -16,13 +16,32 @@ var Card = {
         })
     },
 
-    getAllForUser: (user, limit, offset, done)=>{
-        var query = 'SELECT * from cards LIMIT ? OFFSET ?';
-        var params = [limit, offset];
+    getAllForUser: (user, limit, offset, filterObject, done)=>{
+
+        var query = 'SELECT * from cards ';
+        var whereArray = [];
+        var params = [];
+        var limitString = '';
+
         if (user.role == 'admin') {
-            query = 'SELECT * from cards WHERE owner = ? LIMIT ? OFFSET ?';
-            params = [user.id, limit, offset];
+            whereArray.push('owner = ?');
+            params.push(user.id);
         }
+
+        if (filterObject.filter != '') {
+            whereArray.push(filterObject.filter+' = ?');
+            params.push(filterObject.filterValue);
+        } else {
+            limitString += ' LIMIT ? OFFSET ?';
+            params.push(limit, offset);
+        }
+        var whereString = whereArray.length ? ' WHERE ' + whereArray.join(' AND ') : '';
+
+        query = query + whereString + limitString;
+        console.log(filterObject);
+        console.log(query);
+        console.log(params);
+
         db.query(query, params, (err, rows)=>{
             if (err) {
                 return done(err)
@@ -31,13 +50,25 @@ var Card = {
         })
     },
 
-    getTotalForOwner: (user, done)=>{
-        var query = 'SELECT count(*) as count from cards';
+    getTotalForOwner: (user, filterObject, done)=>{
+
+        var query = 'SELECT count(*) as count from cards ';
+        var whereArray = [];
         var params = [];
+
         if (user.role == 'admin') {
-            query = 'SELECT count(*) as count from cards WHERE owner = ?';
-            params = [user.id];
+            whereArray.push('owner = ?');
+            params.push(user.id);
         }
+
+        if (filterObject.filter != '') {
+            whereArray.push(filterObject.filter+' = ?');
+            params.push(filterObject.filterValue);
+        }
+        var whereString = whereArray.length ? ' WHERE ' + whereArray.join(' AND ') : '';
+
+        query = query + whereString;
+
         db.query(query, params, (err, rows)=>{
             if (err) {
                 return done(err)

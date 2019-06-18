@@ -7,13 +7,10 @@ var bcrypt = require('bcrypt');
 var locale = require('./../misc/locale');
 var config = require('./../misc/config');
 var dict = locale[config.locale];
-var log = require('npmlog');
-var md5 = require('md5');
 var globals = require('./../misc/globals');
 var fs = require('fs');
 var csvjson = require('csvjson');
 var formidable = require('formidable');
-var pdf = require('html-pdf');
 
 var generateCardNumber = (id, tid, ai)=> {
     var zero = '0000000000000000';
@@ -62,7 +59,11 @@ router.get('/', (req, res, next)=>{
     var session_validate_error = req.session.validate_error ? req.session.validate_error : null;
     req.session.validate_error = null;
 
-    Card.getTotalForOwner(req.session.user, (err, rows)=>{
+    const filter = req.query.filter ? req.query.filter : '';
+    const filterValue = req.query.filterValue ? req.query.filterValue : '';
+    let filterObject = {filter: filter, filterValue: filterValue};
+
+    Card.getTotalForOwner(req.session.user, filterObject, (err, rows)=>{
         if (err) {
             req.session.error = dict.messages.db_error+":"+err.message;
             return res.redirect('/cards');
@@ -79,7 +80,7 @@ router.get('/', (req, res, next)=>{
         var offset = (page-1)*limit;
         var page = {offset: offset, limit: limit, page: page, total: total};
 
-        Card.getAllForUser(req.session.user, limit, offset, (err, rows)=>{
+        Card.getAllForUser(req.session.user, limit, offset, filterObject, (err, rows)=>{
             if (err) {
                 req.session.error = dict.messages.db_error+":"+err.message;
                 return res.redirect('/cards');
@@ -94,6 +95,7 @@ router.get('/', (req, res, next)=>{
                     account: req.session.user,
                     message: session_message,
                     error: session_error,
+                    filterObject: filterObject,
                     items: rows
                 });
             }
@@ -119,6 +121,8 @@ router.get('/', (req, res, next)=>{
                         account: req.session.user,
                         message: session_message,
                         error: session_error,
+                        filters: config.filters,
+                        filterObject: filterObject,
                         items: finalRows
                     });
 

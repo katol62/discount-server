@@ -35,6 +35,7 @@ module.exports = {
         {id:'currency', name:'руб.'},
         {id:'percent', name:'%'}
     ],
+    'filters': [{id: 'id', name: 'ID'}, {id: 'qr_code', name: 'QR Code'},{id: 'nfs_code', name: 'NFS Code'},{id: 'm_code', name: 'M-Code'},{id: 'card_nb', name: dict.labels.label_card_number},{id: 'prim', name: dict.labels.label_card_prim}],
 
     'pass': [{days: 1, count: 5},{days: 3, count: 12},{days: 6, count: 25}],
 

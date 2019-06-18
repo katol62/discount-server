@@ -459,3 +459,19 @@ var reloadFields = () => {
     const href = window.location.protocol + '//' + window.location.host + '/companies/journal?dstart='+start+'&dend='+end;
     window.location.href = href;
 };
+
+var searchCards = ()=> {
+    var filter = $('#filter').val();
+    var value = $('#filterValue').val();
+    if (filter && value) {
+        window.location.href = window.location.protocol + '//' + window.location.host + '/cards?filter='+filter+'&filterValue='+value;
+    } else {
+        window.location.href = window.location.protocol + '//' + window.location.host + '/cards';
+    }
+};
+
+var clearCardSearch = ()=> {
+    $('#filter').val('');
+    $('#filterValue').val('');
+    window.location.href = window.location.protocol + '//' + window.location.host + '/cards'
+};

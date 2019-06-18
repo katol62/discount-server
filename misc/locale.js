@@ -48,6 +48,7 @@ module.exports = {
             "visits_report_pass": "Пасс",
             "visits_report_pass_detailed": "Пасс детальный",
             "clear_date": "Очистить",
+            "search": "Искать",
         },
         "labels": {
             "email_address": "Емейл",
@@ -144,6 +145,7 @@ module.exports = {
             "export_card_owner":"Создатель",
             "export_card_seller":"Продавец",
             "export_card_date":"Время продажи",
+            "enter_filter_name":"Введите значение фильтра",
         },
         "messages": {
             "user_not_found": "Пользователь не найден",
