@@ -90,6 +90,7 @@ module.exports = {
             "label_fed_okrug":"Федеральный округ",
             "label_region":"Регион",
             "label_name":"Название",
+            "label_comission":"Комиссия %",
             "label_create_terminal":"Создать терминал",
             "label_add_terminal":"Добавить терминал",
             "label_pass":"Пасс",

@@ -2094,11 +2094,16 @@ var generateFullReport = (visits, type, detailType, checkDate) => {
         '    <tbody>\n';
     let total = 0;
     let totalDiscount = 0;
+    let totalCommission = 0;
 
     if (detailType === 'detailed') {
         visits.forEach((visit, index)=> {
             total += visit.price;
-            let discount = visit.discountUnit === 'percent' ? visit.price * visit.discount / 100 : visit.discount
+            let discount = visit.discountUnit === 'percent' ? visit.price * visit.discount / 100 : visit.discount;
+            let commission = Number(visit.terminalCommission)/100 * (visit.price - discount);
+            totalCommission += commission;
+            console.log('commission = '+commission);
+            console.log('totalCommission = '+totalCommission);
             totalDiscount += discount;
             html += '        <tr>\n' +
                 '            <td>'+(index+1)+'</td>\n' +
@@ -2117,7 +2122,11 @@ var generateFullReport = (visits, type, detailType, checkDate) => {
     } else {
         visits.forEach((visit, index)=> {
             total += visit.price;
-            let discount = visit.discountUnit === 'percent' ? visit.price * visit.discount / 100 : visit.discount
+            let discount = visit.discountUnit === 'percent' ? visit.price * visit.discount / 100 : visit.discount;
+            let commission = Number(visit.terminalCommission)/100 * (visit.price - discount);
+            totalCommission += commission;
+            console.log('commission = '+commission);
+            console.log('totalCommission = '+totalCommission);
             totalDiscount += discount;
         });
         html += '        <tr>\n' +
@@ -2150,12 +2159,12 @@ var generateFullReport = (visits, type, detailType, checkDate) => {
             '    </tr>\n' +
             '    <tr>\n' +
             '        <td class="header-1 align-right">\n' +
-            '            <span>К оплате 2% от суммы скидки: '+((total - totalDiscount) * 0.02).toFixed(2)+'</span>\n' +
+            '            <span>К оплате % от суммы скидки: '+(totalCommission).toFixed(2)+'</span>\n' +
             '        </td>\n' +
             '    </tr>\n' +
             '    <tr>\n' +
             '        <td class="header-1 align-left">\n' +
-            '            <span>Всего оказано услуг на сумму <b>'+((total - totalDiscount) * 0.02).toFixed(2)+' RUB</b></span>\n' +
+            '            <span>Всего оказано услуг на сумму <b>'+(totalCommission).toFixed(2)+' RUB</b></span>\n' +
             '        </td>\n' +
             '    </tr>\n';
 

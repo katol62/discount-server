@@ -14,6 +14,7 @@ block content
                     input#company(type='hidden', name='company', value=company.id)
 
                     +formTextInput('name', 'text', dict.labels.label_name, dict.labels.label_name, '')
+                    +formTextInput('commission', 'number', dict.labels.label_comission, dict.labels.label_comission, '2')
                     +formTextInput('place', 'text', dict.labels.label_city, dict.labels.label_city, '')
 
                     button.btn.btn-primary(type='submit') #{dict.labels.label_create}

@@ -44,6 +44,7 @@ var Visit = {
 
         var query = 'select v.*,\n' +
             '       ter.name as terminalName,\n' +
+            '       ter.commission as terminalCommission,\n' +
             '       tar.name as tariffName,\n' +
             '       tar.discount,\n' +
             '       tar.discountUnit as discountUnit,\n' +
