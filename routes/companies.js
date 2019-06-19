@@ -373,9 +373,12 @@ router.get('/', (req, res, next)=>{
             var length = rows.length;
             var count = 0;
 
+            var allowReport = req.session.user.role !== 'cashier';
+
             rows.forEach((row, index)=>{
 
                 var resRow = row;
+                console.log(row);
                 resRow.terminals = [];
 
                 Terminal.getForCompany(resRow.id, (err, rows)=>{
@@ -395,6 +398,10 @@ router.get('/', (req, res, next)=>{
                         console.log(rows);
                         resultRows[index] = resRow;
 
+                        if (req.session.user.role === 'cashier' && resRow.terminal === null) {
+                            allowReport = true;
+                        }
+
                         if (count == length) {
                             return res.render('company/list', {
                                 pageType: 'companies',
@@ -402,6 +409,7 @@ router.get('/', (req, res, next)=>{
                                 account: req.session.user,
                                 items: resultRows,
                                 message: session_message,
+                                allowReport: allowReport,
                                 error: session_error,
                                 errors: session_validate_error
                             });

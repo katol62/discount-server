@@ -135,6 +135,10 @@ var Visit = {
                 params.push(dend);
             }
         }
+
+        console.log(query);
+        console.log(params);
+
         db.query(query, params, (err, rows)=>{
             if (err) {
                 return done(err);
@@ -155,15 +159,17 @@ var Visit = {
             ' tar.discountType, ' +
             ' ter.company as terminalCompany, ' +
             ' c.card_nb as cardNumber, ' +
+            ' r.company as refCompany, ' +
             ' cm.name as companyName,' +
             ' cm.id as companyId,' +
             ' u.email from visit v' +
             ' left join terminal ter on v.terminal=ter.id' +
+            ' left join reference r on ter.company=r.company ' +
             ' left join company cm on ter.company=cm.id' +
             ' left join tariff tar on v.tariff=tar.id' +
             ' left join cards c on v.card=c.id' +
             ' left join users u on v.user=u.id' +
-            ' where 1=1 ';
+            ' where r.user = ? ';
         if (dstart != '' ) {
             query += ' and date >= ? ';
             params.unshift(dstart);
@@ -178,7 +184,12 @@ var Visit = {
         }
         query +=' order by v.date DESC' +
             ' LIMIT ? OFFSET ?';
+
+        params.unshift(user.id);
+
+        console.log('==================');
         console.log(query);
+        console.log(params);
         db.query(query, params, (err, rows)=>{
             if (err) {
                 return done(err);

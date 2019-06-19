@@ -488,7 +488,7 @@ var Card = {
             } else {
 
                 console.log('=============');
-                var exp_date = moment(card.date_pass, 'YYYY-MM-DD hh:mm').add(config.expireDays, 'days');
+                var exp_date = moment(card.date_pass, 'YYYY-MM-DD HH:mm').add(config.expireDays, 'days');
                 var now = moment();
 
                 if (now > exp_date) {
@@ -509,7 +509,7 @@ var Card = {
                         if (rows && rows[0].count > 0) {
                             return done(null, {success: false, message: dict.messages.visits_card_already_passed});
                         } else {
-                            let expire = moment(card.date_pass_update, 'YYYY-MM-DD hh:mm').add(1, 'days');
+                            let expire = moment(card.date_pass_update, 'YYYY-MM-DD HH:mm').add(1, 'days');
                             // if current date > date of last pass update
                             if (now > expire){
                                 // if card pass days + 1 > defined pass days (1, 3, 6)

@@ -13,7 +13,7 @@ block content
                         | &nbsp;
                         = dict.titles.create_company
             div.col-lg-6.margin-top.text-right
-                if account.role !== 'cashier'
+                if allowReport === true
                     a(class=('btn btn-primary') href="/companies/journal")
                         span(class='glyphicon glyphicon-plus-sign')
                         | &nbsp;

@@ -56,7 +56,7 @@ block content
                             tbody
                                 each item, i in items
                                     tr
-                                        td= moment(item.date).format("YYYY-MM-DD hh:mm")
+                                        td= moment(item.date).format("YYYY-MM-DD HH:mm")
                                         td= item.cardNumber
                                         td= item.tariffName
                                         td= item.discountType=='pass' ? dict.labels.label_pass : dict.labels.label_discount
