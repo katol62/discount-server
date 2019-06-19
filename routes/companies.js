@@ -2000,7 +2000,7 @@ router.get('/journal_pdf', (req, res, next)=> {
     const dstartfull = dstart != '' ? dstart + ' 00:00:00' : '';
     const dendfull = dend != '' ? dend + ' 23:59:59' : '';
 
-    Visit.getExtended(dstartfull, dendfull,(err, rows) => {
+    Visit.getExtended(req.session.user, dstartfull, dendfull,(err, rows) => {
         if (err) {
             req.session.error = dict.messages.db_error+": "+err.message;
             res.redirect('/companies/journal');
