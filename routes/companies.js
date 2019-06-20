@@ -1708,7 +1708,7 @@ var generateReport = (company, visits, type, detailType, checkDate, datestart, d
         '            <th>Наименование работ, услуг ['+checkDate+']</th>\n' +
         '            <th class="c-10">Кол-во</th>\n' +
         '            <th class="c-10">Ед.</th>\n' +
-        '            <th class="c-10">Цена</th>\n' +
+        '            <th class="c-15">Цена</th>\n' +
         '            <th class="c-15">Сумма</th>\n' +
         '        </tr>\n' +
         '    </thead>\n' +

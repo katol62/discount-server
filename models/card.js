@@ -653,7 +653,56 @@ var Card = {
             }
             return done(null, rows);
         })
-    }
+    },
+
+    validateCards: (cards, done) => {
+        let numbersArray = [];
+        if (cards.length > 0) {
+            cards.forEach( (card)=> {
+                numbersArray.push(card.card_nb);
+            });
+        }
+        const numbers = numbersArray.join(',');
+        // var query = 'SELECT * FROM cards WHERE card_nb IN ( ? )';
+        // var params = [numbers];
+        // console.log('SELECT * FROM cards WHERE card_nb IN ('+numbers+')');
+        let query = 'SELECT * FROM cards WHERE card_nb IN ('+numbers+')';
+
+        db.query(query, [], (err, rows)=>{
+            console.log(rows);
+            if (err) {
+                return done(err)
+            }
+            return done(null, rows);
+        })
+
+    },
+
+    exchangeCards: (body, done) => {
+        var updateArray = ['status = ?', 'update_date=?', 'updated_by=?', 'prim = ?'];
+        var paramsArray = [body.status, body.updated, body.updatedBy, body.prim];
+
+        if (body.type) {
+            updateArray.push('type = ?');
+            paramsArray.push(body.type);
+        }
+        if (body.pass) {
+            updateArray.push('pass = ?');
+            paramsArray.push(body.pass);
+        }
+        paramsArray.push(body.card_nb);
+
+        var query = 'UPDATE cards SET '+updateArray.join(',')+' WHERE card_nb = ?';
+        var params = paramsArray;
+
+        db.query(query, params, (err, rows)=>{
+            if (err) {
+                return done(err)
+            }
+            done(null, rows)
+        })
+
+    },
 
 };
 
