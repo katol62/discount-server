@@ -33,6 +33,12 @@ mixin formTextInput(id, type, label, placeholder, value, disabled)
         label(for=id) #{label}
         input.form-control(id= id type= type, name= id, placeholder= placeholder value= value disabled=disabled)
 
+mixin formTextInputNumber(id, type, label, placeholder, value, disabled, step)
+    .form-group
+        label(for=id) #{label}
+        input.form-control(id= id type= type, name= id, placeholder= placeholder step= step value= value disabled=disabled)
+
+
 mixin formTextInputStyle(id, type, label, placeholder, value, style, disabled)
     .form-group
         label(for=id style= style) #{label}

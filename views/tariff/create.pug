@@ -26,7 +26,7 @@ block content
                     .form-group#cardContainer(style='display:none')
                         +formTextInput('card', 'number', dict.labels.label_card, dict.labels.label_card, '')
                     +formSelect('discountType', dict.labels.label_discount_type, discountTypes)
-                    +formTextInput('price', 'number', dict.labels.label_price, dict.labels.label_price, '0')
+                    +formTextInputNumber('price', 'number', dict.labels.label_price, dict.labels.label_price, '0', false, '0.01')
                     +formTextInput('discount', 'number', dict.labels.label_discount, dict.labels.label_discount, '0')
                     +formRadio('discountUnit', dict.labels.label_discount_unit, discountUnits, 'currency')
                     .form-group

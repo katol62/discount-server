@@ -495,8 +495,8 @@ var Card = {
                     done(null, {success: false, message: 'card activity (pass) exceded ' + config.expireDays + ' day'})
                 } else {
                     //Check card pass on terminal
-                    query = 'select count(*) as count from visit where card = ? and terminal = ?';
-                    params = [card.id, body.tid];
+                    query = 'select count(*) as count from visit where card = ? and terminal = ? and type = ? ';
+                    params = [card.id, body.tid, 'pass'];
                     console.log(query);
                     console.log(params);
                     db.query(query, params, (err, rows)=>{
