@@ -406,8 +406,8 @@ var Card = {
         let overdue = false;
 
         if (card.date_discount && card.date_pass) {
-            let exp_date_discount = moment(card.date_discount, 'YYYY-MM-DD h:m').add(config.expireDays, 'days');
-            let exp_date_pass = moment(card.date_pass).add(config.expireDays, 'days');
+            let exp_date_discount = moment(card.date_discount, 'YYYY-MM-DD h:m').add(Number(card.lifetime), 'days');
+            let exp_date_pass = moment(card.date_pass).add(Number(card.servicetime), 'days');
             let now = moment();
 
             if (now>exp_date_discount) {
@@ -463,13 +463,13 @@ var Card = {
                     done(null, {success: res, message: mess});
                 })
             } else {
-                var exp_date = moment(card.date_discount, 'YYYY-MM-DD h:m').add(config.expireDays, 'days');
+                var exp_date = moment(card.date_discount, 'YYYY-MM-DD h:m').add(Number(card.lifetime), 'days');
                 var now = moment();
 
                 if (exp_date >= now) {
                     done(null, {success: true, message: ''});
                 } else {
-                    done(null, {success: false, message: 'card activity (discount) exceded '+config.expireDays+' days'})
+                    done(null, {success: false, message: 'card activity (discount) exceded '+card.lifetime+' days'})
                 }
             }
 
@@ -488,17 +488,15 @@ var Card = {
             } else {
 
                 console.log('=============');
-                var exp_date = moment(card.date_pass, 'YYYY-MM-DD HH:mm').add(config.expireDays, 'days');
+                var exp_date = moment(card.date_pass, 'YYYY-MM-DD HH:mm').add(Number(card.servicetime), 'days');
                 var now = moment();
 
                 if (now > exp_date) {
-                    done(null, {success: false, message: 'card activity (pass) exceded ' + config.expireDays + ' day'})
+                    done(null, {success: false, message: 'card activity (pass) exceded ' + card.servicetime + ' day(s)'})
                 } else {
                     //Check card pass on terminal
                     query = 'select count(*) as count from visit where card = ? and terminal = ? and type = ? ';
                     params = [card.id, body.tid, 'pass'];
-                    console.log(query);
-                    console.log(params);
                     db.query(query, params, (err, rows)=>{
                         if (err) {
                             return done(err);
@@ -568,6 +566,17 @@ var Card = {
                 }
             }
         }
+    },
+
+    resetPass: (body, done) => {
+        let query = 'update cards set pass_count = ?, pass_total = ?, date_pass = ?, date_pass_update = ? where id = ?';
+        let params = [0, 0, body.updated, body.updated, body.id];
+        db.query(query, params, (err, rows)=>{
+            if (err) {
+                return done(err)
+            }
+            done(null, rows)
+        })
     },
 
     sell: (body, done)=>{

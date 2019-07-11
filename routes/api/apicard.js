@@ -2,9 +2,10 @@ var express = require('express');
 
 var router = express.Router();
 
-var config = require('./../../misc/config')
+var config = require('./../../misc/config');
 var Card = require('./../../models/card');
 var locale = require('./../../misc/locale');
+var globals = require('./../../misc/globals');
 var dict = locale[config.locale];
 
 
@@ -16,12 +17,84 @@ router.get('/', (req, res, next)=> {
     res.json({success:true});
 });
 
+router.post('/sell', (req, res, next)=> {
+    let user = req.decoded;
+    let card = req.body.card;
+    Card.getByIdOrNumberForUser(card, user.id, (err, rows)=>{
+
+        if (err) {
+            return res.status(500).json({ success: false, message: err.message});
+        }
+        if (rows.length == 0) {
+            return res.status(404).json({ success: false, message: dict.messages.card_not_found_or_not_allowed});
+        }
+
+        let card = rows[0];
+        var card_number = card.card_nb;
+        var card_id = card.id;
+        let passCount = globals.methods.getPassCount(card.pass);
+
+        const overdue = card.pass_count + 1 > card.pass && card.pass_total >= Number(passCount);
+
+        console.log(card);
+        console.log('passCount:: '+passCount);
+        console.log('status:: '+card.status);
+        console.log('overdue:: '+overdue);
+
+        if (rows[0].status != 'published') {
+            if (!overdue) {
+                return res.status(200).json({ success: false, card: {id: card_id, card_number: card_number}, message: dict.messages.card_already_sold+": "+card_number});
+            }
+        }
+        var body = req.body;
+        body.id = rows[0].id;
+        body.status = 'sold';
+        body.overdue = overdue;
+        body.updatedBy = user.id;
+        body.updated = require('moment')().format('YYYY-MM-DD HH:mm:ss');
+        body.created = require('moment')().format('YYYY-MM-DD HH:mm:ss');
+
+        if (overdue) {
+            Card.resetPass(body, (err, rows) => {
+                if (err) {
+                    return res.status(500).json({ success: false, message: err.message});
+                }
+                if (rows.affectedRows == 0) {
+                    return res.status(200).json({ success: false, card: {id: card_id, card_number: card_number}, message: dict.messages.card_sell_error});
+                }
+
+                Card.sell(body, (err, rows)=>{
+                    if (err) {
+                        return res.status(500).json({ success: false, message: err.message});
+                    }
+                    if (rows.affectedRows == 0) {
+                        return res.status(200).json({ success: false, message: dict.messages.card_sell_error});
+                    }
+                    return res.status(200).json({ success: true, card: {id: card_id, card_number: card_number}, message: dict.messages.card_sold+": "+card_number});
+                })
+
+            })
+        } else {
+            Card.sell(body, (err, rows)=>{
+                if (err) {
+                    return res.status(500).json({ success: false, message: err.message});
+                }
+                if (rows.affectedRows == 0) {
+                    return res.status(200).json({ success: false, message: dict.messages.card_sell_error});
+                }
+                return res.status(200).json({ success: true, card: {id: card_id, card_number: card_number}, message: dict.messages.card_sold+": "+card_number});
+            })
+        }
+
+
+    })
+});
+
 router.post('/verify', (req, res, next)=>{
 
     let user = req.decoded;
 
     let inputcards = req.body.cards;
-    console.log(inputcards);
     Card.validateCards(inputcards, (err, rows) => {
         if (err) {
             return res.status(500).json({ success: false, message: err.message});
