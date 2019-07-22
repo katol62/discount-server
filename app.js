@@ -10,6 +10,8 @@ var session = require('express-session');
 var methodOverride = require('method-override');
 var moment = require('moment');
 var locale = require('./misc/locale');
+var cors = require('cors');
+
 
 //routes
 var index = require('./routes/index');
@@ -67,6 +69,9 @@ app.use('/cards', cards);
 
 //api
 app.use('/api', api);
+
+// app.use(cors());
+app.options('/api', cors());
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

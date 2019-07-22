@@ -13,7 +13,7 @@
     "bootstrap-datepicker": "^1.7.1",
     "bootstrap-select": "^1.12.4",
     "cookie-parser": "^1.4.3",
-    "cors": "^2.8.4",
+    "cors": "^2.8.5",
     "csvjson": "^5.0.0",
     "debug": "~2.6.3",
     "express": "~4.15.2",
