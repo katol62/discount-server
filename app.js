@@ -70,8 +70,8 @@ app.use('/cards', cards);
 //api
 app.use('/api', api);
 
-// app.use(cors());
-app.options('/api', cors());
+app.use(cors());
+//app.options('/api', cors());
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
