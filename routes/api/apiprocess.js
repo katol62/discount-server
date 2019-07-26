@@ -91,6 +91,7 @@ router.post('/visit', (req, res, next)=>{
 
     let trid = req.body.tariff_id;
     let tid = req.body.terminal_id;
+    let sum = req.body.sum;
 
     let card = null;
     if (req.body.card_id) {
@@ -140,8 +141,8 @@ router.post('/visit', (req, res, next)=>{
                 if (err) {
                     return res.status(500).json({ success: false, message: err.message});
                 }
-
-                var body = {type: tariff.discountType, price: tariff.price, tariff: tariff.id, tid:tid};
+                let price = sum !== null ? sum : tariff.price;
+                var body = {type: tariff.discountType, price: price, tariff: tariff.id, tid:tid};
                 body.card = cardId;
                 body.user = user.id;
                 body.date = require('moment')().format('YYYY-MM-DD HH:mm:ss');
