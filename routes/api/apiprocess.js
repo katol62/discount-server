@@ -23,8 +23,6 @@ router.get('/companies', (req, res, next)=>{
 
     let user = req.decoded;
 
-    console.log(user);
-
     Company.getAllCompanies(user.role, user.id, (err, rows)=>{
 
         if (err) {
@@ -65,8 +63,6 @@ router.get('/tariffs/:tid', (req, res, next)=>{
 
     let user = req.decoded;
     let tid = req.params.tid;
-
-    console.log(user);
 
     if (!tid) {
         return res.status(500).json({ success: false, message: "Parameters missing"});
@@ -135,13 +131,12 @@ router.post('/visit', (req, res, next)=>{
             }
             let tariff = rows[0];
 
-            console.log(card);
-
             Card.checkExpired(card, (err, result)=>{
                 if (err) {
                     return res.status(500).json({ success: false, message: err.message});
                 }
-                let price = sum !== null ? sum : tariff.price;
+                let price = sum !== undefined ? sum : tariff.price;
+                price = tariff.discountType === 'pass' ? tariff.price : price;
                 var body = {type: tariff.discountType, price: price, tariff: tariff.id, tid:tid};
                 body.card = cardId;
                 body.user = user.id;

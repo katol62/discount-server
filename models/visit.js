@@ -16,7 +16,16 @@ var Visit = {
 
     getExtendedForTerminalDate: (trid, start, end, done)=>{
 
-        var query = 'select v.*, ter.name as terminalName, tar.name as tariffName, tar.discount, tar.discountUnit as discountUnit, tar.price as totalPrice, tar.discountType, c.card_nb as cardNumber, u.email from visit v left join terminal ter on v.terminal=ter.id left join tariff tar on v.tariff=tar.id left join cards c on v.card=c.id left join users u on v.user=u.id where v.terminal=? ';
+        var query = 'select v.*, ' +
+            'ter.name as terminalName, ' +
+            'tar.name as tariffName, ' +
+            'ter.commission as terminalCommission, ' +
+            'tar.discount, ' +
+            'tar.discountUnit as discountUnit, ' +
+            'tar.price as totalPrice, ' +
+            'tar.discountType, ' +
+            'c.card_nb as cardNumber, ' +
+            'u.email from visit v left join terminal ter on v.terminal=ter.id left join tariff tar on v.tariff=tar.id left join cards c on v.card=c.id left join users u on v.user=u.id where v.terminal=? ';
         let params = [trid];
 
         if (start != '') {
