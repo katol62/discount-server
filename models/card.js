@@ -668,7 +668,7 @@ var Card = {
         let numbersArray = [];
         if (cards.length > 0) {
             cards.forEach( (card)=> {
-                numbersArray.push(card.card_nb);
+                numbersArray.push("'"+card.card_nb+"'");
             });
         }
         const numbers = numbersArray.join(',');
