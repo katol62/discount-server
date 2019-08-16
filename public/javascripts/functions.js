@@ -475,3 +475,18 @@ var clearCardSearch = ()=> {
     $('#filterValue').val('');
     window.location.href = window.location.protocol + '//' + window.location.host + '/cards'
 };
+
+var clearTariffDateFields = (company, terminal)=> {
+    $('#dstart').val('');
+    $('#dend').val('');
+    var start = $('#dstart').val();
+    var end = $('#dend').val();
+    window.location.href = window.location.protocol + '//' + window.location.host + '/companies/' + company + '/terminals/' + terminal + '/tariffs'
+};
+
+var reloadTariffFields = (company, terminal) => {
+    var start = $('#dstart').val();
+    var end = $('#dend').val();
+    const href = window.location.protocol + '//' + window.location.host + '/companies/' + company + '/terminals/' + terminal + '/tariffs?dstart='+start+'&dend='+end;
+    window.location.href = href;
+};

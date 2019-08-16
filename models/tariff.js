@@ -29,10 +29,23 @@ var Tariff = {
 
     },
 
-    getForTerminal: (tid, done)=>{
-        var query = 'SELECT t.*, c.card FROM tariff t LEFT JOIN tariff_card c ON t.id = c.tariff WHERE terminal = ?';
-
-        db.query(query, [tid], (err, rows)=>{
+    getForTerminal: (tid, dstart, dend, done)=>{
+        // var query = 'SELECT t.*, c.card FROM tariff t LEFT JOIN tariff_card c ON t.id = c.tariff WHERE terminal = ?';
+        let params = [tid];
+        let query = 'SELECT t.*, ' +
+            'c.card FROM tariff t ' +
+            'LEFT JOIN tariff_card c ' +
+            'ON t.id = c.tariff ' +
+            'WHERE terminal = ?';
+        if (dstart != '' ) {
+            query += ' and start >= ? ';
+            params.push(dstart);
+        }
+        if (dend != '' ) {
+            query += ' and end <= ? ';
+            params.push(dend)
+        }
+        db.query(query, params, (err, rows)=>{
             if (err) {
                 return done(err)
             }

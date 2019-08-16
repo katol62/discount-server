@@ -9,11 +9,24 @@ block content
                 p(style='font-weight:bold') Компания: #{company.name}
                 p= company.countryname + ', ' + company.focname + ', ' + company.regionname
                 p(style='font-weight:bold') Терминал: #{terminal.name}
-            div.col-lg-12.margin-top
+            div.col-lg-6.margin-top.text-left
                 a(class=('btn btn-primary') href='/companies/'+company.id+'/terminals/'+terminal.id+'/tariffs/create')
                     span(class='glyphicon glyphicon-plus-sign')
                     | &nbsp;
                     = dict.titles.create_tariff
+            div.col-lg-4.margin-top.text-right
+                #datepicker.input-group.input-daterange
+                    input.form-control(id='dstart' type='text', name='start' value=dstart placeholder=dict.labels.label_start_date)
+                    .input-group-addon #{dict.labels.label_to}
+                    input.form-control(id='dend' type='text', name='end' value=dend placeholder=dict.labels.label_end_date)
+            div.col-lg-2.margin-top.text-right
+
+                a(class=('btn btn-primary') onclick='reloadTariffFields('+company.id+','+terminal.id+')' title='Обновить')
+                    i(class='glyphicon glyphicon-repeat')
+                    | &nbsp;
+                a(class=('btn btn-primary ml-2') onclick='clearTariffDateFields('+company.id+','+terminal.id+')' title='Очистить')
+                    i(class='glyphicon glyphicon-remove')
+
             if items && items.length
                 div.col-lg-12.margin-top
 

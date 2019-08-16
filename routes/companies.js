@@ -1104,6 +1104,27 @@ router.get('/:cid/terminals/:tid/tariffs', checkCompany, checkTerminal, (req, re
     var session_validate_error = req.session.validate_error ? req.session.validate_error : null;
     req.session.validate_error = null;
 
+    let dstart = req.query.dstart ? req.query.dstart : '';
+    let dend = req.query.dend ? req.query.dend : '';
+
+    console.log('dstart='+dstart);
+
+    let queryarray = [];
+    let dstartfull = '';
+    let dendfull = '';
+    if (dstart != '') {
+        dstartfull = dstart + ' 00:00:00';
+        queryarray.push('dstart='+dstart);
+    }
+    if (dend != '') {
+        dendfull = dend +' 23:59:59';
+        queryarray.push('dend='+dend);
+    }
+    let querystr = (dstart != '' || dend != '') ? '?' : '';
+    querystr += queryarray.join('&');
+
+    console.log(dstartfull + ' == ' + dendfull);
+
     Company.getExtendedByIdAndOwner(req.params.cid, req.session.user, (err, rows)=>{
 
         var company = rows[0];
@@ -1119,7 +1140,7 @@ router.get('/:cid/terminals/:tid/tariffs', checkCompany, checkTerminal, (req, re
 
             Terminal.getById(req.params.tid, (err, rows)=>{
                 var terminal = rows[0];
-                Tariff.getForTerminal(req.params.tid, (err, rows)=>{
+                Tariff.getForTerminal(req.params.tid, dstartfull, dendfull, (err, rows)=>{
                     if (err) {
                         req.session.error = dict.messages.db_error+":"+err.code;
                         res.redirect('/companies');
@@ -1135,6 +1156,8 @@ router.get('/:cid/terminals/:tid/tariffs', checkCompany, checkTerminal, (req, re
                         terminal: terminal,
                         terminals: terminals,
                         items: tariffs,
+                        dstart: dstart,
+                        dend: dend,
                         account: req.session.user,
                         message: session_message,
                         error: session_error,
