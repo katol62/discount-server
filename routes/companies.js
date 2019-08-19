@@ -1140,7 +1140,7 @@ router.get('/:cid/terminals/:tid/tariffs', checkCompany, checkTerminal, (req, re
 
             Terminal.getById(req.params.tid, (err, rows)=>{
                 var terminal = rows[0];
-                Tariff.getForTerminalFiltered(req.params.tid, dstartfull, dendfull, (err, rows)=>{
+                Tariff.getForTerminalFiltered(req.params.tid, dstart, dend, (err, rows)=>{
                     if (err) {
                         req.session.error = dict.messages.db_error+":"+err.code;
                         res.redirect('/companies');
