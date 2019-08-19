@@ -56,6 +56,8 @@ var Tariff = {
             query += ' and end <= ? ';
             params.push(dend)
         }
+        console.log(query);
+        console.log(params);
         db.query(query, params, (err, rows)=>{
             if (err) {
                 return done(err)
