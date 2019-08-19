@@ -1140,7 +1140,7 @@ router.get('/:cid/terminals/:tid/tariffs', checkCompany, checkTerminal, (req, re
 
             Terminal.getById(req.params.tid, (err, rows)=>{
                 var terminal = rows[0];
-                Tariff.getForTerminal(req.params.tid, (err, rows)=>{
+                Tariff.getForTerminalFiltered(req.params.tid, dstartfull, dendfull, (err, rows)=>{
                     if (err) {
                         req.session.error = dict.messages.db_error+":"+err.code;
                         res.redirect('/companies');
@@ -1299,6 +1299,8 @@ router.get('/:cid/terminals/:tid/tariffs/:trid/edit', checkCompany, checkTermina
                         res.redirect('/companies/'+req.params.cid+'/terminals/'+req.params.tid+'/tariffs');
                         return;
                     }
+
+                    console.log(rows[0]);
 
                     return res.render('tariff/edit', {
                         pageType: 'companies',
