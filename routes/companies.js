@@ -1408,7 +1408,7 @@ router.get('/:cid/terminals/:tid/visits/add', checkCompany, checkTerminal, (req,
         Terminal.getById(req.params.tid, (err, rows)=>{
             var terminal = rows[0];
 
-            Tariff.getForTerminal(req.params.tid, (err, rows)=>{
+            Tariff.getForTerminalActive(req.params.tid, (err, rows)=>{
                 if (err) {
                     req.session.error = dict.messages.db_error+":"+err.code;
                     return res.redirect('/companies/'+req.params.cid+'/terminals/'+req.params.tid+'/visits');

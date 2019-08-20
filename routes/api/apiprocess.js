@@ -68,7 +68,7 @@ router.get('/tariffs/:tid', (req, res, next)=>{
         return res.status(500).json({ success: false, message: "Parameters missing"});
     }
 
-    Tariff.getForTerminal(tid, (err, rows)=>{
+    Tariff.getForTerminalActive(tid, (err, rows)=>{
         if (err) {
             return res.status(500).json({ success: false, message: err.message});
         }

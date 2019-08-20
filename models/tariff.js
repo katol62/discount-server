@@ -40,6 +40,25 @@ var Tariff = {
         })
     },
 
+    getForTerminalActive: (tid, done)=>{
+        let start = new Date();
+        start.setHours(0,0,0,0);
+        let end = new Date();
+        end.setHours(23,59,59,999);
+        let params = [tid, start, end];
+        let query = 'SELECT t.*, ' +
+            'c.card FROM tariff t ' +
+            'LEFT JOIN tariff_card c ' +
+            'ON t.id = c.tariff ' +
+            'WHERE t.terminal = ? AND (t.start is null OR t.start <= ?) AND (t.end is null OR t.end >= ?)';
+        db.query(query, params, (err, rows)=>{
+            if (err) {
+                return done(err)
+            }
+            done(null, rows)
+        })
+    },
+
     getForTerminalFiltered: (tid, dstart, dend, done)=>{
         // var query = 'SELECT t.*, c.card FROM tariff t LEFT JOIN tariff_card c ON t.id = c.tariff WHERE terminal = ?';
         let params = [tid];
@@ -56,8 +75,6 @@ var Tariff = {
             query += ' and end <= ? ';
             params.push(dend)
         }
-        console.log(query);
-        console.log(params);
         db.query(query, params, (err, rows)=>{
             if (err) {
                 return done(err)
