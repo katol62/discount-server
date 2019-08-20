@@ -189,7 +189,7 @@ var Visit = {
         let params = [limit, offset];
         let query =
             'select v.*, ' +
-            'ter.name as terminalName, ' +
+            ' ter.name as terminalName, ' +
             ' tar.name as tariffName, ' +
             ' tar.discount, ' +
             ' tar.discountUnit as discountUnit, ' +

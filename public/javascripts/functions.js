@@ -454,9 +454,19 @@ var clearDateFields = ()=> {
 };
 
 var reloadFields = () => {
-    var start = $('#dstart').val();
-    var end = $('#dend').val();
-    const href = window.location.protocol + '//' + window.location.host + '/companies/journal?dstart='+start+'&dend='+end;
+    let query = [];
+    let start = $('#dstart').val();
+    if (start != '')
+    {
+        query.push('dstart='+start);
+    }
+    let end = $('#dend').val();
+    if (end != '')
+    {
+        query.push('dend='+start);
+    }
+    let href = window.location.protocol + '//' + window.location.host + '/companies/journal';
+    href = query.length ? href + '?' + query.join('&') : href;
     window.location.href = href;
 };
 

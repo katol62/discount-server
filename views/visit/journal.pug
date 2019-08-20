@@ -49,7 +49,7 @@ block content
                             thead
                                 tr(class='th-users'): th= dict.titles.visit_date
                                     th= dict.labels.label_card_number
-                                    th= dict.titles.label_company
+                                    th= dict.labels.label_comp_terminal
                                     th= dict.titles.tariff
                                     th= dict.titles.discountType
                                     th= dict.titles.visit_login
@@ -60,7 +60,7 @@ block content
                                     tr
                                         td= moment(item.date).format("YYYY-MM-DD HH:mm")
                                         td= item.cardNumber
-                                        td= item.companyName
+                                        td= item.companyName + '/ ' + item.terminalName
                                         td= item.tariffName
                                         td= item.discountType=='pass' ? dict.labels.label_pass : dict.labels.label_discount
                                         td= item.email

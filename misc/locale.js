@@ -134,6 +134,7 @@ module.exports = {
             "label_card_test":"Тестовая карта",
             "label_card_number":"Номер карты",
             "label_company":"Компания",
+            "label_comp_terminal": "Компания/Терминал",
             "label_transh_start":"Начальный номер",
             "label_transh_count":"Количество карт в транше",
             "label_visit_type":"Скидочная политика",
