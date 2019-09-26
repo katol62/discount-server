@@ -2,6 +2,7 @@ var db = require('../misc/db');
 var moment = require('moment');
 var locale = require('./../misc/locale');
 var config = require('../misc/config');
+var globals = require('../misc/globals');
 var dict = locale[config.locale];
 
 var Card = {
@@ -143,6 +144,9 @@ var Card = {
         //     query = 'select c.*, u.id as userId from cards c left join users u on c.owner=u.parent WHERE (c.id = ? OR c.card_nb = ?) AND u.id=?';
         //     params = [id, id, user.id];
         // }
+
+        console.log(query);
+        console.log(params);
 
         db.query(query, params, (err, rows)=>{
             if (err) {
@@ -597,6 +601,21 @@ var Card = {
         var query = 'UPDATE cards SET '+updateArray.join(',')+' WHERE id = ?';
         var params = paramsArray;
 
+        db.query(query, params, (err, rows)=>{
+            if (err) {
+                return done(err)
+            }
+            done(null, rows)
+        })
+    },
+
+    registerPass: (body, done) => {
+        console.log(body);
+        const query = 'INSERT INTO purchased_pass (card, date, pass, days, pass_limit) VALUES (?, ?, ?, ?, ?)';
+        const limit = globals.methods.getPassLimit(body.pass);
+        const params = [Number(body.id), body.updated, body.pass, body.pass, limit];
+        console.log(query);
+        console.log(params);
         db.query(query, params, (err, rows)=>{
             if (err) {
                 return done(err)

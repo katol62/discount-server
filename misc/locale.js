@@ -245,6 +245,10 @@ module.exports = {
             "card_sell_error": "Ошибка продажи карты",
             "card_already_sold": "Карта уже продана",
             "card_sold": "Карта продана",
+            "card_not_sold": "Карта не продана",
+            "card_pass_invalid": "Карта просрочена либо заблокирована",
+            "card_pass_update_error": "Ошибка продажи пасса",
+            "card_pass_sold": "Пакет ПАСС успешно добавлен",
         }
     }
 };

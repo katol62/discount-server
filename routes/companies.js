@@ -152,7 +152,7 @@ var visitPreActions = (req, res, next)=> {
 
         console.log(body);
 
-        card.passCount = globals.methods.getPassCount(card.pass);
+        card.passCount = globals.methods.getPassLimit(card.pass);
 
         Card.checkExpired(card, (err, result)=>{
             if (err) {

@@ -906,7 +906,7 @@ router.post('/sell', (req, res, nexr)=>{
 
         let card = rows[0];
         var card_number = card.card_nb;
-        let passCount = globals.methods.getPassCount(card.pass);
+        let passCount = globals.methods.getPassLimit(card.pass);
 
         const overdue = card.pass_count + 1 > card.pass && card.pass_total >= Number(passCount);
 
@@ -950,9 +950,18 @@ router.post('/sell', (req, res, nexr)=>{
                         req.session.error = dict.messages.card_sell_error;
                         return res.redirect('/cards/sell');
                     }
-                    req.session.message = dict.messages.card_sold+": "+card_number;
-                    return res.redirect('/cards/sell');
-
+                    Card.registerPass(body, (err, rows) => {
+                        if (err) {
+                            req.session.error = dict.messages.db_error+': '+err.message;
+                            return res.redirect('/cards/sell');
+                        }
+                        if (rows.affectedRows == 0) {
+                            req.session.error = dict.messages.card_sell_error;
+                            return res.redirect('/cards/sell');
+                        }
+                        req.session.message = dict.messages.card_sold+": "+card_number;
+                        return res.redirect('/cards/sell');
+                    })
                 })
 
             })
@@ -966,9 +975,18 @@ router.post('/sell', (req, res, nexr)=>{
                     req.session.error = dict.messages.card_sell_error;
                     return res.redirect('/cards/sell');
                 }
-                req.session.message = dict.messages.card_sold+": "+card_number;
-                return res.redirect('/cards/sell');
-
+                Card.registerPass(body, (err, rows) => {
+                    if (err) {
+                        req.session.error = dict.messages.db_error+': '+err.message;
+                        return res.redirect('/cards/sell');
+                    }
+                    if (rows.affectedRows == 0) {
+                        req.session.error = dict.messages.card_sell_error;
+                        return res.redirect('/cards/sell');
+                    }
+                    req.session.message = dict.messages.card_sold+": "+card_number;
+                    return res.redirect('/cards/sell');
+                })
             })
         }
     })

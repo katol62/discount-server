@@ -32,7 +32,7 @@ router.post('/sell', (req, res, next)=> {
         let card = rows[0];
         var card_number = card.card_nb;
         var card_id = card.id;
-        let passCount = globals.methods.getPassCount(card.pass);
+        let passCount = globals.methods.getPassLimit(card.pass);
 
         const overdue = card.pass_count + 1 > card.pass && card.pass_total >= Number(passCount);
 
@@ -82,7 +82,15 @@ router.post('/sell', (req, res, next)=> {
                 if (rows.affectedRows == 0) {
                     return res.status(200).json({ success: false, message: dict.messages.card_sell_error});
                 }
-                return res.status(200).json({ success: true, card: {id: card_id, card_number: card_number}, message: dict.messages.card_sold+": "+card_number});
+                Card.registerPass(body, (err, rows) => {
+                    if (err) {
+                        return res.status(500).json({ success: false, message: err.message});
+                    }
+                    if (rows.affectedRows == 0) {
+                        return res.status(200).json({ success: false, message: dict.messages.card_sell_error});
+                    }
+                    return res.status(200).json({ success: true, card: {id: card_id, card_number: card_number}, message: dict.messages.card_sold+": "+card_number});
+                })
             })
         }
 
@@ -146,6 +154,73 @@ router.post('/exchange', (req, res, next)=>{
 
     });
 
+});
+
+router.post('/sellpass', (req, res, next)=>{
+
+    let user = req.decoded;
+
+    let inputCard = req.body;
+
+    Card.getByIdOrNumberForUser(inputCard.card, user.id, (err, rows)=>{
+
+        if (err) {
+            return res.status(500).json({ success: false, message: err.message});
+        }
+        if (rows.length == 0) {
+            return res.status(404).json({ success: false, message: dict.messages.card_not_found_or_not_allowed});
+        }
+
+        let card = rows[0];
+        var card_number = card.card_nb;
+        var card_id = card.id;
+        let passCount = globals.methods.getPassLimit(card.pass);
+
+        const overdue = card.pass_count + 1 > card.pass && card.pass_total >= Number(passCount);
+
+        console.log(card);
+        console.log('passCount:: '+passCount);
+        console.log('status:: '+card.status);
+        console.log('overdue:: '+overdue);
+
+        if (rows[0].status == 'published') {
+            return res.status(200).json({ success: false, card: {id: card_id, card_number: card_number}, message: dict.messages.card_not_sold+": "+card_number});
+        }
+        if (rows[0].status == 'overdue' || rows[0].status == 'blocked') {
+            return res.status(200).json({ success: false, card: {id: card_id, card_number: card_number}, message: dict.messages.card_pass_invalid+": "+card_number});
+        }
+
+        var body = req.body;
+        body.id = rows[0].id;
+        body.overdue = overdue;
+        body.status = 'sold';
+        body.pass = inputCard.days;
+        body.updatedBy = user.id;
+        body.updated = require('moment')().format('YYYY-MM-DD HH:mm:ss');
+        body.created = require('moment')().format('YYYY-MM-DD HH:mm:ss');
+
+        if (overdue) {
+            return res.status(200).json({ success: false, card: {id: card_id, card_number: card_number}, message: dict.messages.card_pass_invalid+": "+card_number});
+        } else {
+            Card.sell(body, (err, rows)=>{
+                if (err) {
+                    return res.status(500).json({ success: false, message: err.message});
+                }
+                if (rows.affectedRows == 0) {
+                    return res.status(200).json({ success: false, message: dict.messages.card_pass_update_error});
+                }
+                Card.registerPass(body, (err, rows) => {
+                    if (err) {
+                        return res.status(500).json({ success: false, message: err.message});
+                    }
+                    if (rows.affectedRows == 0) {
+                        return res.status(200).json({ success: false, message: dict.messages.card_pass_update_error});
+                    }
+                    return res.status(200).json({ success: true, card: {id: card_id, card_number: card_number, days: inputCard.days}, message: dict.messages.card_pass_sold+": "+card_number});
+                })
+            })
+        }
+    })
 });
 
 module.exports = router;
