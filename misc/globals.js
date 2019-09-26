@@ -30,6 +30,9 @@ var globals = {
                 }
             });
             return count;
+        },
+        getPassLimit: (pass) => {
+            return pass === 1 ? pass * 5 : pass * 4;
         }
 
     },

@@ -675,7 +675,7 @@ var Card = {
         // var query = 'SELECT * FROM cards WHERE card_nb IN ( ? )';
         // var params = [numbers];
         // console.log('SELECT * FROM cards WHERE card_nb IN ('+numbers+')');
-        let query = 'SELECT * FROM cards WHERE card_nb IN ('+numbers+')';
+        let query = `SELECT * FROM cards WHERE card_nb IN (${numbers})`;
 
         db.query(query, [], (err, rows)=>{
             console.log(rows);

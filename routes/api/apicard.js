@@ -102,7 +102,8 @@ router.post('/verify', (req, res, next)=>{
 
         let cards = [];
         rows.forEach((row)=> {
-            let resRow = {card_nb: row.card_nb, status: (row.status == 'published' ? 'ok' : row.status)};
+            let limit = globals.methods.getPassLimit(row.pass);
+            let resRow = {card_nb: row.card_nb, status: (row.status == 'published' ? 'ok' : row.status), type: row.type, pass: row.pass, pass_count: row.pass_count, pass_total: row.pass_total, pass_limit: limit};
             cards.push(resRow);
         });
 
