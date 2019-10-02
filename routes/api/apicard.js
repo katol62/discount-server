@@ -173,6 +173,7 @@ router.post('/sellpass', (req, res, next)=>{
         }
 
         let card = rows[0];
+        card.passCount = globals.methods.getPassLimit(card.pass);
 
         console.log(card);
 

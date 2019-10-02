@@ -131,6 +131,7 @@ router.post('/visit', (req, res, next)=>{
             }
             let tariff = rows[0];
 
+            card.passCount = globals.methods.getPassLimit(card.pass);
             Card.checkExpired(card, (err, result)=>{
                 if (err) {
                     return res.status(500).json({ success: false, message: err.message});
