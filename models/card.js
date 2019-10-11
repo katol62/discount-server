@@ -521,8 +521,8 @@ var Card = {
                                         done(null, {success: false, message: dict.messages.visits_card_pass_count_exceded});
                                     } else {
                                         //updating total pass count
-                                        query = 'update cards set pass_total = ? where id = ?';
-                                        params = [(card.pass_total + 1), card.id];
+                                        query = 'update cards set pass_total = ?, date_pass_update = ? where id = ?';
+                                        params = [(card.pass_total + 1), now.format('YYYY-MM-DD HH:mm:ss'), card.id];
 
                                         console.log(query);
                                         console.log(params);
