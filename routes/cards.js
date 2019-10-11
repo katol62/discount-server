@@ -11,6 +11,7 @@ var globals = require('./../misc/globals');
 var fs = require('fs');
 var csvjson = require('csvjson');
 var formidable = require('formidable');
+var md5 = require('md5');
 
 var generateCardNumber = (id, tid, ai)=> {
     var zero = '0000000000000000';
