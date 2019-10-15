@@ -9,6 +9,7 @@ var Tariff = require('./../../models/tariff');
 var Card = require('./../../models/card');
 var Visit = require('./../../models/visit');
 var locale = require('./../../misc/locale');
+var globals = require('./../../misc/globals');
 var dict = locale[config.locale];
 
 router.get('/', (req, res, next)=>{
