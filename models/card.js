@@ -479,8 +479,11 @@ var Card = {
 
         } else {
             if (!card.date_pass) {
-                query = 'update cards set date_pass = ?, date_pass_update = ? where id = ?';
-                params = [body.created, body.created, card.id];
+                query = 'update cards set pass_total = ?, date_pass = ?, date_pass_update = ? where id = ?';
+                params = [(card.pass_total + 1), body.created, body.created, card.id];
+                console.log('====== first pass ====')
+                console.log(query);
+                console.log(params);
                 db.query(query, params, (err, rows)=>{
                     if (err) {
                         return done(err)
@@ -505,7 +508,7 @@ var Card = {
                         if (err) {
                             return done(err);
                         }
-                        console.log('=== CHECK TERMINAL ===');
+                        console.log('=== CHECK TERMINAL!! ===');
                         console.log(rows[0].count);
                         //if card was already checked on terminal
                         if (rows && rows[0].count > 0) {
@@ -524,6 +527,7 @@ var Card = {
                                         query = 'update cards set pass_total = ?, date_pass_update = ? where id = ?';
                                         params = [(card.pass_total + 1), now.format('YYYY-MM-DD HH:mm:ss'), card.id];
 
+                                        console.log('====== card.pass_count + 1 > card.pass ====')
                                         console.log(query);
                                         console.log(params);
 
@@ -541,6 +545,10 @@ var Card = {
                                     query = 'update cards set date_pass_update = ?, pass_count = ?, pass_total = ? where id = ?';
                                     params = [now.format('YYYY-MM-DD HH:mm:ss'), (card.pass_count + 1), (card.pass_total + 1), card.id];
 
+                                    console.log('====== card.pass_count + 1 < card.pass ====')
+                                    console.log(query);
+                                    console.log(params);
+
                                     db.query(query, params, (err, rows)=>{
                                         if (err) {
                                             return done(err)
@@ -551,9 +559,10 @@ var Card = {
                             } else {
                                 // if current date <= date of last pass update
                                 // add pass to the card
-                                query = 'update cards set pass_total = ? where id = ?';
-                                params = [(card.pass_total + 1), card.id];
+                                query = 'update cards set pass_total = ?, date_pass_update = ? where id = ?';
+                                params = [(card.pass_total + 1), now.format('YYYY-MM-DD HH:mm:ss'), card.id];
 
+                                console.log('====== current date <= date of last pass update ====')
                                 console.log(query);
                                 console.log(params);
 
