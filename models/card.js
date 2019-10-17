@@ -544,8 +544,8 @@ var Card = {
                                     //updating total pass days & pass updated date + adding total pass count
                                     // query = 'update cards set date_pass_update = ?, pass_count = ?, pass_total = ? where id = ?';
                                     // params = [now.format('YYYY-MM-DD HH:mm:ss'), (card.pass_count + 1), (card.pass_total + 1), card.id];
-                                    query = 'update cards set pass_count = ?, pass_total = ? where id = ?';
-                                    params = [(card.pass_count + 1), (card.pass_total + 1), card.id];
+                                    query = 'update cards set pass_total = ? where id = ?';
+                                    params = [(card.pass_total + 1), card.id];
 
                                     console.log('====== card.pass_count + 1 < card.pass ====')
                                     console.log(query);
@@ -561,8 +561,8 @@ var Card = {
                             } else {
                                 // if current date <= date of last pass update
                                 // add pass to the card
-                                query = 'update cards set pass_total = ?, date_pass_update = ? where id = ?';
-                                params = [(card.pass_total + 1), now.format('YYYY-MM-DD HH:mm:ss'), card.id];
+                                query = 'update cards set pass_count = ?, pass_total = ?, date_pass_update = ? where id = ?';
+                                params = [(card.pass_total + 1), (card.pass_count + 1), now.format('YYYY-MM-DD HH:mm:ss'), card.id];
 
                                 console.log('====== current date <= date of last pass update ====')
                                 console.log(query);
