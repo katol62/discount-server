@@ -538,12 +538,22 @@ var Card = {
                             } else {
                                 // if current date <= date of last pass update
                                 query = 'update cards set pass_total = ? where id = ?';
-                                params = [(card.pass_count + 1), card.id];
+                                params = [(card.pass_total + 1), card.id];
                                 db.query(query, params, (err, rows)=>{
                                     if (err) {
                                         return done(err)
                                     }
-                                    done(null, {success: true, message: ''})
+                                    let new_pass_count = card.pass_count + 1;
+                                    let new_pass_total = card.pass_total + 1;
+                                    if (new_pass_count + 1 > card.pass) {
+                                        if (new_pass_total >= Number(card.passCount)) {
+                                            done(null, {success: false, message: dict.messages.visits_card_pass_count_exceded});
+                                        } else {
+                                            done(null, {success: true, message: ''})
+                                        }
+                                    } else {
+                                        done(null, {success: true, message: ''})
+                                    }
                                 });
                             }
                         }
