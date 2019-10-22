@@ -518,23 +518,48 @@ var Card = {
                             // if current date > date of last pass update
                             if (now > expire){
                                 let new_pass_count = card.pass_count + 1;
-                                query = 'update cards set pass_count = ?, pass_total = ?, date_pass_update = ? where id = ?';
-                                params = [new_pass_count, (card.pass_total + 1), now.format('YYYY-MM-DD HH:mm:ss'), card.id];
-
-                                db.query(query, params, (err, rows)=>{
-                                    if (err) {
-                                        return done(err)
+                                if (new_pass_count > card.pass) {
+                                    if (card.pass_total >= Number(card.passCount)) {
+                                        done(null, {success: false, message: dict.messages.visits_card_pass_count_exceded});
+                                    } else {
+                                        query = 'update cards set pass_total = ? where id = ?';
+                                        params = [(card.pass_total + 1), card.id];
+                                        db.query(query, params, (err, rows)=>{
+                                            if (err) {
+                                                return done(err)
+                                            }
+                                            let new_pass_count = card.pass_count + 1;
+                                            let new_pass_total = card.pass_total + 1;
+                                            if (new_pass_count + 1 > card.pass) {
+                                                if (new_pass_total >= Number(card.passCount)) {
+                                                    done(null, {success: false, message: dict.messages.visits_card_pass_count_exceded});
+                                                } else {
+                                                    done(null, {success: true, message: ''})
+                                                }
+                                            } else {
+                                                done(null, {success: true, message: ''})
+                                            }
+                                        });
                                     }
-                                    if (new_pass_count + 1 > card.pass) {
-                                        if (card.pass_total >= Number(card.passCount)) {
-                                            done(null, {success: false, message: dict.messages.visits_card_pass_count_exceded});
+                                } else {
+                                    query = 'update cards set pass_count = ?, pass_total = ?, date_pass_update = ? where id = ?';
+                                    params = [new_pass_count, (card.pass_total + 1), now.format('YYYY-MM-DD HH:mm:ss'), card.id];
+
+                                    db.query(query, params, (err, rows)=>{
+                                        if (err) {
+                                            return done(err)
+                                        }
+                                        if (new_pass_count + 1 > card.pass) {
+                                            if (card.pass_total >= Number(card.passCount)) {
+                                                done(null, {success: false, message: dict.messages.visits_card_pass_count_exceded});
+                                            } else {
+                                                done(null, {success: true, message: ''})
+                                            }
                                         } else {
                                             done(null, {success: true, message: ''})
                                         }
-                                    } else {
-                                        done(null, {success: true, message: ''})
-                                    }
-                                });
+                                    });
+                                }
                             } else {
                                 // if current date <= date of last pass update
                                 query = 'update cards set pass_total = ? where id = ?';
