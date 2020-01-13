@@ -54,7 +54,7 @@ router.post('/sell', (req, res, next)=> {
         body.updated = require('moment')().format('YYYY-MM-DD HH:mm:ss');
         body.created = require('moment')().format('YYYY-MM-DD HH:mm:ss');
 
-        if (overdue) {
+        if (overdue && Number(card.pass) !== 0) {
             Card.resetPass(body, (err, rows) => {
                 if (err) {
                     return res.status(500).json({ success: false, message: err.message});

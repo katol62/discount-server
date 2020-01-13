@@ -931,7 +931,7 @@ router.post('/sell', (req, res, nexr)=>{
         body.updated = require('moment')().format('YYYY-MM-DD HH:mm:ss');
         body.created = require('moment')().format('YYYY-MM-DD HH:mm:ss');
 
-        if (overdue) {
+        if (overdue && Number(card.pass) !== 0) {
             Card.resetPass(body, (err, rows) => {
                 if (err) {
                     req.session.error = dict.messages.db_error+': '+err.message;
