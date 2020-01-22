@@ -16,6 +16,7 @@ var cors = require('cors');
 //routes
 var index = require('./routes/index');
 var admins = require('./routes/admins');
+var partners = require('./routes/partners');
 var profiles = require('./routes/profiles');
 var companies = require('./routes/companies');
 var locations = require('./routes/locations');
@@ -63,6 +64,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', index);
 app.use('/admins', admins);
 app.use('/profile', profiles);
+app.use('/partners', partners);
 app.use('/companies', companies);
 app.use('/location', locations);
 app.use('/cards', cards);

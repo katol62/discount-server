@@ -187,6 +187,19 @@ var User = {
         });
     },
 
+    deletePartner: (id, done) => {
+        const q = "DELETE u, t, c " +
+            "FROM `user` u " +
+            "JOIN `transh` t ON t.owner = u.id " +
+            "JOIN `cards` c ON c.owner = u.id WHERE u.id = ?";
+        db.query(q, [id]), (err, rows)=> {
+            if (err) {
+                return done(err);
+            }
+            done(null, rows);
+        }
+    },
+
     getByNamePassword: function (name, password, done) {
         db.query('SELECT * FROM users where name = ? and password = ?', name, password, function(err, rows) {
             if (err) {

@@ -10,10 +10,11 @@ block content
                 p= company.countryname + ', ' + company.focname + ', ' + company.regionname
                 p(style='font-weight:bold') Терминал: #{terminal.name}
             div.col-lg-6.margin-top
-                a(class=('btn btn-primary') href='/companies/'+company.id+'/terminals/'+terminal.id+'/visits/add')
-                    span(class='glyphicon glyphicon-plus-sign')
-                    | &nbsp;
-                    = dict.titles.create_visit
+                if account.role !== 'partner'
+                    a(class=('btn btn-primary') href='/companies/'+company.id+'/terminals/'+terminal.id+'/visits/add')
+                        span(class='glyphicon glyphicon-plus-sign')
+                        | &nbsp;
+                        = dict.titles.create_visit
             div.col-lg-2.margin-top.text-right
                 div.btn-group
                     button.btn.btn-primary.dropdown-toggle(type='button', data-toggle='dropdown', aria-haspopup='true', aria-expanded='false')

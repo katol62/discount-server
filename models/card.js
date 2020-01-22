@@ -24,12 +24,12 @@ var Card = {
         var params = [];
         var limitString = '';
 
-        if (user.role == 'admin') {
+        if (user.role === 'admin' || user.role === 'partner') {
             whereArray.push('owner = ?');
             params.push(user.id);
         }
 
-        if (filterObject.filter != '') {
+        if (filterObject.filter !== '') {
             whereArray.push(filterObject.filter+' = ?');
             params.push(filterObject.filterValue);
         } else {
@@ -57,7 +57,7 @@ var Card = {
         var whereArray = [];
         var params = [];
 
-        if (user.role == 'admin') {
+        if (user.role == 'admin' || user.role == 'partner') {
             whereArray.push('owner = ?');
             params.push(user.id);
         }
@@ -265,14 +265,14 @@ var Card = {
 
         var query = 'SELECT c.card_nb, c.qr_code, c.type, u.email as owner, uu.email as seller, CAST(c.update_date as CHAR) as date from cards c left join users u on c.owner=u.id left join users uu on c.updated_by=uu.id where c.status=?';
         var params = [type];
-        if (user.role == 'admin') {
+        if (user.role === 'admin' || user.role === 'partner') {
             query = 'SELECT c.card_nb, c.qr_code, c.type, u.email as owner, uu.email as seller, CAST(c.update_date as CHAR) as date from cards c \n' +
                 'left join users u on c.owner=u.id \n' +
                 'left join users uu on c.updated_by=uu.id\n' +
                 'where c.status=? and c.owner=?';
             params = [type, user.id];
         }
-        if (user.role == 'cashier') {
+        if (user.role === 'cashier') {
             query = 'SELECT c.card_nb, c.qr_code, c.type, u.email as owner, uu.email as seller, CAST(c.update_date as CHAR) as date from cards c \n' +
                 'left join users u on c.owner=u.id \n' +
                 'left join users uu on c.updated_by=uu.id\n' +
@@ -280,7 +280,7 @@ var Card = {
             params = [type, user.id];
         }
 
-        if (start != '') {
+        if (start !== '') {
             query += ' and c.update_date >= ?';
             params.push(start);
         }

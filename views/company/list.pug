@@ -7,7 +7,7 @@ block content
             div.col-lg-4.col-lg-offset-4.col-md-6.col-md-offset-3.col-sm-12
                 h2= dict.titles.companies
             div.col-lg-6.margin-top
-                if account.role !== 'cashier'
+                if account.role !== 'cashier' && account.role !== 'partner'
                     a(class=('btn btn-primary') href="/companies/create")
                         span(class='glyphicon glyphicon-plus-sign')
                         | &nbsp;
@@ -33,7 +33,7 @@ block content
                                     tr(class='tr-top')
                                         td #{item.name}
                                         td(class="col-md-4")
-                                            if account.role !== 'cashier'
+                                            if account.role !== 'cashier' && account.role !== 'partner'
                                                 +link('', '/companies/' + item.id + '/edit', 'glyphicon glyphicon-edit', '', dict.labels.label_update)
                                                 | &nbsp;&nbsp;
                                                 +link('', '', 'glyphicon glyphicon-trash text-danger', '', dict.labels.label_delete, 'confirmDeleteCompany(' + item.id + ', "' + item.name + '"); return false;')
@@ -44,7 +44,7 @@ block content
 
                                     if item.terminals && item.terminals.length
                                         each subitem, i in item.terminals
-                                            if account.role !== 'cashier'
+                                            if account.role !== 'cashier' && account.role !== 'partner'
                                                 tr(class='tr-second')
                                                     td(class='offset') #{subitem.name}
                                                     td(class="col-md-4")

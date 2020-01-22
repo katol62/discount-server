@@ -55,7 +55,7 @@ var Company = {
         var query = 'select c.id, c.name, c.owner, c.region, state.name as countryname, foc.name as focname, region.name as regionname from company c join loc_states state on c.country = state.id join loc_fos foc on c.foc = foc.id join loc_regions region on c.region = region.id where c.id = ?';
         var params = [id];
         if (owner.role === 'admin') {
-            query = 'select c.id, c.name, c.owner, c.region, state.name as countryname, foc.name as focname, region.name as regionname from company c join loc_states state on c.country = state.id join loc_fos foc on c.foc = foc.id join loc_regions region on c.region = region.id where c.id = ? and c.owner = ?';
+            query = 'select c.id, c.name, c.owner, c.region, state.name as countryname, foc.name as focname, region.name as regionname from company c join loc_states state on c.country = state.id join loc_fos foc on c.foc = foc.id join loc_regions region on c.region = region.id where c.id = ? and c.owner = ? ';
             params = [id, owner.id];
             console.log(query);
             console.log(params);

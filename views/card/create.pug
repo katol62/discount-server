@@ -15,7 +15,8 @@ block content
 
                     input(type='hidden', name='owner', value=account.id)
 
-                    +formSelect('company', dict.labels.label_company, companies)
+                    if account.role !== 'partner'
+                        +formSelect('company', dict.labels.label_company, companies)
 
                     +formTextInput('lifetime', 'number', dict.labels.label_card_lifetime, dict.labels.label_card_lifetime, '1825')
                     +formTextInput('servicetime', 'number', dict.labels.label_card_servicetime, dict.labels.label_card_servicetime, '31')

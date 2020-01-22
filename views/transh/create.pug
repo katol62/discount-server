@@ -7,7 +7,7 @@ block content
         div.row
             div.col-lg-4.col-lg-offset-4.col-md-6.col-md-offset-3.col-sm-12.login-form-pre
                 h2= dict.titles.generate_cards
-                p(style='font-weight:bold')= account.name+' '+account.last
+                p(style='font-weight:bold')= account.name+' '+account.last + ' (' + account.role + ')'
             div.col-lg-4.col-lg-offset-4.col-md-6.col-md-offset-3.col-sm-12
                 form(method='post' action='/cards/transhes/create')
 
@@ -19,12 +19,13 @@ block content
                     input(type='hidden', name='status', value='published')
                     input(type='hidden', name='test', value='0')
 
-                    +formSelect('company', dict.labels.label_company, companies)
+                    if account.role !== 'partner'
+                        +formSelect('company', dict.labels.label_company, companies)
 
                     +formTextInput('count', 'number', dict.labels.label_transh_count, dict.labels.label_transh_count, '')
 
-                    +formTextInput('lifetime', 'number', dict.labels.label_card_lifetime, dict.labels.label_card_lifetime, '')
-                    +formTextInput('servicetime', 'number', dict.labels.label_card_servicetime, dict.labels.label_card_servicetime, '')
+                    +formTextInput('lifetime', 'number', dict.labels.label_card_lifetime, dict.labels.label_card_lifetime, '1825')
+                    +formTextInput('servicetime', 'number', dict.labels.label_card_servicetime, dict.labels.label_card_servicetime, '31')
                     +formTextInput('codetype', 'number', dict.labels.label_card_codetype, dict.labels.label_card_codetype, '')
 
                     +formSelect('type', dict.labels.label_card_type, types)

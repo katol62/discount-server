@@ -28,6 +28,14 @@ var getTerminalForUser = (tid, terminals)=>{
     return t;
 };
 
+var checkRole = (req, res, next) => {
+    if (req.session.user.role !== 'super' && req.session.user.role !== 'admin') {
+        req.session.error = dict.messages.company_not_allowed;
+        return res.redirect('/companies');
+    }
+    next();
+};
+
 var checkCompany = (req, res, next)=>{
     if (req.params.cid) {
         Company.getById(req.params.cid, (err, rows)=>{
@@ -39,7 +47,7 @@ var checkCompany = (req, res, next)=>{
                 req.session.error = dict.messages.company_not_found;
                 return res.redirect('/companies');
             }
-            if (req.session.user.role !== 'super') {
+            if (req.session.user.role !== 'super' && req.session.user.role !== 'partner') {
                 User.allowedCompany(req.session.user, req.params.cid, (err, rows)=>{
                     if (err) {
                         req.session.error = dict.messages.db_error+":"+err.code;
@@ -72,7 +80,7 @@ var checkTerminal = (req, res, next)=>{
                 req.session.error = dict.messages.terminal_not_found;
                 return res.redirect('/companies');
             }
-            if (req.session.user.role !== 'super') {
+            if (req.session.user.role !== 'super' && req.session.user.role !== 'partner') {
                 User.allowedTerminal(req.session.user, req.params.cid, req.params.tid, (err, rows)=>{
                     if (err) {
                         req.session.error = dict.messages.db_error+":"+err.code;
@@ -426,7 +434,7 @@ router.get('/', (req, res, next)=>{
  */
 
 //create company form
-router.get('/create', (req, res, next)=> {
+router.get('/create', checkRole, (req, res, next)=> {
 
     var session_message = req.session.message ? req.session.message : null;
     req.session.message = null;
@@ -527,7 +535,7 @@ router.post('/create', function(req, res, next) {
  */
 
 //edit company form
-router.get('/:cid/edit', checkCompany, (req, res, next)=> {
+router.get('/:cid/edit', checkRole, checkCompany, (req, res, next)=> {
 
     var session_message = req.session.message ? req.session.message : null;
     req.session.message = null;
@@ -664,7 +672,7 @@ router.get('/:cid/terminals', (req, res, next)=>{
 
 });
 
-router.get('/:cid/terminals/create', checkCompany, (req, res, next)=>{
+router.get('/:cid/terminals/create', checkRole, checkCompany, (req, res, next)=>{
 
     var session_message = req.session.message ? req.session.message : null;
     req.session.message = null;
@@ -740,7 +748,7 @@ router.delete('/:cid/terminals/:tid/delete', (req, res, next)=>{
     });
 });
 
-router.get('/:cid/terminals/:tid/edit', checkCompany, checkTerminal, (req, res, next)=>{
+router.get('/:cid/terminals/:tid/edit', checkRole, checkCompany, checkTerminal, (req, res, next)=>{
 
     var session_message = req.session.message ? req.session.message : null;
     req.session.message = null;
@@ -809,7 +817,7 @@ router.put('/:cid/terminals/:tid/edit', (req, res, next)=>{
  * Company users
  */
 
-router.get('/:cid/users', checkCompany, (req, res, next)=>{
+router.get('/:cid/users', checkRole, checkCompany, (req, res, next)=>{
 
     var session_message = req.session.message ? req.session.message : null;
     req.session.message = null;
@@ -864,7 +872,7 @@ router.get('/:cid/users', checkCompany, (req, res, next)=>{
  * Create user - cashier
  */
 
-router.get('/:cid/users/create', checkCompany, (req, res, next)=>{
+router.get('/:cid/users/create', checkRole, checkCompany, (req, res, next)=>{
 
     var session_message = req.session.message ? req.session.message : null;
     req.session.message = null;
@@ -952,7 +960,7 @@ router.post('/:cid/users/create', (req, res, next)=> {
  * Edit user - cashier
  */
 
-router.get('/:cid/users/:uid/edit', checkCompany, (req, res, next)=>{
+router.get('/:cid/users/:uid/edit', checkRole, checkCompany, (req, res, next)=>{
 
     var session_message = req.session.message ? req.session.message : null;
     req.session.message = null;
@@ -1095,7 +1103,7 @@ router.delete('/:cid/users/:uid/delete', function(req, res, next) {
  * Tariffs
  */
 
-router.get('/:cid/terminals/:tid/tariffs', checkCompany, checkTerminal, (req, res, next)=>{
+router.get('/:cid/terminals/:tid/tariffs', checkRole, checkCompany, checkTerminal, (req, res, next)=>{
 
     var session_message = req.session.message ? req.session.message : null;
     req.session.message = null;
@@ -1174,7 +1182,7 @@ router.get('/:cid/terminals/:tid/tariffs', checkCompany, checkTerminal, (req, re
  * Create tariff
  */
 
-router.get('/:cid/terminals/:tid/tariffs/create', checkCompany, checkTerminal, (req, res, next)=> {
+router.get('/:cid/terminals/:tid/tariffs/create', checkRole, checkCompany, checkTerminal, (req, res, next)=> {
 
     var session_message = req.session.message ? req.session.message : null;
     req.session.message = null;
@@ -1258,7 +1266,7 @@ router.delete('/:cid/terminals/:tid/tariffs/:trid/delete', (req, res, next)=>{
     });
 });
 
-router.get('/:cid/terminals/:tid/tariffs/:trid/edit', checkCompany, checkTerminal, (req, res, next)=>{
+router.get('/:cid/terminals/:tid/tariffs/:trid/edit', checkRole, checkCompany, checkTerminal, (req, res, next)=>{
 
     var session_message = req.session.message ? req.session.message : null;
     req.session.message = null;
@@ -1364,7 +1372,9 @@ router.get('/:cid/terminals/:tid/visits', checkCompany, checkTerminal, (req, res
         Terminal.getById(req.params.tid, (err, rows)=>{
             var terminal = rows[0];
 
-            Visit.getExtendedForTerminal(req.params.tid, (err, rows)=>{
+            console.log(req.session.user);
+
+            Visit.getExtendedForTerminalAndOwner(req.params.tid, req.session.user,(err, rows)=>{
                 if (err) {
                     req.session.error = dict.messages.db_error+":"+err.code;
                     res.redirect('/companies');
@@ -1775,16 +1785,18 @@ var generateReport = (company, visits, type, detailType, checkDate, datestart, d
             totalDiscount += discount;
 
         });
-        html += '        <tr>\n' +
-            '            <td>1</td>\n' +
-            '            <td>Премия организатора согласно ПАРТНЕРСКОГО ДОГОВОРА №'+company.dogovor+' от '+getDate(company.dogovordate)+' ЗА ПЕРИОД  '+ checkDate +'</td>\n' +
-            '            <td>'+visits.length+'</td>\n' +
-            '            <td>руб</td>\n' +
-            '            <td>'+total.toFixed(2)+'</td>\n' +
-            '            <td>'+total.toFixed(2)+'</td>\n' +
-            '        </tr>\n' +
-            '    </tbody>\n' +
-            '</table>\n';
+        if (visits.length) {
+            html += '        <tr>\n' +
+                '            <td>1</td>\n' +
+                '            <td>Премия организатора согласно ПАРТНЕРСКОГО ДОГОВОРА №'+company.dogovor+' от '+getDate(company.dogovordate)+' ЗА ПЕРИОД  '+ checkDate +'</td>\n' +
+                '            <td>'+visits.length+'</td>\n' +
+                '            <td>руб</td>\n' +
+                '            <td>'+total.toFixed(2)+'</td>\n' +
+                '            <td>'+total.toFixed(2)+'</td>\n' +
+                '        </tr>\n' +
+                '    </tbody>\n' +
+                '</table>\n';
+        }
     }
 
     html += '<table border=0 cellpadding=0 cellspacing=0 width=540>\n' +
@@ -1876,7 +1888,7 @@ router.get('/pdf', (req, res, next)=> {
         }
         const company = rows[0];
 
-        Visit.getExtendedForTerminalDate(tid, dstartfull, dendfull, (err, rows) => {
+        Visit.getExtendedForTerminalDateAndOwner(tid, dstartfull, dendfull, req.session.user,(err, rows) => {
             if (err) {
                 req.session.error = dict.messages.db_error+": "+err.message;
                 res.redirect('/companies/'+cid+'/terminals/'+tid+'/visits');
@@ -1885,6 +1897,7 @@ router.get('/pdf', (req, res, next)=> {
 
             let visits = rows;
             visits = type !== '' ? visits.filter( elm => elm.type === type.toLowerCase()) : visits;
+            console.log('!!!visits!!!');
             console.log(visits);
 
             var checkDate = '';
@@ -1959,6 +1972,7 @@ router.get('/journal', (req, res, next)=>{
     let dend = req.query.dend ? req.query.dend : '';
 
     console.log('dstart='+dstart);
+    console.log('dend='+dend);
 
     let queryarray = [];
     let dstartfull = '';
@@ -1979,7 +1993,7 @@ router.get('/journal', (req, res, next)=>{
     Visit.getTotalCount(req.session.user, dstartfull, dendfull, (err, result)=> {
         if (err) {
             req.session.error = 'Company error: '+err.message;
-            return res.redirect('/companies');
+            return res.redirect('/companies/journal'+querystr);
         }
 
         var total = result;
@@ -1987,10 +2001,10 @@ router.get('/journal', (req, res, next)=>{
         var pagen = req.query.page ? Number(req.query.page) : 1;
         var offset = (pagen-1)*limit;
 
-        Visit.getListWithCompany(req.session.user, offset, limit, dstartfull, dendfull,(err, rows)=>{
+        Visit.getListForJournal(req.session.user, offset, limit, dstartfull, dendfull,(err, rows)=>{
             if (err) {
                 session_error = 'Visit error: '+err.message;
-                //return res.redirect('/companies/journal'+querystr);
+                return res.redirect('/companies/journal'+querystr);
             }
 
             if (!rows.length) {

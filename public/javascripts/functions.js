@@ -270,6 +270,41 @@ var confirmDeleteAdmin = (id, name)=>{
     });
 };
 
+var confirmDeletePartner = (id, name)=>{
+    bootbox.confirm({
+        message: "Удалить партнера?<br>Внимание! Вы удалите все связанные с ним карты и транши!",
+        buttons: {
+            confirm: {
+                label: 'Да',
+                className: 'btn-success'
+            },
+            cancel: {
+                label: 'Нет',
+                className: 'btn-danger'
+            }
+        },
+        callback: function (result) {
+            if (result) {
+
+                var url = '/partners/'+id+'/delete';
+                $.ajax({
+                    url: url,
+                    type: 'DELETE',
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader('X-HTTP-Method-Override', 'DELETE');
+                    },
+                    data: {},
+                    success:  () => {
+                        location.reload();
+                    },
+                    error: (data)=> {
+                        console.log(data);
+                    },
+                });
+            }
+        }
+    });
+};
 
 
 var confirmDeleteTerminal = (cid, tid, name)=> {
@@ -463,7 +498,7 @@ var reloadFields = () => {
     let end = $('#dend').val();
     if (end != '')
     {
-        query.push('dend='+start);
+        query.push('dend='+end);
     }
     let href = window.location.protocol + '//' + window.location.host + '/companies/journal';
     href = query.length ? href + '?' + query.join('&') : href;

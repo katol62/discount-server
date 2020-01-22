@@ -5,7 +5,7 @@ var Transh = {
     getAllByOwner: (owner, done)=>{
         var query = 'SELECT t.id, t.start, t.count, t.owner, u.id as ownerId, u.name, u.last, u.email, u.role, u.parent, u.publisher, c.card_nb as number FROM transh t LEFT JOIN users u ON t.owner=u.id LEFT JOIN cards c ON c.card_nb = (SELECT c1.card_nb FROM cards as c1 WHERE t.id=c1.transh ORDER BY c1.card_nb LIMIT 1)';
         var params = [];
-        if (owner.role === 'admin') {
+        if (owner.role === 'admin' || owner.role === 'partner') {
             query = 'SELECT t.id, t.start, t.count, t.owner, u.id as ownerId, u.name, u.last, u.email, u.role, u.parent, u.publisher, c.card_nb as number FROM transh t LEFT JOIN users u ON t.owner=u.id LEFT JOIN cards c ON c.card_nb = (SELECT c1.card_nb FROM cards as c1 WHERE t.id=c1.transh ORDER BY c1.card_nb LIMIT 1) WHERE t.owner=?';
             params = [owner.id];
         }

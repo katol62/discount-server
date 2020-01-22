@@ -14,6 +14,42 @@ var Visit = {
 
     },
 
+    getExtendedForTerminalAndOwner: (trid, user, done)=>{
+
+        let params = [trid];
+        var query = 'select v.*, ' +
+            'ter.name as terminalName, ' +
+            'tar.name as tariffName, ' +
+            'tar.discount, ' +
+            'tar.discountUnit as discountUnit, ' +
+            'tar.price as totalPrice, ' +
+            'tar.discountType, ' +
+            'c.card_nb as cardNumber, ' +
+            'u.email from visit v ' +
+            'left join terminal ter on v.terminal=ter.id ' +
+            'left join tariff tar on v.tariff=tar.id ' +
+            'left join cards c on v.card=c.id ' +
+            'left join users u on v.user=u.id ' +
+            'where v.terminal=? ';
+        if (user.role === 'partner') {
+            query += ' AND c.id in (SELECT distinct id from cards where owner = ?) ';
+            params.push(user.id);
+        }
+        query += 'order by v.date DESC';
+
+        // console.log('+++++++++++++++++++++')
+        // console.log(query)
+        // console.log(params)
+        // console.log('+++++++++++++++++++++')
+        db.query(query, params, (err, rows)=>{
+            if (err) {
+                return done(err);
+            }
+            done(null, rows);
+        })
+
+    },
+
     getExtendedForTerminalDate: (trid, start, end, done)=>{
 
         var query = 'select v.*, ' +
@@ -25,8 +61,58 @@ var Visit = {
             'tar.price as totalPrice, ' +
             'tar.discountType, ' +
             'c.card_nb as cardNumber, ' +
-            'u.email from visit v left join terminal ter on v.terminal=ter.id left join tariff tar on v.tariff=tar.id left join cards c on v.card=c.id left join users u on v.user=u.id where v.terminal=? ';
+            'u.email from visit v ' +
+            'left join terminal ter on v.terminal=ter.id ' +
+            'left join tariff tar on v.tariff=tar.id ' +
+            'left join cards c on v.card=c.id ' +
+            'left join users u on v.user=u.id ' +
+            'where v.terminal=? ';
         let params = [trid];
+
+        if (start != '') {
+            query += ' and v.date >= ?';
+            params.push(start);
+        }
+
+        if (end != '') {
+            query += ' and v.date <= ?';
+            params.push(end);
+        }
+
+        query += ' order by v.date DESC';
+
+        db.query(query, params, (err, rows)=>{
+            if (err) {
+                return done(err);
+            }
+            done(null, rows);
+        })
+
+    },
+
+    getExtendedForTerminalDateAndOwner: (trid, start, end, user, done)=>{
+
+        var query = 'select v.*, ' +
+            'ter.name as terminalName, ' +
+            'tar.name as tariffName, ' +
+            'ter.commission as terminalCommission, ' +
+            'tar.discount, ' +
+            'tar.discountUnit as discountUnit, ' +
+            'tar.price as totalPrice, ' +
+            'tar.discountType, ' +
+            'c.card_nb as cardNumber, ' +
+            'u.email from visit v ' +
+            'left join terminal ter on v.terminal=ter.id ' +
+            'left join tariff tar on v.tariff=tar.id ' +
+            'left join cards c on v.card=c.id ' +
+            'left join users u on v.user=u.id ' +
+            'where v.terminal=? ';
+        let params = [trid];
+
+        if (user.role === 'partner') {
+            query += ' and c.id in (SELECT distinct id from cards where owner = ?)';
+            params.push(user.id);
+        }
 
         if (start != '') {
             query += ' and v.date >= ?';
@@ -67,8 +153,7 @@ var Visit = {
             '         left join company cm on ter.company=cm.id\n' +
             '         left join tariff tar on v.tariff=tar.id\n' +
             '         left join cards c on v.card=c.id\n' +
-            '         left join users u on v.user=u.id ' +
-            ' where 1=1';
+            '         left join users u on v.user=u.id ';
 
         if (user.role === 'admin' || user.role === 'cashier') {
             query =
@@ -94,6 +179,9 @@ var Visit = {
                 ' left join users u on v.user=u.id' +
                 ' where r.user = ? ';
         }
+        if (user.role === 'partner') {
+            query += ' where c.id in (select distinct id from cards where owner = ?)'
+        }
 
         let params = [];
 
@@ -108,11 +196,11 @@ var Visit = {
         }
         query += ' order by v.date DESC';
 
-        if (user.role === 'admin' || user.role === 'cashier') {
+        if (user.role === 'admin' || user.role === 'cashier' || user.role === 'partner') {
             params.unshift(user.id);
         }
-        console.log(query);
-        console.log(params);
+        // console.log(query);
+        // console.log(params);
 
         db.query(query, params, (err, rows)=>{
             if (err) {
@@ -145,37 +233,32 @@ var Visit = {
     },
 
     getTotalCount: (user, dstart, dend, done)=> {
-        let query = 'select id from visit';
+        let query = 'select v.id from visit v';
         let params = [];
-        if (user.role == 'admin' || user.role == 'cashier') {
-            params = [user.id]
-            query = 'select v.id, v.terminal, t.company, r.company from visit v ' +
-            'left join terminal t on v.terminal=t.id ' +
-            'left join reference r on t.company=r.company ' +
-            'where r.user=?';
+        let whereArray = [];
 
-            if (dstart != '' ) {
-                query += ' and v.date >= ? ';
-                params.push(dstart);
-            }
-            if (dend != '' ) {
-                query += ' and v.date <= ? ';
-                params.push(dend);
-            }
-        } else {
-            if (dstart != '' ) {
-                query += ' where date >= ? ';
-                params.push(dstart);
-            }
-            if (dend != '' ) {
-                let pre = (dstart != '') ? ' and' : ' where';
-                query += pre + ' date <= ? ';
-                params.push(dend);
-            }
+        if (user.role === 'admin' || user.role === 'cashier') {
+            query = 'select v.id, ' +
+                'v.terminal, t.company, r.company from visit v ' +
+                'left join terminal t on v.terminal=t.id ' +
+                'left join reference r on t.company=r.company ';
+            whereArray.push('r.user=?');
+            params.push(user.id);
+        }
+        if (user.role === 'partner') {
+            whereArray.push('card in (select id from cards where owner = ?)');
+            params.push(user.id);
+        }
+        if (dstart != '' ) {
+            whereArray.push('v.date >= ?');
+            params.push(dstart);
+        }
+        if (dend != '' ) {
+            whereArray.push('v.date <= ?');
+            params.push(dend);
         }
 
-        console.log(query);
-        console.log(params);
+        query += whereArray.length ? ' where ' + whereArray.join(' and ') : '';
 
         db.query(query, params, (err, rows)=>{
             if (err) {
@@ -249,9 +332,87 @@ var Visit = {
             params.unshift(user.id);
         }
 
-        console.log('==================');
-        console.log(query);
-        console.log(params);
+        db.query(query, params, (err, rows)=>{
+            if (err) {
+                return done(err);
+            }
+            done(null, rows);
+        })
+
+    },
+
+    getListForJournal: (user, offset, limit, dstart, dend, done)=> {
+        // let params = [limit, offset];
+        let params = [];
+        let whereArray = [];
+        let query =
+            'select v.*, ' +
+            ' ter.name as terminalName, ' +
+            ' tar.name as tariffName, ' +
+            ' tar.discount, ' +
+            ' tar.discountUnit as discountUnit, ' +
+            ' tar.price as totalPrice,' +
+            ' tar.discountType, ' +
+            ' ter.company as terminalCompany, ' +
+            ' c.card_nb as cardNumber, ' +
+            ' cm.name as companyName,' +
+            ' cm.id as companyId,' +
+            ' u.email from visit v' +
+            ' left join terminal ter on v.terminal=ter.id' +
+            ' left join company cm on ter.company=cm.id' +
+            ' left join tariff tar on v.tariff=tar.id' +
+            ' left join cards c on v.card=c.id' +
+            ' left join users u on v.user=u.id';
+
+        if (user.role == 'admin' || user.role == 'cashier') {
+            query =
+                'select v.*, ' +
+                'ter.name as terminalName, ' +
+                ' tar.name as tariffName, ' +
+                ' tar.discount, ' +
+                ' tar.discountUnit as discountUnit, ' +
+                ' tar.price as totalPrice,' +
+                ' tar.discountType, ' +
+                ' ter.company as terminalCompany, ' +
+                ' c.card_nb as cardNumber, ' +
+                ' r.company as refCompany, ' +
+                ' cm.name as companyName,' +
+                ' cm.id as companyId,' +
+                ' u.email from visit v' +
+                ' left join terminal ter on v.terminal=ter.id' +
+                ' left join reference r on ter.company=r.company ' +
+                ' left join company cm on ter.company=cm.id' +
+                ' left join tariff tar on v.tariff=tar.id' +
+                ' left join cards c on v.card=c.id' +
+                ' left join users u on v.user=u.id';
+            whereArray.push('r.user = ?');
+            params.push(user.id);
+        }
+
+        if (user.role === 'partner') {
+            whereArray.push('c.id in (select id from cards where owner = ?)');
+            params.push(user.id);
+        }
+        if (dstart != '' ) {
+            whereArray.push('v.date >= ?');
+            params.push(dstart);
+        }
+        if (dend != '' ) {
+            whereArray.push('v.date <= ?');
+            params.push(dend);
+        }
+
+        query += whereArray.length ? ' where ' + whereArray.join(' and ') : '';
+
+        query +=' order by v.date DESC' +
+            ' LIMIT ? OFFSET ?';
+        params.push(limit);
+        params.push(offset);
+
+        if (user.role == 'admin' || user.role == 'cashier') {
+            params.unshift(user.id);
+        }
+
         db.query(query, params, (err, rows)=>{
             if (err) {
                 return done(err);
@@ -260,7 +421,6 @@ var Visit = {
         })
 
     }
-
 
 };
 

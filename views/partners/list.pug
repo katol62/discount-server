@@ -1,0 +1,49 @@
+extends ../layout
+
+block content
+
+    div.container
+        div.row
+            div.col-lg-4.col-lg-offset-4.col-md-6.col-md-offset-3.col-sm-12
+                h2= dict.titles.partners
+            div.col-lg-12.margin-top
+                a(class=('btn btn-primary') href="/partners/create")
+                    span(class='glyphicon glyphicon-plus-sign')
+                    |&nbsp;
+                    = dict.titles.create_partner
+            if items && items.length
+                div.col-lg-12.margin-top
+
+                    div.table-responsive
+
+                        table.table.table-bordered
+                            thead
+                                tr(class='th-users')
+                                    th #{dict.labels.label_first_name}
+                                    th #{dict.labels.label_email}
+                                    th #{dict.labels.label_role}
+                                    th #{dict.labels.label_actions}
+                            tbody
+                                each item, i in items
+                                    tr(class='tr-top')
+                                        td #{item.name+' '+item.last}
+                                        td #{item.email}
+                                        td #{item.role}
+                                        td
+                                            a(class='glyphicon glyphicon-edit' href='/partners/' + item.id + '/edit')
+                                            |&nbsp;
+                                            a(class='glyphicon glyphicon-trash text-danger' onclick='confirmDeletePartner('+ item.id+', "'+item.name+' '+item.last+'"); return false;' style='cursor:pointer')
+
+            if message
+                div.col-lg-4.col-lg-offset-4.col-md-6.col-md-offset-3.col-sm-12.margin-top
+                    span.mess.success #{message}
+
+            if error
+                div.col-lg-4.col-lg-offset-4.col-md-6.col-md-offset-3.col-sm-12.margin-top
+                    span.mess.error #{error}
+
+            if errors
+                div.col-lg-4.col-lg-offset-4.col-md-6.col-md-offset-3.col-sm-12.margin-top
+                    ul.error
+                        for error in errors
+                            li.mess.error!= error.msg

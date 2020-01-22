@@ -18,7 +18,8 @@ block content
                         +formSelect('admin', dict.labels.label_admin, admins, card.owner)
                     input(type='hidden', name='owner', value=card.owner)
 
-                    +formSelect('company', dict.labels.label_company, companies, card.company_id)
+                    if account.role !== 'partner'
+                        +formSelect('company', dict.labels.label_company, companies, card.company_id)
 
                     +formTextInput('lifetime', 'number', dict.labels.label_card_lifetime, dict.labels.label_card_lifetime, card.lifetime)
                     +formTextInput('servicetime', 'number', dict.labels.label_card_servicetime, dict.labels.label_card_servicetime, card.servicetime)
