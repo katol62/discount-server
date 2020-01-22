@@ -1,0 +1,47 @@
+extends ../layout
+
+block content
+
+    div.container
+        div.row
+            div.col-lg-4.col-lg-offset-4.col-md-6.col-md-offset-3.col-sm-12
+                h2= dict.titles.transhes + ' ' + partner
+            div.col-lg-12.margin-top
+                a(class=('btn btn-primary') href="/cards/transhes/create")
+                    span(class='glyphicon glyphicon-plus-sign')
+                    | &nbsp;
+                    = dict.titles.generate_cards
+            if items && items.length
+                div.col-lg-12.margin-top
+                    div.table-responsive
+                        table.table.table-bordered
+                            thead
+                                tr(class='th-users')
+                                    th= dict.labels.label_transh_start
+                                    th= dict.labels.label_transh_count
+                                    th= dict.labels.label_actions
+                            tbody
+                                each item, i in items
+                                    tr
+                                        td #{item.number}
+                                        td #{item.count} #{item.ownerId}
+                                        td(class="col-md-2")
+                                            if Number(item.ownerId) === Number(partner)
+                                                +link('text-danger cursor', null, 'glyphicon glyphicon-minus-sign', dict.labels.unlink_transh, dict.labels.unlink_transh, 'confirmUpdateTransh(' + item.id + ', ' + partner + ', false); return false;')
+                                            else
+                                                +link('cursor', null, 'glyphicon glyphicon-plus-sign', dict.labels.link_transh, dict.labels.link_transh, 'confirmUpdateTransh(' + item.id + ', ' + partner + ', true); return false;')
+
+            if message
+                div.col-lg-12.margin-top.text-center
+                    span.mess.success #{message}
+
+            if error
+                div.col-lg-12.margin-top.text-center
+                    span.mess.error #{error}
+
+            if errors
+                div.col-lg-12.margin-top.text-center
+                    ul.error
+                        for error in errors
+                            li
+                                span.mess.error= error.msg

@@ -453,6 +453,45 @@ var confirmDeleteTransh = (id)=>{
     });
 };
 
+var confirmUpdateTransh = (id, partnerId, link) => {
+    const prompt = link === true ? 'Привязать' : 'Отвязать';
+    bootbox.confirm({
+        message: prompt + " транш " + id + "?",
+        buttons: {
+            confirm: {
+                label: 'Да',
+                className: 'btn-success'
+            },
+            cancel: {
+                label: 'Нет',
+                className: 'btn-danger'
+            }
+        },
+        callback: function (result) {
+            if (result) {
+
+                var url = '/cards/transhes/'+id+'/link';
+                $.ajax({
+                    url: url,
+                    type: 'PUT',
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader('X-HTTP-Method-Override', 'PUT');
+                        xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+                    },
+                    data: {link: link, partnerId: partnerId},
+                    success:  () => {
+                        location.reload();
+                    },
+                    error: (data)=> {
+                        console.log(data);
+                    },
+                });
+            }
+        }
+    });
+
+};
+
 var toCsv = ()=> {
     var start = $('#dstart').val();
     var end = $('#dend').val();

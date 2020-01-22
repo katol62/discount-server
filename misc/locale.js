@@ -151,6 +151,8 @@ module.exports = {
             "export_card_seller":"Продавец",
             "export_card_date":"Время продажи",
             "enter_filter_name":"Введите значение фильтра",
+            "link_transh": "Привязать транш",
+            "unlink_transh": "Отвязать транш",
         },
         "messages": {
             "user_not_found": "Пользователь не найден",
@@ -252,6 +254,7 @@ module.exports = {
             "card_pass_invalid": "Карта просрочена либо заблокирована",
             "card_pass_update_error": "Ошибка продажи пасса",
             "card_pass_sold": "Пакет ПАСС успешно добавлен",
+            "missing_params": "Недостаточно параметров",
         }
     }
 };

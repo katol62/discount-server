@@ -1,6 +1,7 @@
 var express = require('express');
 var User = require('./../models/user');
 var Company = require('./../models/company');
+var Transh = require('./../models/transh');
 var bcrypt = require('bcrypt');
 var locale = require('./../misc/locale');
 var config = require('./../misc/config');
@@ -242,5 +243,40 @@ router.put('/:id/edit', function(req, res, next) {
         })
     }
 });
+
+router.get('/:id/transhes', function(req, res, next) {
+
+    var session_message = req.session.message ? req.session.message : null;
+    req.session.message = null;
+    var session_error = req.session.error ? req.session.error : null;
+    req.session.error = null;
+    var session_validate_error = req.session.validate_error ? req.session.validate_error : null;
+    req.session.validate_error = null;
+
+    Transh.getAll(req.session.user, (err, rows)=>{
+        if (err) {
+            req.session.error = dict.messages.db_error+": "+err.message;
+            res.redirect('/partners');
+            return;
+        }
+
+        console.log(rows);
+
+        console.log(req.params.id);
+
+        return res.render('partners/transhes', {
+            pageType: 'partners',
+            dict: dict,
+            account: req.session.user,
+            partner: req.params.id,
+            items: rows,
+            message: session_message,
+            error: session_error,
+            errors: session_validate_error
+        });
+
+    })
+});
+
 
 module.exports = router;

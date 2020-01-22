@@ -758,6 +758,35 @@ router.put('/transhes/:id/edit', (req, res, next)=> {
     });
 });
 
+router.put('/transhes/:id/link', (req, res, next)=> {
+
+    const link = req.body.link;
+    const partnerId = link == 'true' ? req.body.partnerId : 1;
+    const transhId = req.params.id;
+
+    console.log(req.body);
+    if (!partnerId || !transhId) {
+        return res.status(200).json({ success: false, message: dict.messages.missing_params});
+    }
+
+    const body = {owner: partnerId, transhId: transhId};
+
+    Transh.updateTranshOwner(body, (err, rows, next) => {
+        if (err) {
+            req.session.error = dict.messages.db_error+": "+err.message;
+        } else {
+            if (rows.affectedRows) {
+                req.session.message = dict.messages.transh_updated;
+            } else {
+                req.session.error = dict.messages.transh_update_error;
+            }
+        }
+        return res.status(200).send('ok');
+    })
+
+});
+
+
 /*
  * Delete card
  */
