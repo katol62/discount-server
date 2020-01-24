@@ -20,7 +20,7 @@ div.navbar.navbar-default.navbar-fixed-top(role='navigation')
                     if account.role == 'super'
                         +headLi('admins', 'Администраторы', 'admins')
                         +headLi('partners', 'Партнеры', 'partners')
-                    if account.role !== 'cashier'
+                    if account.role !== 'cashier' && account.role !== 'partner'
                         +headLi('cards', 'Карты', 'cards')
                     if account.role !== 'partner'
                         +headLi('sell', 'Продажа карт', 'cards/sell')

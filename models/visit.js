@@ -32,15 +32,11 @@ var Visit = {
             'left join users u on v.user=u.id ' +
             'where v.terminal=? ';
         if (user.role === 'partner') {
-            query += ' AND c.id in (SELECT distinct id from cards where owner = ?) ';
+            query += 'AND v.type = "discount" AND c.id in (SELECT distinct id from cards where owner = ?) ';
             params.push(user.id);
         }
         query += 'order by v.date DESC';
 
-        // console.log('+++++++++++++++++++++')
-        // console.log(query)
-        // console.log(params)
-        // console.log('+++++++++++++++++++++')
         db.query(query, params, (err, rows)=>{
             if (err) {
                 return done(err);
@@ -246,7 +242,8 @@ var Visit = {
             params.push(user.id);
         }
         if (user.role === 'partner') {
-            whereArray.push('card in (select id from cards where owner = ?)');
+            whereArray.push('v.card in (select id from cards where owner = ?)');
+            whereArray.push('v.type = "discount"');
             params.push(user.id);
         }
         if (dstart != '' ) {
@@ -259,6 +256,8 @@ var Visit = {
         }
 
         query += whereArray.length ? ' where ' + whereArray.join(' and ') : '';
+        console.log(query);
+        console.log(params);
 
         db.query(query, params, (err, rows)=>{
             if (err) {
@@ -390,7 +389,8 @@ var Visit = {
         }
 
         if (user.role === 'partner') {
-            whereArray.push('c.id in (select id from cards where owner = ?)');
+            whereArray.push('v.card in (select id from cards where owner = ?)');
+            whereArray.push('v.type = "discount"');
             params.push(user.id);
         }
         if (dstart != '' ) {

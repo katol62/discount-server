@@ -20,12 +20,13 @@ block content
                         li
                             a(onclick='journalToPdf("discount", "detailed");return false;' style='cursor:pointer')
                                 = dict.titles.visits_report_discount_detailed
-                        li
-                            a(onclick='journalToPdf("pass", "all");return false;' style='cursor:pointer')
-                                = dict.titles.visits_report_pass
-                        li
-                            a(onclick='journalToPdf("pass", "detailed");return false;' style='cursor:pointer')
-                                = dict.titles.visits_report_pass_detailed
+                        if account.role !== 'partner'
+                            li
+                                a(onclick='journalToPdf("pass", "all");return false;' style='cursor:pointer')
+                                    = dict.titles.visits_report_pass
+                            li
+                                a(onclick='journalToPdf("pass", "detailed");return false;' style='cursor:pointer')
+                                    = dict.titles.visits_report_pass_detailed
             div.col-lg-4.margin-top.text-right
                 #datepicker.input-group.input-daterange
                     input.form-control(id='dstart' type='text', name='start' value=dstart placeholder=dict.labels.label_start_date)
