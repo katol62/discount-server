@@ -2139,10 +2139,11 @@ var generateFullReport = (visits, type, detailType, checkDate) => {
     html += '<table border=1 cellpadding=0 cellspacing=0 width=540>\n' +
         '    <thead>\n' +
         '        <tr>\n' +
-        '            <th class="c-10">№</th>\n' +
+        '            <th class="c-5">№</th>\n' +
         '            <th>Наименование работ, услуг ['+checkDate+']</th>\n' +
         '            <th class="c-15">Компания</th>\n' +
         '            <th class="c-5">К-во</th>\n' +
+        '            <th class="c-10">Скидка</th>\n' +
         '            <th class="c-10">Ед.</th>\n' +
         '            <th class="c-10">Цена</th>\n' +
         '            <th class="c-15">Сумма</th>\n' +
@@ -2159,14 +2160,16 @@ var generateFullReport = (visits, type, detailType, checkDate) => {
             let discount = visit.discountUnit === 'percent' ? visit.price * visit.discount / 100 : visit.discount;
             let commission = Number(visit.terminalCommission)/100 * (visit.price - discount);
             totalCommission += commission;
-            console.log('commission = '+commission);
-            console.log('totalCommission = '+totalCommission);
+            const disc = visit.discount + (visit.discountUnit === 'percent' ? '%' : 'руб.');
+            // console.log('commission = '+commission);
+            // console.log('totalCommission = '+totalCommission);
             totalDiscount += discount;
             html += '        <tr>\n' +
                 '            <td>'+(index+1)+'</td>\n' +
                 '            <td>Карта Гостя № '+visit.cardNumber+' - '+getDate(visit.date)+'</td>\n' +
                 '            <td>'+visit.companyName+'</td>\n' +
                 '            <td>1</td>\n' +
+                '            <td>'+ disc +'</td>\n' +
                 '            <td>руб</td>\n' +
                 '            <td>'+visit.price.toFixed(2)+'</td>\n' +
                 '            <td>'+visit.price.toFixed(2)+'</td>\n' +
@@ -2182,8 +2185,9 @@ var generateFullReport = (visits, type, detailType, checkDate) => {
             let discount = visit.discountUnit === 'percent' ? visit.price * visit.discount / 100 : visit.discount;
             let commission = Number(visit.terminalCommission)/100 * (visit.price - discount);
             totalCommission += commission;
-            console.log('commission = '+commission);
-            console.log('totalCommission = '+totalCommission);
+            const disc = visit.discount + (visit.discountUnit === 'percent' ? '%' : 'руб.');
+            // console.log('commission = '+commission);
+            // console.log('totalCommission = '+totalCommission);
             totalDiscount += discount;
         });
         html += '        <tr>\n' +
@@ -2191,6 +2195,7 @@ var generateFullReport = (visits, type, detailType, checkDate) => {
             '            <td>Премия организатора ЗА ПЕРИОД  '+ checkDate +'</td>\n' +
             '            <td></td>\n' +
             '            <td>'+visits.length+'</td>\n' +
+            '            <td>'+ disc +'</td>\n' +
             '            <td>руб</td>\n' +
             '            <td>'+total.toFixed(2)+'</td>\n' +
             '            <td>'+total.toFixed(2)+'</td>\n' +

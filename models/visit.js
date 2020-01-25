@@ -133,6 +133,9 @@ var Visit = {
 
     getExtended: (user, start, end, done)=>{
 
+        let whereArray = [];
+        let params = [];
+
         var query = 'select v.*,\n' +
             '       ter.name as terminalName,\n' +
             '       ter.commission as terminalCommission,\n' +
@@ -174,29 +177,27 @@ var Visit = {
                 ' left join cards c on v.card=c.id' +
                 ' left join users u on v.user=u.id' +
                 ' where r.user = ? ';
+            whereArray.push('r.user = ?');
+            params.push(user.id);
         }
         if (user.role === 'partner') {
-            query += ' where c.id in (select distinct id from cards where owner = ?)'
+            whereArray.push('c.id in (select distinct id from cards where owner = ?)');
+            params.push(user.id);
         }
 
-        let params = [];
-
         if (start != '') {
-            query += ' and v.date >= ?';
+            whereArray.push('v.date >= ?');
             params.push(start);
         }
 
         if (end != '') {
-            query += ' and v.date <= ?';
+            whereArray.push('v.date <= ?');
             params.push(end);
         }
-        query += ' order by v.date DESC';
 
-        if (user.role === 'admin' || user.role === 'cashier' || user.role === 'partner') {
-            params.unshift(user.id);
-        }
-        // console.log(query);
-        // console.log(params);
+        const where = whereArray.length ? ' where ' + whereArray.join(' and ') : '';
+        query += where;
+        query += ' order by v.date DESC';
 
         db.query(query, params, (err, rows)=>{
             if (err) {
