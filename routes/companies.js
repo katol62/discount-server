@@ -2160,9 +2160,7 @@ var generateFullReport = (visits, type, detailType, checkDate) => {
             let discount = visit.discountUnit === 'percent' ? visit.price * visit.discount / 100 : visit.discount;
             let commission = Number(visit.terminalCommission)/100 * (visit.price - discount);
             totalCommission += commission;
-            discTxt = visit.discount + (visit.discountUnit === 'percent' ? '%' : 'руб.');
-            // console.log('commission = '+commission);
-            // console.log('totalCommission = '+totalCommission);
+            discTxt = visit.discount + (visit.discountUnit === 'percent' ? '%' : ' руб.');
             totalDiscount += discount;
             html += '        <tr>\n' +
                 '            <td>'+(index+1)+'</td>\n' +
@@ -2185,8 +2183,6 @@ var generateFullReport = (visits, type, detailType, checkDate) => {
             let discount = visit.discountUnit === 'percent' ? visit.price * visit.discount / 100 : visit.discount;
             let commission = Number(visit.terminalCommission)/100 * (visit.price - discount);
             totalCommission += commission;
-            // console.log('commission = '+commission);
-            // console.log('totalCommission = '+totalCommission);
             totalDiscount += discount;
         });
         html += '        <tr>\n' +
