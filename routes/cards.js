@@ -12,6 +12,7 @@ var fs = require('fs');
 var csvjson = require('csvjson');
 var formidable = require('formidable');
 var md5 = require('md5');
+var paginate = require('./../misc/paginate');
 
 var generateCardNumber = (id, tid, ai)=> {
     var zero = '0000000000000000';
@@ -77,9 +78,9 @@ router.get('/', (req, res, next)=>{
         var total = rows[0].count;
 
         var limit = config.paginationLimit;
-        var page = req.query.page ? Number(req.query.page) : 1;
-        var offset = (page-1)*limit;
-        var page = {offset: offset, limit: limit, page: page, total: total};
+        var pageNb = req.query.page ? Number(req.query.page) : 1;
+        var offset = (pageNb-1)*limit;
+        var page = {offset: offset, limit: limit, page: pageNb, total: total};
 
         Card.getAllForUser(req.session.user, limit, offset, filterObject, (err, rows)=>{
             if (err) {
@@ -103,11 +104,12 @@ router.get('/', (req, res, next)=>{
             var finalRows = [];
             var count = 0;
             var pCount = Math.ceil(total/limit);
-            console.log(pCount+' '+total+' '+(total/limit));
+            console.log('pCount=' + pCount+' Total: '+total+' pCount='+(total/limit));
             page.pages = [];
             for (var i=1; i<=pCount; i++) {
                 page.pages.push(i);
             }
+            const pages = paginate.pages(total, page.page);
             rows.forEach((row, index)=>{
                 count++;
                 var finalRow = row;
@@ -119,6 +121,7 @@ router.get('/', (req, res, next)=>{
                         pageType: 'cards',
                         dict: dict,
                         page: page,
+                        pagination: pages,
                         account: req.session.user,
                         message: session_message,
                         error: session_error,
@@ -459,18 +462,25 @@ router.get('/transhes', (req, res, next)=>{
     var session_validate_error = req.session.validate_error ? req.session.validate_error : null;
     req.session.validate_error = null;
 
-    Transh.getAllByOwner(req.session.user, (err, rows)=>{
+    Transh.getTotalForOwner(req.session.user, null,(err, rows)=>{
         if (err) {
             req.session.error = dict.messages.db_error+": "+err.message;
             res.redirect('/cards');
             return;
         }
 
+        console.log(rows);
+
+        let total = rows.total;
+        let items = rows.items;
+        console.log('TOTAL=' + total);
+        console.log(items);
+
         return res.render('transh/list', {
             pageType: 'cards',
             dict: dict,
             account: req.session.user,
-            items: rows,
+            items: items,
             message: session_message,
             error: session_error,
             errors: session_validate_error

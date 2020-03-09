@@ -81,14 +81,31 @@ block content
                                                 a(class='glyphicon glyphicon-trash text-danger' onclick='confirmDeleteCard(' + item.id + ', "' + item.card_nb + '"); return false;' style='cursor:pointer')
                 if page.total>page.limit
                     div.col-lg-12
-                        ul(class='pagination')
-                            each p in page.pages
-                                if page.page == p
+                        ul(class='pagination text-center')
+                            if pagination.showFirst
+                                li
+                                    a(href='/cards?page=1')= 'Начало'
+                                li
+                                    a= '...'
+                            if pagination.showPrev
+                                li
+                                    a(class='glyphicon glyphicon-menu-left' href='/cards?page=' + (pagination.currentPage - 1))
+                            each p in pagination.pages
+                                if pagination.currentPage == p
                                     li(class='active')
                                         a= p
                                 else
                                     li
                                         a(href='/cards?page='+p)= p
+                            if pagination.showNext
+                                li
+                                    a(class='glyphicon glyphicon-menu-right' href='/cards?page=' + (pagination.currentPage + 1))
+
+                            if pagination.showLast
+                                li
+                                    a= '...'
+                                li
+                                    a(href='/cards?page='+pagination.totalPages)= 'Конец'
 
                 if account.role == 'super' || (account.role == 'admin' && account.publisher == '1')
                     div.col-lg-12.margin-top

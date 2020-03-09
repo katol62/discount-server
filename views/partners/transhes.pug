@@ -26,7 +26,7 @@ block content
                                         td #{item.number}
                                         td #{item.count}
                                         td(class="col-md-2")
-                                            if Number(item.ownerId) === Number(partner)
+                                            if Number(item.owner) === Number(partner)
                                                 +link('text-danger cursor', null, 'glyphicon glyphicon-minus-sign', dict.labels.unlink_transh, dict.labels.unlink_transh, 'confirmUpdateTransh(' + item.id + ', ' + partner + ', false); return false;')
                                             else
                                                 +link('cursor', null, 'glyphicon glyphicon-plus-sign', dict.labels.link_transh, dict.labels.link_transh, 'confirmUpdateTransh(' + item.id + ', ' + partner + ', true); return false;')
