@@ -153,6 +153,7 @@ module.exports = {
             "enter_filter_name":"Введите значение фильтра",
             "link_transh": "Привязать транш",
             "unlink_transh": "Отвязать транш",
+            "label_transh_external":"Регистрировать через моб. приложение",
         },
         "messages": {
             "user_not_found": "Пользователь не найден",

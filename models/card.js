@@ -616,16 +616,29 @@ var Card = {
         })
     },
 
+    checkAvailableCards: (done) => {
+        const query = 'select count(*) as count from cards c, transh t where t.external=\'1\' and c.transh = t.id';
+        db.query(query, [], (err, rows)=> {
+            if (err) {
+                return done(err)
+            }
+            done(null, rows);
+        })
+    },
+
     assignSoftCard: (body, done)=>{
 
-        var selectArray = ['status = ?'];
+        var selectArray = ['t.external=\'1\'', 'c.transh = t.id', 'c.status = ?'];
         var paramsArray = ['published'];
         if (body.company) {
-            selectArray.push('company_id = ?');
+            selectArray.push('c.company_id = ?');
             paramsArray.push(body.company);
         }
 
-        var query = 'SELECT * FROM cards WHERE '+selectArray.join(' AND ')+' ORDER BY id LIMIT 1';
+        const where = ' WHERE ' + selectArray.join( ' AND ');
+
+        const query = 'select c.* from cards c, transh t' + where + ' ORDER BY id LIMIT 1';
+        // var query = 'SELECT * FROM cards WHERE '+selectArray.join(' AND ')+' ORDER BY id LIMIT 1';
         var params = paramsArray;
 
         db.query(query, params, (err, rows)=>{

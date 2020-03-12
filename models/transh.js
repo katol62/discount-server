@@ -73,8 +73,8 @@ var Transh = {
     },
 
     createTransh: (body, done)=> {
-        var query = 'INSERT INTO transh (start, count, owner) VALUES (?, ?, ?)';
-        var params = [body.start, body.count, body.owner];
+        var query = 'INSERT INTO transh (start, count, owner, external) VALUES (?, ?, ?, ?)';
+        var params = [body.start, body.count, body.owner, body.external=='on'?'1':'0'];
         db.query(query, params, (err, rows)=>{
             if (err) {
                 return (done(err));
@@ -84,9 +84,10 @@ var Transh = {
     },
 
     updateTransh: (body, done)=> {
-        var owner = (body.admin && body.admin!='')?body.admin:body.owner;
-        var query = 'UPDATE transh set owner=? WHERE id = ?';
-        var params = [owner, body.id];
+        const owner = (body.admin && body.admin!='')?body.admin:body.owner;
+        const external = body.external=='on'?'1':'0';
+        const query = 'UPDATE transh set owner=?, external=? WHERE id = ?';
+        const params = [owner, external, body.id];
         db.query(query, params, (err, rows)=>{
             if (err) {
                 return (done(err));
@@ -115,7 +116,7 @@ var Transh = {
     },
 
     getTransh: (id, done)=>{
-        var query = 'SELECT t.id, t.owner, t.count, c.card_nb, c.type, c.status, c.lifetime, c.servicetime, c.company_id, c.test FROM cards c JOIN transh t on c.transh=t.id WHERE t.id = ? ORDER BY c.id LIMIT 1';
+        var query = 'SELECT t.id, t.owner, t.external, t.count, c.card_nb, c.type, c.status, c.lifetime, c.servicetime, c.company_id, c.test FROM cards c JOIN transh t on c.transh=t.id WHERE t.id = ? ORDER BY c.id LIMIT 1';
         db.query(query, [id], (err, rows)=>{
             if (err) {
                 return (done(err));

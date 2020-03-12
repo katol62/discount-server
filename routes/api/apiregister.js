@@ -11,12 +11,25 @@ var Card = require('./../../models/card');
 var locale = require('./../../misc/locale');
 var dict = locale[config.locale];
 
+var checkCard = (req, res, next) => {
+    Card.checkAvailableCards((err, rows)=>{
+        if (err) {
+            return res.status(500).json({success: false, message:err.message});
+        }
+        if (rows.count === 0) {
+            return res.status(404).json({success: false, message:'No cards available'});
+        }
+        next();
+    });
+};
+
 
 router.get('/', (req, res, next)=>{
     return res.status(404).json({ success: false, message: 'Method not allowed' });
 });
 
-router.post('/', (req, res, next)=> {
+
+router.post('/', checkCard, (req, res, next)=> {
 
     if (!req.body.softcode) {
         return res.status(500).json({success: false, message:'Parameters missing'});

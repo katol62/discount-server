@@ -581,11 +581,12 @@ router.post('/transhes/create', (req, res, next)=> {
             res.redirect('/cards/transhes');
             return;
         }
-        var start = rows[0].ai;
-        var count = req.body.count;
-        var owner = (req.body.admin && req.body.admin != '') ? req.body.admin : req.body.owner;
+        const start = rows[0].ai;
+        const count = req.body.count;
+        const external = req.body.external ? req.body.external : '0';
+        const owner = (req.body.admin && req.body.admin != '') ? req.body.admin : req.body.owner;
 
-        var body = {start: start, count: count, owner: owner};
+        var body = {start: start, count: count, owner: owner, external: external};
 
         Transh.createTransh(body, (err, rows)=>{
             if (err) {

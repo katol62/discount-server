@@ -30,6 +30,12 @@ block content
 
                     +formSelect('type', dict.labels.label_card_type, types)
 
+                    .form-group
+                        .form-check.form-check-inline
+                            label.form-check-label
+                                input#guest.form-check-input(type='checkbox', name='external' )
+                                |  #{dict.labels.label_transh_external}
+
 
                     button.btn.btn-primary(type='submit') #{dict.labels.label_create}
 

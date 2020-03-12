@@ -19,12 +19,14 @@ block content
                                 tr(class='th-users')
                                     th= dict.labels.label_transh_start
                                     th= dict.labels.label_transh_count
+                                    th= dict.labels.label_transh_external
                                     th= dict.labels.label_actions
                             tbody
                                 each item, i in items
                                     tr
                                         td #{item.number}
                                         td #{item.count}
+                                        td #{item.external == '1' ? dict.labels.label_yes : dict.labels.label_no}
                                         td(class="col-md-2")
                                             +link('', '/cards/transhes/' + item.id + '/edit', 'glyphicon glyphicon-edit', '', dict.labels.label_update)
                                             | &nbsp;&nbsp;
