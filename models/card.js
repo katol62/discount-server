@@ -417,14 +417,14 @@ var Card = {
             if (now>exp_date_discount) {
                 overdue = true;
             }
-            if (now => exp_date_pass) {
-                let expire = require('moment')(card.date_pass_update).add(1, 'days');
-                if (now > expire) {
-                    if (card.pass_count + 1 > card.pass && card.pass_total >= Number(card.passCount)) {
-                        overdue = true;
-                    }
-                }
-            }
+            // if (now => exp_date_pass) {
+            //     let expire = require('moment')(card.date_pass_update).add(1, 'days');
+            //     if (now > expire) {
+            //         if (card.pass_count + 1 > card.pass && card.pass_total >= Number(card.passCount)) {
+            //             overdue = true;
+            //         }
+            //     }
+            // }
             // if (now>exp_date_discount && now>exp_date_pass) {
             //     //both expired
             //     overdue = true;
