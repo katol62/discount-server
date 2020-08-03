@@ -239,7 +239,7 @@ module.exports = {
             "visit_card_activated":"Карта уже активирована",
             "visit_card_not_allowed":"Карта не разрешена для прохода",
             "visit_card_tariff_error":"Тариф привязан к другой карте",
-            "visit_card_tariff_type_error":"Тип тарифа не соответствует типа карты",
+            "visit_card_tariff_type_error":"Тип тарифа не соответствует типу карты",
             "visits_not_found": "Проходы не найдены",
             "visits_card_already_passed": "Карта уже использовалась на данном терминале",
             "visits_card_pass_count_exceded": "Количество проходов превышено",

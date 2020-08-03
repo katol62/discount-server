@@ -478,6 +478,10 @@ var Card = {
             }
 
         } else {
+            // do not allow discount cards to use pass terminals
+            if (card.pass === 0) {
+                return done(null, {success: false, message: dict.messages.visit_card_tariff_type_error})
+            }
             if (!card.date_pass) {
                 query = 'update cards set pass_total = ?, date_pass = ?, date_pass_update = ? where id = ?';
                 params = [(card.pass_total + 1), body.created, body.created, card.id];
@@ -647,7 +651,7 @@ var Card = {
             }
 
             if (rows.length == 0) {
-                return done({status:'error', message: 'Cards now available'});
+                return done({status:'error', message: 'Cards not available'});
             }
             var card = rows[0];
             var updated = require('moment')().format('YYYY-MM-DD HH:mm:ss');
