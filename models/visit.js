@@ -268,6 +268,50 @@ var Visit = {
         })
     },
 
+    getTotalCompCount: (user, dstart, dend, card, done)=> {
+        let query = 'select v.id from visit v';
+        let params = [];
+        let whereArray = [];
+
+        if (user.role === 'admin' || user.role === 'cashier') {
+            query = 'select v.id, ' +
+                'v.terminal, t.company, r.company from visit v ' +
+                'left join terminal t on v.terminal=t.id ' +
+                'left join reference r on t.company=r.company ';
+            whereArray.push('r.user=?');
+            params.push(user.id);
+        }
+        if (user.role === 'partner') {
+            whereArray.push('v.card in (select id from cards where owner = ?)');
+            whereArray.push('v.type = "discount"');
+            params.push(user.id);
+        }
+        if (dstart != '' ) {
+            whereArray.push('v.date >= ?');
+            params.push(dstart);
+        }
+        if (dend != '' ) {
+            whereArray.push('v.date <= ?');
+            params.push(dend);
+        }
+        if (card != '' ) {
+            whereArray.push('v.card = (select id from cards where card_nb = ?)');
+            params.push(card);
+        }
+
+        query += whereArray.length ? ' where ' + whereArray.join(' and ') : '';
+        console.log(query);
+        console.log(params);
+
+        db.query(query, params, (err, rows)=>{
+            if (err) {
+                return done(err);
+            }
+            done(null, rows.length);
+        })
+    },
+
+
     getListWithCompany: (user, offset, limit, dstart, dend, done)=> {
         let params = [limit, offset];
         let query =
@@ -421,7 +465,94 @@ var Visit = {
             done(null, rows);
         })
 
+    },
+
+    getUpdatedListForJournal: (user, offset, limit, dstart, dend, card, done)=> {
+        // let params = [limit, offset];
+        let params = [];
+        let whereArray = [];
+        let query =
+            'select v.*, ' +
+            ' ter.name as terminalName, ' +
+            ' tar.name as tariffName, ' +
+            ' tar.discount, ' +
+            ' tar.discountUnit as discountUnit, ' +
+            ' tar.price as totalPrice,' +
+            ' tar.discountType, ' +
+            ' ter.company as terminalCompany, ' +
+            ' c.card_nb as cardNumber, ' +
+            ' cm.name as companyName,' +
+            ' cm.id as companyId,' +
+            ' u.email from visit v' +
+            ' left join terminal ter on v.terminal=ter.id' +
+            ' left join company cm on ter.company=cm.id' +
+            ' left join tariff tar on v.tariff=tar.id' +
+            ' left join cards c on v.card=c.id' +
+            ' left join users u on v.user=u.id';
+
+        if (user.role == 'admin' || user.role == 'cashier') {
+            query =
+                'select v.*, ' +
+                'ter.name as terminalName, ' +
+                ' tar.name as tariffName, ' +
+                ' tar.discount, ' +
+                ' tar.discountUnit as discountUnit, ' +
+                ' tar.price as totalPrice,' +
+                ' tar.discountType, ' +
+                ' ter.company as terminalCompany, ' +
+                ' c.card_nb as cardNumber, ' +
+                ' r.company as refCompany, ' +
+                ' cm.name as companyName,' +
+                ' cm.id as companyId,' +
+                ' u.email from visit v' +
+                ' left join terminal ter on v.terminal=ter.id' +
+                ' left join reference r on ter.company=r.company ' +
+                ' left join company cm on ter.company=cm.id' +
+                ' left join tariff tar on v.tariff=tar.id' +
+                ' left join cards c on v.card=c.id' +
+                ' left join users u on v.user=u.id';
+            whereArray.push('r.user = ?');
+            params.push(user.id);
+        }
+
+        if (user.role === 'partner') {
+            whereArray.push('v.card in (select id from cards where owner = ?)');
+            whereArray.push('v.type = "discount"');
+            params.push(user.id);
+        }
+        if (dstart != '' ) {
+            whereArray.push('v.date >= ?');
+            params.push(dstart);
+        }
+        if (dend != '' ) {
+            whereArray.push('v.date <= ?');
+            params.push(dend);
+        }
+        if (card != '') {
+            whereArray.push('v.card = (select id from cards where card_nb = ?)');
+            params.push(card);
+        }
+
+        query += whereArray.length ? ' where ' + whereArray.join(' and ') : '';
+
+        query +=' order by v.date DESC' +
+            ' LIMIT ? OFFSET ?';
+        params.push(limit);
+        params.push(offset);
+
+        if (user.role == 'admin' || user.role == 'cashier') {
+            params.unshift(user.id);
+        }
+
+        db.query(query, params, (err, rows)=>{
+            if (err) {
+                return done(err);
+            }
+            done(null, rows);
+        })
+
     }
+
 
 };
 

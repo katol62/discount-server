@@ -529,6 +529,11 @@ var clearDateFields = ()=> {
 
 var reloadFields = () => {
     let query = [];
+    let cardNb = $('#cardNb').val();
+    if (cardNb != '')
+    {
+        query.push('cardNb='+cardNb);
+    }
     let start = $('#dstart').val();
     if (start != '')
     {

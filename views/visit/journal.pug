@@ -7,7 +7,7 @@ block content
             div.col-lg-4.col-lg-offset-4.col-md-6.col-md-offset-3.col-sm-12
                 h2= dict.titles.visits
         div.row
-            div.col-lg-6.margin-top.text-left
+            div.col-lg-3.margin-top.text-left
                 div.btn-group
                     button.btn.btn-primary.dropdown-toggle(type='button', data-toggle='dropdown', aria-haspopup='true', aria-expanded='false')
                         = dict.titles.visits_report
@@ -27,6 +27,8 @@ block content
                             li
                                 a(onclick='journalToPdf("pass", "detailed");return false;' style='cursor:pointer')
                                     = dict.titles.visits_report_pass_detailed
+            div.col-lg-3.margin-top.text-right
+                input.form-control(id='cardNb' type='number', name='cardNb', placeholder=dict.labels.label_card_number value=cardNb)
             div.col-lg-4.margin-top.text-right
                 #datepicker.input-group.input-daterange
                     input.form-control(id='dstart' type='text', name='start' value=dstart placeholder=dict.labels.label_start_date)

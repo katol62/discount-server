@@ -1970,11 +1970,15 @@ router.get('/journal', (req, res, next)=>{
     req.session.validate_error = null;
     let dstart = req.query.dstart ? req.query.dstart : '';
     let dend = req.query.dend ? req.query.dend : '';
+    let cardNb = req.query.cardNb ? req.query.cardNb : '';
 
     console.log('dstart='+dstart);
     console.log('dend='+dend);
 
     let queryarray = [];
+    if (cardNb != '') {
+        queryarray.push(cardNb);
+    }
     let dstartfull = '';
     let dendfull = '';
     if (dstart != '') {
@@ -1989,8 +1993,9 @@ router.get('/journal', (req, res, next)=>{
     querystr += queryarray.join('&');
 
     console.log(dstartfull + ' == ' + dendfull);
+    console.log(cardNb);
 
-    Visit.getTotalCount(req.session.user, dstartfull, dendfull, (err, result)=> {
+    Visit.getTotalCompCount(req.session.user, dstartfull, dendfull, cardNb, (err, result)=> {
         if (err) {
             req.session.error = 'Company error: '+err.message;
             return res.redirect('/companies/journal'+querystr);
@@ -2001,7 +2006,7 @@ router.get('/journal', (req, res, next)=>{
         var pagen = req.query.page ? Number(req.query.page) : 1;
         var offset = (pagen-1)*limit;
 
-        Visit.getListForJournal(req.session.user, offset, limit, dstartfull, dendfull,(err, rows)=>{
+        Visit.getUpdatedListForJournal(req.session.user, offset, limit, dstartfull, dendfull, cardNb, (err, rows)=>{
             if (err) {
                 session_error = 'Visit error: '+err.message;
                 return res.redirect('/companies/journal'+querystr);
@@ -2026,6 +2031,7 @@ router.get('/journal', (req, res, next)=>{
                 items: rows,
                 account: req.session.user,
                 dstart: dstart,
+                cardNb: cardNb,
                 dend: dend,
                 message: session_message,
                 page: pageObj,
